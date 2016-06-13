@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @Path("/teacher_service")
 public class TeacherService {
     
-	
 	@Path("/hello")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
