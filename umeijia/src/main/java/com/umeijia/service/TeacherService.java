@@ -18,6 +18,6 @@ public class TeacherService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
 	
-		return "welcom to UMJ server... xiao峰峰";
+		return "welcom to UMJ server... xiao小峰峰";
 	}
 }
