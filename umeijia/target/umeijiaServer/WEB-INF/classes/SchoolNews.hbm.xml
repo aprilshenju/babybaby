@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private String title;
+	private String description;
+	private String image_urls;
+	private Date date;
+	private long teacher_id;  // 老师发布的新闻
+	private long school_id;
+	-->
+
+	<class name="com.umeijia.vo.SchoolNews" table="t_schoolnews">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="title" column="title"></property>	
+		<property name="description" column="description"></property>
+		<property name="image_urls" column="image_urls" ></property>		
+		<property name="date" column="date" ></property>		
+           <property name="teacher_id" column="teacher_id"></property>   
+		 <many-to-one name="school_id" class="com.umeijia.vo.Kindergarten" column="garten_id"></many-to-one>      
+	</class>
+	
+	
+	
+</hibernate-mapping>

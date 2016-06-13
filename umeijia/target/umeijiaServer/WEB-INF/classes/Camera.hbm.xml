@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private String ip_url;
+	private String description;
+	private String manufactory;
+	private String type;
+	private String state;
+	private String thumb_path; //缩略图路径
+	private Date begin,end;
+	-->
+
+	<class name="com.umeijia.vo.Camera" table="t_camera">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="ip_url" column="ip_url"></property>	
+		<property name="description" column="description"></property>	
+		<property name="manufactory" column="manufactory"></property>   
+		<property name="type" column="type" ></property>		
+		<property name="state" column="state"></property>   
+		<property name="thumb_path" column="thumb_path"></property>   
+		<property name="begin" column="begin" ></property>		
+		<property name="end" column="end"></property> 
+		<property name="is_public" column="is_public"></property> 
+		<property name="video_url" column="video_url"></property> 
+		
+          
+    	<many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id"></many-to-one>  
+        <many-to-one name="garten_id" class="com.umeijia.vo.Kindergarten" column="garten_id"></many-to-one>       
+                    
+	</class>
+	
+	
+	
+</hibernate-mapping>

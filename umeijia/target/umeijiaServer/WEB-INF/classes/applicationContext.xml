@@ -1,0 +1,87 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:component-scan base-package="com.umeijia.*" />
+	<context:annotation-config/>
+
+ <!-- 	 <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mappingLocations">
+            <list>
+                <value>classpath:/User.hbm.xml</value>
+                <value>classpath:/DownloadRecords.hbm.xml</value>
+                <value>classpath:/Image.hbm.xml</value>
+                <value>classpath:/CreditsRecords.hbm.xml</value>               
+            </list>
+        </property>
+        <property name="configLocation">
+            <value>classpath:/hibernate.cfg.xml</value>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>            
+                <prop key="hibernate.current_session_context_class">thread</prop>
+       		  <prop key="current_session_context_class">thread</prop>
+            </props>
+        </property>
+    </bean>  
+	    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager"> 
+			<property name="sessionFactory"> 
+			<ref local="sessionFactory" /> 
+			</property> 
+		</bean>  -->
+    
+   <!--  
+	<bean id="userdao" class="com.me.db_locker2.dao.Userdao">
+		<property name="jdbcTemplate">
+			<ref local="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="imagedao" class="com.me.db_locker2.dao.Imagedao">
+		<property name="jdbcTemplate">
+			<ref local="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="dwonloadrecordsdao" class="com.me.db_locker2.dao.DownloadRecordsdao">
+		<property name="jdbcTemplate">
+			<ref local="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="creditsrecordsdao" class="com.me.db_locker2.dao.CreditsRecordsdao">
+		<property name="jdbcTemplate">
+			<ref local="jdbcTemplate" />
+		</property>
+	</bean>
+ -->
+
+
+<!--  	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>  -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://121.199.78.235:3306/umj_server</value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>zRqafryLPc5tVTQ3</value>
+		</property>
+	</bean>
+</beans>
