@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private Date log_date;
+	private int user_type; // 用户身份类型
+	private long user_id; //用户id，agent或administrator的id
+	private String op_type; // 操作类型
+	private String op_content; // 操作类容 
+	private String op_object; //操作对象 ，添加的幼儿园的id，摄像头的id
+	-->
+
+	<class name="com.umeijia.vo.DailyLog" table="t_dailylog">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="log_date" column="log_date"></property>	
+		<property name="user_type" column="user_type"></property>
+		<property name="user_id" column="user_id" ></property>		
+		<property name="op_type" column="op_type" ></property>		
+        <property name="op_content" column="op_content"></property> 
+		<property name="op_object" column="op_object"></property>            
+	</class>
+	
+	
+	
+</hibernate-mapping>

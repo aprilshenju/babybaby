@@ -90,6 +90,8 @@ public class Teacher {
 	public void setIs_leader(boolean is_leader) {
 		this.is_leader = is_leader;
 	}
+	
+	//测试提交——ly
 
 
 }

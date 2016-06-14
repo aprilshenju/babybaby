@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private Date date;
+	private int period;
+	private String image_path;
+	private long stu_id;
+	private long class_id;
+	private String state; //签到状态
+	-->
+
+	<class name="com.umeijia.vo.CheckinRecords" table="t_checkinrecords">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="date" column="date"></property>	
+		<property name="period" column="period"></property>
+		<property name="image_path" column="image_path" ></property>		
+		<property name="state" column="state"></property>   
+
+
+           <!-- 这个需要关联么？ -->
+          <property name="stu_id" column="stu_id"></property> 
+          <property name="class_id"  column="class_id"></property> 
+                    
+	</class>
+	
+	
+	
+</hibernate-mapping>
