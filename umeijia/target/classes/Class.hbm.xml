@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+private long id;
+	private String name;
+	private long school_id;
+	private Set<Long> stu_ids;
+	private Set<Long> camera_ids;
+	private Set<Long> teacher_ids;
+	private Set<Long> homework_ids;
+	private Set<Long> checkin_ids;
+	private String course_schedule; //课程表
+	private String teachers_contacts; //联系方式
+	private String parents_contacts; // 家长联系方式
+	-->
+
+	<class name="com.umeijia.vo.Class" table="t_class">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="name" column="name"></property>	
+<!-- 		<property name="school_id" column="school_id"></property>	 -->
+		<property name="course_schedule" column="course_schedule"></property>   
+		<property name="teachers_contacts" column="teachers_contacts" ></property>		
+		<property name="parents_contacts" column="parents_contacts"></property>   
+
+          
+         <set name="stu_ids" cascade="all" inverse="true" lazy="false">                
+                <key column="class_id"></key>   
+                <one-to-many class="com.umeijia.vo.Student"/>   
+         </set>  
+         
+          <set name="camera_ids" cascade="all" inverse="true" lazy="false">                
+                <key column="class_id"></key>   
+                <one-to-many class="com.umeijia.vo.Camera"/>   
+         </set>  
+         
+         <set name="teacher_ids" cascade="save-update" inverse="true" lazy="false">                
+                <key column="class_id"></key>   
+                <many-to-many class="com.umeijia.vo.Teacher"/>   
+         </set>      
+                 
+         <!--   <set name="homework_ids" cascade="all" inverse="true" lazy="false">                
+                <key column="class_id"></key>   
+                <many-to-many class="com.umeijia.vo.HomeWork"/>   
+         </set>   
+
+		 <set name="checkin_ids" cascade="all" inverse="true" lazy="false">                
+                <key column="class_id"></key>   
+                <one-to-many class="com.umeijia.vo.CheckinRecords"/>   
+         </set>    
+         
+          <set name="activity_ids" cascade="all" inverse="true" lazy="false">                
+                <key column="class_id"></key>   
+                <many-to-many class="com.umeijia.vo.ClassActivity"/>   
+         </set>   
+-->
+		 <set name="food_ids" cascade="all" inverse="true" lazy="false">                
+                <key column="class_id"></key>   
+                <one-to-many class="com.umeijia.vo.FoodRecord"/>   
+         </set>    
+         
+           <many-to-one name="school_id" class="com.umeijia.vo.Kindergarten" column="garten_id"></many-to-one> 
+          
+	</class>
+	
+	
+	
+</hibernate-mapping>

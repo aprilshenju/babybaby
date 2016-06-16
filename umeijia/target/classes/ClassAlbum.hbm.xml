@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private long class_id;
+	private Date date; 
+	private String image_name;
+	-->
+
+	<class name="com.umeijia.vo.ClassAlbum" table="t_classalbum">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="class_id" column="class_id"></property>	
+		<property name="date" column="date"></property>
+		<property name="image_name" column="image_name" ></property>		         
+	</class>
+	
+	
+	
+</hibernate-mapping>

@@ -3,7 +3,6 @@ com\umeijia\vo\CheckinRecords.class
 com\umeijia\vo\Class.class
 com\umeijia\util\LockerLogger.class
 com\umeijia\vo\Parents.class
-com\umeijia\service\UMeijiaService.class
 com\umeijia\vo\ClassActivity.class
 com\umeijia\vo\Teacher.class
 com\umeijia\vo\HomeWork.class
