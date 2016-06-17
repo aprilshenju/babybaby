@@ -1,13 +1,11 @@
 package com.umeijia.service;
 
+import org.springframework.stereotype.Service;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
 
 // ip/umeijia/teacher_service/hello
 
@@ -20,6 +18,6 @@ public class TeacherService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
 		
-		return "welcom to UMJ server... xiao小峰峰";
+		return "welcom to UMJ server... 小峰峰";
 	}
 }
