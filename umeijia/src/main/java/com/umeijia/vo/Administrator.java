@@ -54,4 +54,22 @@ public class Administrator {
 	}
 	private String email;
 	private Date regist_date;
+
+	public Date getExpire() {
+		return expire;
+	}
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public void setExpire(Date expire) {
+		this.expire = expire;
+	}
+
+	private Date expire; // 过期时间
+	private String token; //登陆token
 }

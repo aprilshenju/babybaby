@@ -45,7 +45,7 @@
          </set>    
            <set name="news_ids" cascade="all" inverse="true" lazy="true">                
                 <key column="garten_id"></key>   
-                <one-to-many class="com.umeijia.vo.SchoolNews"/>   
+                <one-to-many class="com.umeijia.vo.GartenNews"/>
          </set> 
         
           <many-to-one name="agent_id" class="com.umeijia.vo.Agent" column="agent_id" cascade="delete"></many-to-one>

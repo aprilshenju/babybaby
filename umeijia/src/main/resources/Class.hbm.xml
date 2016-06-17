@@ -26,7 +26,8 @@ private long id;
 <!-- 		<property name="school_id" column="school_id"></property>	 -->
 		<property name="course_schedule" column="course_schedule"></property>   
 		<property name="teachers_contacts" column="teachers_contacts" ></property>		
-		<property name="parents_contacts" column="parents_contacts"></property>   
+		<property name="parents_contacts" column="parents_contacts"></property>
+        <property name="class_introduction" column="class_introduction"></property>
 
           
          <set name="stu_ids" cascade="all" inverse="true" lazy="true">                
@@ -39,7 +40,7 @@ private long id;
                 <one-to-many class="com.umeijia.vo.Camera"/>   
          </set>  
          
-         <set name="teacher_ids" cascade="save-update"  lazy="true" table="t_teacher_class">
+         <set name="teacher_ids" cascade="save-update"  lazy="true"  inverse="false" table="t_teacher_class">
                 <key column="class_id"></key>
                 <many-to-many column="teacher_id" class="com.umeijia.vo.Teacher"/>
          </set>      

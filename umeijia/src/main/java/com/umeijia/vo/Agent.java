@@ -64,9 +64,35 @@ public class Agent {
 	private String name;
 	private String pwd_md;
 	private String phone_num;
+
+	public Set<Long> getGarten_ids() {
+		return garten_ids;
+	}
+
+	public void setGarten_ids(Set<Long> garten_ids) {
+		this.garten_ids = garten_ids;
+	}
+
 	private Set<Long> garten_ids;
 	private String company_name;
 	private float price_rate;
-	
+
+	public Date getExpire() {
+		return expire;
+	}
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public void setExpire(Date expire) {
+		this.expire = expire;
+	}
+
+	private Date expire; // 过期时间
+	private String token; //登陆token
 	
 }

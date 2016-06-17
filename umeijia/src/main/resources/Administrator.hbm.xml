@@ -21,7 +21,9 @@
 		<property name="name" column="name" ></property>		
 		<property name="is_super" column="is_super" ></property>		
 		<property name="email" column="email" unique="true" not-null="true"></property>
-		<property name="regist_date" column="regist_date"></property>            
+		<property name="regist_date" column="regist_date"></property>
+		<property name="expire" column="expire"></property>
+		<property name="token" column="token"></property>
 	</class>
 	
 	

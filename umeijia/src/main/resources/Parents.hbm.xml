@@ -37,7 +37,8 @@
 		<property name="email" column="email" unique="true"></property>
 		<property name="regist_date" column="regist_date"></property>
 		<property name="relationship" column="relationship"></property>
-
+		<property name="vip_start" column="vip_start"></property>
+		<property name="vip_end" column="vip_end"></property>
 		
          <many-to-one name="stu_id" class="com.umeijia.vo.Student" column="stu_id" cascade="delete"></many-to-one>
           

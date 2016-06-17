@@ -39,7 +39,7 @@ public class FoodRecordDao {
             return null;
         }
     }
-    
+
     public boolean addFoodRecord(FoodRecord food) {
         boolean result=false;
         Session session = DBManager.getSession();

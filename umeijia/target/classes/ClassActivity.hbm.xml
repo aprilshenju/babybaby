@@ -33,7 +33,10 @@
 		<property name="participate_num" column="participate_num"></property>	
 		<property name="baby_ids" column="baby_ids"></property>
 		<property name="parent_ids" column="parent_ids" ></property>
-		<property name="participate_time" column="participate_time"></property>		         
+		<property name="participate_time" column="participate_time"></property>
+		<property name="contact_name" column="contact_name"></property>
+		<property name="contact_phone" column="contact_phone"></property>
+
 	</class>
 	
 	

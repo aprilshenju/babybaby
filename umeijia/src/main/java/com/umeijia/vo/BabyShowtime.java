@@ -58,18 +58,6 @@ public class BabyShowtime {
 	public void setComments_ids(Set<Long> comments_ids) {
 		this.comments_ids = comments_ids;
 	}
-	public boolean isIs_showtime() {
-		return is_showtime;
-	}
-	public void setIs_showtime(boolean is_showtime) {
-		this.is_showtime = is_showtime;
-	}
-	public boolean isIs_footprints() {
-		return is_footprints;
-	}
-	public void setIs_footprints(boolean is_footprints) {
-		this.is_footprints = is_footprints;
-	}
 	private long id;
 	private String description;
 	private String image_urls;
@@ -79,7 +67,6 @@ public class BabyShowtime {
 	private long teacher_id; // 动态是由 老师或家长发布的
 	private long parent_id;
 	private Set<Long> comments_ids;
-	private boolean is_showtime,is_footprints;
 
 	// 足迹要按月查历史。。。？？？
 

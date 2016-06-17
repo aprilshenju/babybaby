@@ -99,7 +99,31 @@ public class Parents {
 	private String avatar_path;
 	private long stu_id;
 	private long class_id; // 暂时无法支持多个学生？
+
+	public void setVip_start(Date vip_start) {
+		this.vip_start = vip_start;
+	}
+
+	public void setVip_end(Date vip_end) {
+		this.vip_end = vip_end;
+	}
+
 	private boolean is_vip;
+
+	public Date getVip_end() {
+		return vip_end;
+	}
+
+	public boolean is_vip() {
+		return is_vip;
+	}
+
+	public Date getVip_start() {
+		return vip_start;
+	}
+
+	private  Date vip_start;
+	private Date vip_end; //会员开始结束时间
 	private int gender;
 	private String email;
 	private Date regist_date;

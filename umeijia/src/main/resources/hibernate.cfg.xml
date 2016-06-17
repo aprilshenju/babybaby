@@ -49,7 +49,7 @@
 				
 		<mapping resource="BabyKnowledge.hbm.xml"/> 
 		<mapping resource="BabyShowtime.hbm.xml"/> 
-		  <mapping resource="SchoolNews.hbm.xml"/> 
+		  <mapping resource="GartenNews.hbm.xml"/>
 		    <mapping resource="CheckinCard.hbm.xml"/> 
 		     <mapping resource="ShowtimeComments.hbm.xml"/> 
 		      <mapping resource="ClassActivity.hbm.xml"/> 
@@ -58,6 +58,7 @@
 			   <mapping resource="DailyLog.hbm.xml"/> 
 				<mapping resource="FoodRecord.hbm.xml"/> 
 				<mapping resource="Message.hbm.xml"/>
+		<mapping resource="BabyFootPrint.hbm.xml"/>
 		<mapping resource="FeedBack.hmb.xml"/>
 		<mapping resource="BasicInfo.hbm.xml"/>
 

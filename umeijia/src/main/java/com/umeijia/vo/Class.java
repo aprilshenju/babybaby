@@ -70,15 +70,23 @@ public class Class {
 	private Set<Long> checkin_ids;
 	private Set<Long> activity_ids; //班级活动集合
 */
-	
-/*	public Set<Long> getActivity_ids() {
-		return activity_ids;
-	}
-	public void setActivity_ids(Set<Long> activity_ids) {
-		this.activity_ids = activity_ids;
-	}
-*/
 
+	public String getClass_introduction() {
+		return class_introduction;
+	}
+
+	public void setClass_introduction(String class_introduction) {
+		this.class_introduction = class_introduction;
+	}
+
+	/*	public Set<Long> getActivity_ids() {
+                return activity_ids;
+            }
+            public void setActivity_ids(Set<Long> activity_ids) {
+                this.activity_ids = activity_ids;
+            }
+        */
+	private  String class_introduction;
 	private String course_schedule; //课程表
 	private String teachers_contacts; //联系方式
 	private String parents_contacts; // 家长联系方式

@@ -28,11 +28,13 @@
 		<property name="class_id" column="class_id" ></property>		
         <property name="baby_id" column="baby_id"></property> 
 		<property name="teacher_id" column="teacher_id"></property>    
-		<property name="parent_id" column="parent_id" ></property>		
-        <property name="deleteFlag" column="deleteFlag"></property> 
+		<property name="parent_id" column="parent_id" ></property>
 		<property name="is_showtime" column="is_showtime"></property> 
-		<property name="is_footprints" column="is_footprints"></property>  
-		 <set name="comments_ids" cascade="all" inverse="true" lazy="false">                
+		<property name="is_footprints" column="is_footprints"></property>
+		<property name="valid" column="valid"></property>
+		<property name="show_type" column="show_type"></property>
+
+		<set name="comments_ids" cascade="all" inverse="true" lazy="true">
                 <key column="showtime_id"></key>   
                 <one-to-many class="com.umeijia.vo.ShowtimeComments"/>   
          </set>           

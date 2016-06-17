@@ -99,5 +99,32 @@ public class Student {
 	private Set<Long> parents_ids;
 	private Date entrance_date;
 
+	public Date getExpire() {
+		return expire;
+	}
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public void setExpire(Date expire) {
+		this.expire = expire;
+	}
+
+	private Date expire; // 过期时间
+	private String token; //登陆token
+
+	public boolean is_vip() {
+		return is_vip;
+	}
+
+	public void setIs_vip(boolean is_vip) {
+		this.is_vip = is_vip;
+	}
+
+	private  boolean is_vip; //登陆就得反查
 
 }

@@ -29,26 +29,26 @@
 		
 		<property name="leader_id" column="leader_id"></property>
           
-         <set name="camera_ids" cascade="all" inverse="true" lazy="false">                
+         <set name="camera_ids" cascade="all" inverse="true" lazy="true">                
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Camera"/>   
          </set>  
          
-          <set name="class_ids" cascade="all" inverse="true" lazy="false">                
+          <set name="class_ids" cascade="all" inverse="true" lazy="true">                
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Class"/>   
          </set>  
          
-         <set name="teacher_ids" cascade="all" inverse="true" lazy="false">                
+         <set name="teacher_ids" cascade="all" inverse="true" lazy="true">                
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Teacher"/>   
          </set>    
-           <set name="news_ids" cascade="all" inverse="true" lazy="false">                
+           <set name="news_ids" cascade="all" inverse="true" lazy="true">                
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.SchoolNews"/>   
          </set> 
         
-          <many-to-one name="agent_id" class="com.umeijia.vo.Agent" column="agent_id"></many-to-one>     
+          <many-to-one name="agent_id" class="com.umeijia.vo.Agent" column="agent_id" cascade="delete"></many-to-one>
                     
 	</class>
 	

@@ -16,9 +16,8 @@
 	private int gender;
 	private boolean allow_app_push; // 家长是否允许app推送
 	private boolean allow_wechat_push; // 家长是否允许微信推送 
-	
-		private String email;
-	private Date regist_date;
+
+
 	
 	-->
 
@@ -26,7 +25,7 @@
 		<id name="id" column="id">
 			<generator class="native"></generator>
 		</id>
-		<property name="phone_num" column="phone_num"></property>	
+		<property name="phone_num" column="phone_num" unique="true" not-null="true"></property>
 		<property name="pwd_md" column="pwd_md"></property>
 		<property name="name" column="name" ></property>		
 		
@@ -35,11 +34,13 @@
 		<property name="is_vip" column="is_vip"></property> 
 		<property name="gender" column="gender"></property>   
 		
-		<property name="email" column="email"></property> 
-		<property name="regist_date" column="regist_date"></property> 
+		<property name="email" column="email" unique="true"></property>
+		<property name="regist_date" column="regist_date"></property>
+		<property name="relationship" column="relationship"></property>
+		<property name="vip_start" column="vip_start"></property>
+		<property name="vip_end" column="vip_end"></property>
 		
-		
-         <many-to-one name="stu_id" class="com.umeijia.vo.Student" column="stu_id"></many-to-one>
+         <many-to-one name="stu_id" class="com.umeijia.vo.Student" column="stu_id" cascade="delete"></many-to-one>
           
   		<property name="allow_app_push" column="allow_app_push"></property>  
   		<property name="allow_wechat_push" column="allow_wechat_push"></property>  

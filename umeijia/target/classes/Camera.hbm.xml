@@ -19,20 +19,19 @@
 		<id name="id" column="id">
 			<generator class="native"></generator>
 		</id>
-		<property name="ip_url" column="ip_url"></property>	
+		<property name="ip_url" column="ip_url" unique="true" not-null="true"></property>
 		<property name="description" column="description"></property>	
 		<property name="manufactory" column="manufactory"></property>   
 		<property name="type" column="type" ></property>		
 		<property name="state" column="state"></property>   
-		<property name="thumb_path" column="thumb_path"></property>   
-		<property name="begin" column="begin" ></property>		
-		<property name="end" column="end"></property> 
+		<property name="thumb_path" column="thumb_path"></property>
+		<property name="active_period" column="active_period"></property>
 		<property name="is_public" column="is_public"></property> 
 		<property name="video_url" column="video_url"></property> 
 		
           
-    	<many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id"></many-to-one>  
-        <many-to-one name="garten_id" class="com.umeijia.vo.Kindergarten" column="garten_id"></many-to-one>       
+    	<many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
+        <many-to-one name="garten_id" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
                     
 	</class>
 	

@@ -21,12 +21,14 @@
 		<property name="date" column="date"></property>	
 		<property name="period" column="period"></property>
 		<property name="image_path" column="image_path" ></property>		
-		<property name="state" column="state"></property>   
-
+		<property name="state" column="state"></property>
+		<property name="temperature"  column="temperature"></property>
 
            <!-- 这个需要关联么？ -->
           <property name="stu_id" column="stu_id"></property> 
-          <property name="class_id"  column="class_id"></property> 
+          <property name="class_id"  column="class_id"></property>
+
+
                     
 	</class>
 	

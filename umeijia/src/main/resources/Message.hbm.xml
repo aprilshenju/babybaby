@@ -25,7 +25,9 @@
 		<property name="teacher_id" column="teacher_id" ></property>		
            <property name="parents_id" column="parents_id"></property> 
 		<property name="send_direction" column="send_direction"></property>  
-		<property name="date" column="date"></property>           
+		<property name="date" column="date"></property>
+		<property name="read_or_not" column="read_or_not"></property>
+
 	</class>
 	
 	

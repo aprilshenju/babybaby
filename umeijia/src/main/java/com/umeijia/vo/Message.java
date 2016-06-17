@@ -62,4 +62,15 @@ public class Message {
 	private long parents_id;
 	private int send_direction; // 1-家长发给老师的，2-老师发给家长的
 	private Date date;
+
+	public boolean isRead_or_not() {
+		return read_or_not;
+	}
+
+	public void setRead_or_not(boolean read_or_not) {
+		this.read_or_not = read_or_not;
+	}
+
+	private boolean read_or_not;
+
 }
