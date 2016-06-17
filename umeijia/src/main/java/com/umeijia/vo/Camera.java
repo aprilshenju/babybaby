@@ -51,18 +51,6 @@ public class Camera {
 	public void setThumb_path(String thumb_path) {
 		this.thumb_path = thumb_path;
 	}
-	public String getBegin() {
-		return begin;
-	}
-	public void setBegin(String begin) {
-		this.begin = begin;
-	}
-	public String getEnd() {
-		return end;
-	}
-	public void setEnd(String end) {
-		this.end = end;
-	}
 	public String getVideo_url() {
 		return video_url;
 	}
@@ -87,13 +75,31 @@ public class Camera {
 	private String video_url;
 	private String description;
 	private String manufactory;
-	private long class_id;
+	private long class_id;  //公公摄像头 classid为 -1
 	private long garten_id;
 
-	private String type;
+	private String type;  //班级私有还是 公开摄像头
+
 	private String state;
 	private String thumb_path; //缩略图路径
-	private String begin,end;
+
+	public String getActive_period() {
+		return active_period;
+	}
+
+	public void setActive_period(String active_period) {
+		this.active_period = active_period;
+	}
+
+	private String active_period;
 	private boolean is_public; // 是否是公共摄像头 
-	
+
+	/**
+	 * 根据时间段判断，是否在线开放
+	 * **/
+	public boolean isActive(){
+
+			return  true;
+	}
+
 }

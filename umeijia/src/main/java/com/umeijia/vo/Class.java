@@ -70,7 +70,6 @@ public class Class {
 	private Set<Long> checkin_ids;
 	private Set<Long> activity_ids; //班级活动集合
 */
-	private Set<Long> food_ids; //班级饮食集合 
 	
 /*	public Set<Long> getActivity_ids() {
 		return activity_ids;
@@ -79,14 +78,7 @@ public class Class {
 		this.activity_ids = activity_ids;
 	}
 */
-	public Set<Long> getFood_ids() {
-		return food_ids;
-	}
-	public void setFood_ids(Set<Long> food_ids) {
-		this.food_ids = food_ids;
-	}
 
-	
 	private String course_schedule; //课程表
 	private String teachers_contacts; //联系方式
 	private String parents_contacts; // 家长联系方式

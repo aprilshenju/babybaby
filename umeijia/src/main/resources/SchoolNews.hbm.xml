@@ -23,7 +23,7 @@
 		<property name="image_urls" column="image_urls" ></property>		
 		<property name="date" column="date" ></property>		
            <property name="teacher_id" column="teacher_id"></property>   
-		 <many-to-one name="school_id" class="com.umeijia.vo.Kindergarten" column="garten_id"></many-to-one>      
+		 <many-to-one name="school_id" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
 	</class>
 	
 	

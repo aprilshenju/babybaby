@@ -17,7 +17,7 @@
 		</id>
 		<property name="class_id" column="class_id"></property>	
 		<property name="date" column="date"></property>
-		<property name="image_name" column="image_name" ></property>		         
+		<property name="image_names" column="image_names" ></property>
 	</class>
 	
 	

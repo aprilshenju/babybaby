@@ -1,7 +1,6 @@
 package com.umeijia.vo;
 
 import java.util.Date;
-import java.util.List;
 
 public class ClassActivity {
 
@@ -90,5 +89,26 @@ public class ClassActivity {
 	private String parent_ids; //参与人的家长
 	private String participate_time; //参与时间
 
+	public void setContact_name(String contact_name) {
+		this.contact_name = contact_name;
+	}
+
+	public String getContact_name() {
+		return contact_name;
+	}
+
+	private String contact_name; // 活动联系人
+
+	public String getContact_phone() {
+		return contact_phone;
+	}
+
+	public void setContact_phone(String contact_phone) {
+		this.contact_phone = contact_phone;
+	}
+
+	private String contact_phone; // 联系电话
+
+	/// 删除班级活动，可以将 班级id设为 -1
 
 }

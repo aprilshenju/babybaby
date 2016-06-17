@@ -1,7 +1,6 @@
 package com.umeijia.vo;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 public class BabyShowtime {
@@ -59,12 +58,6 @@ public class BabyShowtime {
 	public void setComments_ids(Set<Long> comments_ids) {
 		this.comments_ids = comments_ids;
 	}
-	public boolean isDeleteFlag() {
-		return deleteFlag;
-	}
-	public void setDeleteFlag(boolean deleteFlag) {
-		this.deleteFlag = deleteFlag;
-	}
 	public boolean isIs_showtime() {
 		return is_showtime;
 	}
@@ -85,9 +78,28 @@ public class BabyShowtime {
 	private long baby_id;
 	private long teacher_id; // 动态是由 老师或家长发布的
 	private long parent_id;
-	private Set<Long> comments_ids; 
-	private boolean deleteFlag;
+	private Set<Long> comments_ids;
 	private boolean is_showtime,is_footprints;
 
+	// 足迹要按月查历史。。。？？？
+
+	public int getShow_type() {
+		return show_type;
+	}
+
+	public void setShow_type(int show_type) {
+		this.show_type = show_type;
+	}
+
+	private int show_type; // 1 图文 2 视频
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	private boolean valid; //是否删除
 	
 }

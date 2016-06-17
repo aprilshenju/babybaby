@@ -1,7 +1,6 @@
 package com.umeijia.vo;
 
 import java.util.Date;
-import java.util.Set;
 
 public class Parents {
 
@@ -87,6 +86,16 @@ public class Parents {
 	private String phone_num;
 	private String pwd_md;
 	private String name;
+
+	public String getRelationship() {
+		return relationship;
+	}
+
+	public void setRelationship(String relationship) {
+		this.relationship = relationship;
+	}
+
+	private String relationship;
 	private String avatar_path;
 	private long stu_id;
 	private long class_id; // 暂时无法支持多个学生？

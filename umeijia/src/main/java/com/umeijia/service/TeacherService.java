@@ -7,6 +7,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 // ip/umeijia/teacher_service/hello
 
 @Service
@@ -17,7 +19,7 @@ public class TeacherService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
-	
+		
 		return "welcom to UMJ server... xiao小峰峰";
 	}
 }

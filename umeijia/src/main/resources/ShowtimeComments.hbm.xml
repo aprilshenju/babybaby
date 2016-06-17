@@ -22,8 +22,11 @@
 		<property name="user_id" column="user_id" ></property>	
 		<property name="response_user_type" column="response_user_type"></property>		
         <property name="response_user_id" column="response_user_id"></property>            	
-		<property name="date" column="date" ></property>	 
-		<many-to-one name="showtime_id" class="com.umeijia.vo.BabyShowtime" column="showtime_id"></many-to-one>      
+		<property name="date" column="date" ></property>
+		<property name="comment_content" column="comment_content" ></property>
+		<property name="say_good" column="say_good" ></property>
+
+		<many-to-one name="showtime_id" class="com.umeijia.vo.BabyShowtime" column="showtime_id" cascade="delete"></many-to-one>
 	</class>
 	
 	

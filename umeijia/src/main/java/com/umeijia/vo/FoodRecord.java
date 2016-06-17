@@ -1,9 +1,5 @@
 package com.umeijia.vo;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
 /**
  * 根据时间段和class_id更新 饮食记录。只维持最新的。
  * ***/
@@ -15,11 +11,11 @@ public class FoodRecord {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
+	public String getRecords() {
+		return records;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setRecords(String records) {
+		this.records = records;
 	}
 	public long getClass_id() {
 		return class_id;
@@ -39,25 +35,15 @@ public class FoodRecord {
 	public void setImage_urls(String image_urls) {
 		this.image_urls = image_urls;
 	}
-	public Date getDate() {
-		return date;
-	}
-	public void setDate(Date date) {
-		this.date = date;
-	}
-	public int getTime_area() {
-		return time_area;
-	}
-	public void setTime_area(int time_area) {
-		this.time_area = time_area;
-	}
 	private long id;
-	private String name;
+	private String records;
 	private long class_id;
 	private long school_id;
 	private String image_urls;
-	private Date date; //哪一天
-	private int time_area; //什么时候的食物，早餐、中餐、晚餐
+	// 分号隔离每天的数据，逗号隔离每顿的数据
+
+/*	private Date date; //哪一天*/
+/*	private int time_area; //什么时候的食物，早餐、中餐、晚餐*/
 	
 	
 }

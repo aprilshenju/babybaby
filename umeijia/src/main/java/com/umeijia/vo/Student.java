@@ -58,7 +58,46 @@ public class Student {
 	private String nick_name;
 	private int gender;
 	private int age;
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public String getAvatar_path() {
+		return avatar_path;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
+	public void setAvatar_path(String avatar_path) {
+		this.avatar_path = avatar_path;
+	}
+	private Date birthday;
+	private int height;
+	private int weight;
+	private String avatar_path;
+
 	private long class_id;
 	private Set<Long> parents_ids;
 	private Date entrance_date;
+
+
 }

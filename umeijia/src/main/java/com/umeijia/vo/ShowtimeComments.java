@@ -55,4 +55,25 @@ public class ShowtimeComments {
 	private int response_user_type; //回复目标用户类型
 	private long response_user_id; //回复目标用户的id
 	private Date date;
+
+	public String getComment_content() {
+		return comment_content;
+	}
+
+	public void setComment_content(String comment_content) {
+		this.comment_content = comment_content;
+	}
+
+	private String comment_content;
+
+	public boolean isSay_good() {
+		return say_good;
+	}
+
+	public void setSay_good(boolean say_good) {
+		this.say_good = say_good;
+	}
+
+	private  boolean say_good; // 是否点赞
+
 }

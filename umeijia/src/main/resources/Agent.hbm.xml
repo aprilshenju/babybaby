@@ -20,7 +20,7 @@
 		</id>
 		<property name="name" column="name"></property>	
 		<property name="pwd_md" column="pwd_md"></property>
-		<property name="phone_num" column="phone_num" ></property>		
+		<property name="phone_num" column="phone_num" unique="true" not-null="true" ></property>
 		<property name="company_name" column="company_name" ></property>		
         <property name="price_rate" column="price_rate" ></property>
            <property name="email" column="email"></property> 

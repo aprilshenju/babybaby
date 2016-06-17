@@ -45,6 +45,15 @@ public class CheckinRecords {
 	public void setState(String state) {
 		this.state = state;
 	}
+
+	public float getTemperature() {
+		return temperature;
+	}
+
+	public void setTemperature(float temperature) {
+		this.temperature = temperature;
+	}
+
 	private long id;
 	private Date date;
 	private int period;
@@ -52,4 +61,6 @@ public class CheckinRecords {
 	private long stu_id;
 	private long class_id;
 	private String state; //签到状态
+
+	private float temperature; //体温数据
 }

@@ -24,15 +24,15 @@ public class ClassAlbum {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-	public String getImage_name() {
-		return image_name;
+	public String getImage_names() {
+		return image_names;
 	}
-	public void setImage_name(String image_name) {
-		this.image_name = image_name;
+	public void setImage_names(String image_names) {
+		this.image_names = image_names;
 	}
 	private long id;
 	private long class_id;
 	private Date date; 
-	private String image_name;
+	private String image_names; //一天所有的照片内容 分号分离
 	
 }
