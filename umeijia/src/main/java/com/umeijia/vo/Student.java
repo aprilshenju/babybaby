@@ -59,6 +59,16 @@ public class Student {
 	private int gender;
 	private int age;
 
+	public Boolean getIs_vip() {
+		return is_vip;
+	}
+
+	public void setIs_vip(Boolean is_vip) {
+		this.is_vip = is_vip;
+	}
+
+	private  Boolean is_vip; //登陆就得反查
+
 	public Date getBirthday() {
 		return birthday;
 	}
@@ -116,15 +126,5 @@ public class Student {
 
 	private Date expire; // 过期时间
 	private String token; //登陆token
-
-	public boolean is_vip() {
-		return is_vip;
-	}
-
-	public void setIs_vip(boolean is_vip) {
-		this.is_vip = is_vip;
-	}
-
-	private  boolean is_vip; //登陆就得反查
 
 }

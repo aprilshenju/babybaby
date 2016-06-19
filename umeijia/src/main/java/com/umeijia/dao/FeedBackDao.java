@@ -19,7 +19,7 @@ import java.util.List;
  *
  */
 @Scope("prototype")
-@Repository("babyknowledgedao")
+@Repository("feedbackdao")
 public class FeedBackDao {
     public FeedBackDao(){
 

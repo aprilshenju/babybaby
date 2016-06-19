@@ -3,12 +3,6 @@ package com.umeijia.vo;
 import java.util.Set;
 
 public class Kindergarten {
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
-	}
 	public String getName() {
 		return name;
 	}
@@ -69,7 +63,16 @@ public class Kindergarten {
 	public void setLeader_id(long leader_id) {
 		this.leader_id = leader_id;
 	}
-	private long id;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	private Long id;
 	private String name;
 	private String addr;
 	private String contact_num;

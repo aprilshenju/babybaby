@@ -18,12 +18,14 @@
 		<id name="id" column="id">
 			<generator class="native"></generator>
 		</id>
-		<property name="title" column="title"></property>	
+		<property name="title" column="title"></property>
+		<property name="summary" column="summary"></property>
 		<property name="description" column="description"></property>
 		<property name="image_urls" column="image_urls" ></property>		
-		<property name="date" column="date" ></property>		
+		<property name="publishDate" column="publishDate"></property>
+		<property name="modifyDate" column="modifyDate"></property>
            <property name="teacher_id" column="teacher_id"></property>   
-		 <many-to-one name="school_id" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+		 <many-to-one name="kindergarten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
 	</class>
 	
 	

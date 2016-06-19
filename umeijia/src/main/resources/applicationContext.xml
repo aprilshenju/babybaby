@@ -36,8 +36,7 @@
 			<ref local="sessionFactory" /> 
 			</property> 
 		</bean>  -->
-    
-   <!--  
+   <!--
 	<bean id="userdao" class="com.me.db_locker2.dao.Userdao">
 		<property name="jdbcTemplate">
 			<ref local="jdbcTemplate" />
