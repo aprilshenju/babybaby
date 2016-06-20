@@ -30,10 +30,14 @@ public class RunService {
     @Autowired
     @Qualifier("administratordao")
     private AdministratorDao administratordao;
-
     @Autowired
     @Qualifier("agentdao")
     private AgentDao agentdao;
+
+
+
+
+
 
 
     @Path("/hello")
