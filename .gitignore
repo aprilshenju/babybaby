@@ -6,6 +6,7 @@
 /umeijia/target/
 /umeijia/.classpath
 /umeijia/.project
+/umeijia/bin/
 *.iml
 
 # Compiled source #
