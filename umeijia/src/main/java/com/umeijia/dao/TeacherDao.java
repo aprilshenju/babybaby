@@ -1,6 +1,7 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
+import com.umeijia.util.MD5;
 import com.umeijia.vo.Teacher;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,16 +73,96 @@ public class TeacherDao {
         }
     }
 
-    public boolean loginCheck(String phoneNumber, String passwd) {
+    public boolean verifyToken(long id,String tkn){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("select count(*) from Teacher as u where u.phone_num=\'%s\' and u.pwd_md=\'%s\'",phoneNumber,passwd);
+        String sql = String.format("select u.expire from Teacher as u where u.id=%ld and u.token=\'%s\'",id,tkn);
         Query query = session.createQuery(sql);
-        int count = ((Long) query.uniqueResult()).intValue();
+        List list = query.list();
         session.close();
-        return count > 0;
-
+        if(list.size()>0){
+            Date dead=(Date)list.get(0);
+            Date now=new Date();
+            if(dead.after(now)){
+                return  true;  //还有效
+            }
+        }
+        return  false;
     }
+    /**
+     * 登陆成功，设置tkn和有效时间
+     * **/
+    public boolean loginCheckByPhone(String phoneNumber, String passwd) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Teacher as u where u.phone_num=\'%s\'", phoneNumber);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        if(list.size()>0) {
+            Teacher teacher = (Teacher) list.get(0);
+            if(passwd.equals(teacher.getPwd_md())){ //密码匹配
+                try {
+                    session.setFlushMode(FlushMode.AUTO);
+                    session.beginTransaction();
+                    teacher.setToken(MD5.GetSaltMD5Code(teacher.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
+                    Date now=new Date();
+                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    teacher.setExpire(dead);
+                    session.update(teacher);
+                    session.flush();
+                    session.getTransaction().commit();
+                    result=true;
+                } catch (HibernateException e) {
+                    e.printStackTrace();
+                    session.getTransaction().rollback();
+                    result=false;
+                } finally{
+                    session.close();
+                    return result;
+                }
+            }
+        }
+        return  false;
+    }
+
+    /**
+     * 登陆成功，设置tkn和有效时间
+     * **/
+    public boolean loginCheckByEmail(String email, String passwd) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Teacher as u where u.email=\'%s\'", email);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        if(list.size()>0) {
+            Teacher teacher = (Teacher) list.get(0);
+            if(passwd.equals(teacher.getPwd_md())){ //密码匹配
+                try {
+                    session.setFlushMode(FlushMode.AUTO);
+                    session.beginTransaction();
+                    teacher.setToken(MD5.GetSaltMD5Code(teacher.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
+                    Date now=new Date();
+                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    teacher.setExpire(dead);
+                    session.update(teacher);
+                    session.flush();
+                    session.getTransaction().commit();
+                    result=true;
+                } catch (HibernateException e) {
+                    e.printStackTrace();
+                    session.getTransaction().rollback();
+                    result=false;
+                } finally{
+                    session.close();
+                    return result;
+                }
+            }
+        }
+        return  false;
+    }
+
 
     public boolean addTeacher(Teacher teacher) {
         boolean result=false;

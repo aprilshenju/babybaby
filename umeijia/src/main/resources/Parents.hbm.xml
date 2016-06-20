@@ -43,7 +43,10 @@
          <many-to-one name="student" class="com.umeijia.vo.Student" column="stu_id" cascade="delete"></many-to-one>
           
   		<property name="allow_app_push" column="allow_app_push"></property>  
-  		<property name="allow_wechat_push" column="allow_wechat_push"></property>  
+  		<property name="allow_wechat_push" column="allow_wechat_push"></property>
+
+		<property name="expire" column="expire"></property>
+		<property name="token" column="token"></property>
                     
 	</class>
 	

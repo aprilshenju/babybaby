@@ -1,6 +1,7 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
+import com.umeijia.util.MD5;
 import com.umeijia.vo.Parents;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -66,7 +68,7 @@ public class ParentsDao {
             return null;
         }
     }
-
+/*
     public boolean loginCheck(String phoneNumber, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
@@ -76,7 +78,98 @@ public class ParentsDao {
         session.close();
         return count > 0;
 
+    }*/
+
+    public boolean verifyToken(long id,String tkn){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("select u.expire from Parents as u where u.id=%ld and u.token=\'%s\'",id,tkn);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            Date dead=(Date)list.get(0);
+            Date now=new Date();
+            if(dead.after(now)){
+                return  true;  //还有效
+            }
+        }
+        return  false;
     }
+    /**
+     * 登陆成功，设置tkn和有效时间
+     * **/
+    public boolean loginCheckByPhone(String phoneNumber, String passwd) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Parents as u where u.phone_num=\'%s\'", phoneNumber);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        if(list.size()>0) {
+            Parents parents = (Parents) list.get(0);
+            if(passwd.equals(parents.getPwd_md())){ //密码匹配
+                try {
+                    session.setFlushMode(FlushMode.AUTO);
+                    session.beginTransaction();
+                    parents.setToken(MD5.GetSaltMD5Code(parents.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
+                    Date now=new Date();
+                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    parents.setExpire(dead);
+                    session.update(parents);
+                    session.flush();
+                    session.getTransaction().commit();
+                    result=true;
+                } catch (HibernateException e) {
+                    e.printStackTrace();
+                    session.getTransaction().rollback();
+                    result=false;
+                } finally{
+                    session.close();
+                    return result;
+                }
+            }
+        }
+        return  false;
+    }
+
+    /**
+     * 登陆成功，设置tkn和有效时间
+     * **/
+    public boolean loginCheckByEmail(String email, String passwd) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Parents as u where u.email=\'%s\'", email);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        if(list.size()>0) {
+            Parents parents = (Parents) list.get(0);
+            if(passwd.equals(parents.getPwd_md())){ //密码匹配
+                try {
+                    session.setFlushMode(FlushMode.AUTO);
+                    session.beginTransaction();
+                    parents.setToken(MD5.GetSaltMD5Code(parents.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
+                    Date now=new Date();
+                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    parents.setExpire(dead);
+                    session.update(parents);
+                    session.flush();
+                    session.getTransaction().commit();
+                    result=true;
+                } catch (HibernateException e) {
+                    e.printStackTrace();
+                    session.getTransaction().rollback();
+                    result=false;
+                } finally{
+                    session.close();
+                    return result;
+                }
+            }
+        }
+        return  false;
+    }
+
 
     public boolean addParents(Parents parents) {
         boolean result=false;

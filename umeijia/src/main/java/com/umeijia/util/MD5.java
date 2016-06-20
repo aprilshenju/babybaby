@@ -10,6 +10,7 @@ public class MD5 {
     private final static String[] strDigits = { "0", "1", "2", "3", "4", "5",
             "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
 
+    private static String salt="bs345!39f&8fo*nby!q4zb7xi9tp0ahi";
     public MD5() {
     }
     // 返回形式为数字跟字符串
@@ -43,7 +44,8 @@ public class MD5 {
         return sBuffer.toString();
     }
 
-    public static String GetMD5Code(String strObj) {
+    public static String GetSaltMD5Code(String strObj) {
+        strObj+=salt; //添加盐值
         String resultString = null;
         try {
             resultString = new String(strObj);
@@ -57,9 +59,9 @@ public class MD5 {
     }
 
     public static void main(String[] args) {
-        System.out.println(MD5.GetMD5Code("123456"));
+      /*  System.out.println(MD5.GetMD5Code("123456"));
         System.out.println(MD5.GetMD5Code("654321"));
         System.out.println(MD5.GetMD5Code("353253"));
-        System.out.println(MD5.GetMD5Code("981234"));
+        System.out.println(MD5.GetMD5Code("981234"));*/
     }
 }

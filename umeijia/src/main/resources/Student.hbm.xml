@@ -36,8 +36,6 @@ private long id;
 		<property name="avatar_path" column="avatar_path" ></property>
 
 		<property name="entrance_date" column="entrance_date" ></property>
-		<property name="expire" column="expire"></property>
-		<property name="token" column="token"></property>
 		<property name="vip" column="vip"></property>
 
 
