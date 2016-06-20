@@ -114,8 +114,25 @@ public class Student {
 		this.vip = vip;
 	}
 
-	private  boolean vip; //登陆就得反查
+	public Date getVip_start() {
+		return vip_start;
+	}
 
+	public Date getVip_end() {
+		return vip_end;
+	}
+
+	public void setVip_start(Date vip_start) {
+		this.vip_start = vip_start;
+	}
+
+	public void setVip_end(Date vip_end) {
+		this.vip_end = vip_end;
+	}
+
+	private  boolean vip; //登陆就得反查
+	private  Date vip_start;
+	private Date vip_end; //会员开始结束时间
 
 
 

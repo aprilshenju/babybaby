@@ -28,7 +28,7 @@ public class FeedBackDao {
     public FeedBack queryFeedBack(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from FeedBack as fb where fb.id=%ld",id);
+        String sql = String.format("from FeedBack as fb where fb.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

@@ -28,7 +28,7 @@ public class CheckinRecordsDao {
     public CheckinRecords queryCheckinRecords(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from CheckinRecords as cr where cr.id=%ld",id);
+        String sql = String.format("from CheckinRecords as cr where cr.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

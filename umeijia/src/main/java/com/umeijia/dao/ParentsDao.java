@@ -27,7 +27,7 @@ public class ParentsDao {
     public Parents queryParents(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Parents as u where u.id=%ld", id);
+        String sql = String.format("from Parents as u where u.id=%d", id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -83,7 +83,7 @@ public class ParentsDao {
     public boolean verifyToken(long id,String tkn){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("select u.expire from Parents as u where u.id=%ld and u.token=\'%s\'",id,tkn);
+        String sql = String.format("select u.expire from Parents as u where u.id=%d and u.token=\'%s\'",id,tkn);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -99,8 +99,7 @@ public class ParentsDao {
     /**
      * 登陆成功，设置tkn和有效时间
      * **/
-    public boolean loginCheckByPhone(String phoneNumber, String passwd) {
-        boolean result=false;
+    public Parents loginCheckByPhone(String phoneNumber, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Parents as u where u.phone_num=\'%s\'", phoneNumber);
@@ -119,25 +118,23 @@ public class ParentsDao {
                     session.update(parents);
                     session.flush();
                     session.getTransaction().commit();
-                    result=true;
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                    result=false;
+                    parents=null;
                 } finally{
                     session.close();
-                    return result;
+                    return parents;
                 }
             }
         }
-        return  false;
+        return  null;
     }
 
     /**
      * 登陆成功，设置tkn和有效时间
      * **/
-    public boolean loginCheckByEmail(String email, String passwd) {
-        boolean result=false;
+    public Parents loginCheckByEmail(String email, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Parents as u where u.email=\'%s\'", email);
@@ -156,18 +153,17 @@ public class ParentsDao {
                     session.update(parents);
                     session.flush();
                     session.getTransaction().commit();
-                    result=true;
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                    result=false;
+                    parents=null;
                 } finally{
                     session.close();
-                    return result;
+                    return parents;
                 }
             }
         }
-        return  false;
+        return null;
     }
 
 
@@ -220,32 +216,6 @@ public class ParentsDao {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
             String hql=String.format("update Parents parents set parents.name=\'%s\' where parents.phone_num=\'%s\'",name,phoneNumber);
-            Query queryupdate=session.createQuery(hql);
-            int ret=queryupdate.executeUpdate();
-            session.flush();
-            session.getTransaction().commit();
-            if(ret>=0)
-                result=true;
-        } catch (HibernateException e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-            result=false;
-        } finally{
-            session.close();
-            return result;
-        }
-    }
-    public boolean correctParentsVip(String phoneNumber,boolean is_vip) {
-        boolean result=false;
-        Session session = DBManager.getSession();
-        int vip=0;
-        if(is_vip)
-            vip=1;
-
-        try {
-            session.setFlushMode(FlushMode.AUTO);
-            session.beginTransaction();
-            String hql=String.format("update Parents parents set parents.is_vip=%d where parents.phone_num=\'%s\'",vip,phoneNumber);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -341,7 +311,7 @@ public class ParentsDao {
     public List<Parents> queryParentssByGarten(long gartenID) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Parents as u where u.garten_id=%ld",gartenID);
+        String sql = String.format("from Parents as u where u.garten_id=%d",gartenID);
         Query query = session.createQuery(sql);
         List list =query.list();
         List<Parents> parentss=new ArrayList<Parents>();

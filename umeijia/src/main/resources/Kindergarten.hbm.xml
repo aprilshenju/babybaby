@@ -28,7 +28,14 @@
 		<property name="description" column="description" ></property>		
 		
 		<property name="leader_id" column="leader_id"></property>
-          
+        <property name="create_date" column="create_date"></property>
+
+        <property name="teacher_presence_imgs" column="teacher_presence_imgs"></property>
+        <property name="garten_instrument_imgs" column="garten_instrument_imgs"></property>
+        <property name="garten_presence_imgs" column="garten_presence_imgs"></property>
+        <property name="leader_wishes" column="leader_wishes"></property>
+
+
          <set name="cameras" cascade="all" inverse="true" lazy="true">
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Camera"/>   
@@ -49,7 +56,10 @@
          </set> 
         
           <many-to-one name="agent" class="com.umeijia.vo.Agent" column="agent_id" cascade="delete"></many-to-one>
-                    
+
+
+
+
 	</class>
 	
 	

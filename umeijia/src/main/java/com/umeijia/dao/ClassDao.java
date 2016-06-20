@@ -2,6 +2,7 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.Class;
+import com.umeijia.vo.Kindergarten;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -27,7 +28,7 @@ public class ClassDao {
     public Class queryClass(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Class as c where c.id=%ld", class_id);
+        String sql = String.format("from Class as c where c.id=%d", class_id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -43,7 +44,7 @@ public class ClassDao {
         String teacherContacts="";
         Session session = DBManager.getSession();
         session.clear();
-        String hql = String.format("select teachers_contacts from Class as c where c.id=%ld",class_id);
+        String hql = String.format("select c.teachers_contacts from Class as c where c.id=%d",class_id);
         Query query = session.createQuery(hql);
         //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
         List<Object> list = query.list();
@@ -60,7 +61,7 @@ public class ClassDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Class c set c.teachers_contacts=\'%s\' where c.id=%ld",teacherContacts,class_id);
+            String hql=String.format("update Class c set c.teachers_contacts=\'%s\' where c.id=%d",teacherContacts,class_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -81,7 +82,7 @@ public class ClassDao {
         String parentsContacts="";
         Session session = DBManager.getSession();
         session.clear();
-        String hql = String.format("select parents_contacts from Class as c where c.id=%ld",class_id);
+        String hql = String.format("select c.parents_contacts from Class as c where c.id=%d",class_id);
         Query query = session.createQuery(hql);
         //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
         List<Object> list = query.list();
@@ -98,7 +99,7 @@ public class ClassDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Class c set c.parents_contacts=\'%s\' where c.id=%ld",parentsContacts,class_id);
+            String hql=String.format("update Class c set c.parents_contacts=\'%s\' where c.id=%d",parentsContacts,class_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -115,19 +116,18 @@ public class ClassDao {
         }
     }
 
-    public long getSchoolID(long class_id){
-        long schoolID=-1;
+    public Kindergarten getGarten(long class_id){
+       Kindergarten garten=null;
         Session session = DBManager.getSession();
         session.clear();
-        String hql = String.format("select school_id from Class as c where c.id=%ld",class_id);
+        String hql = String.format("select c.garten from Class as c where c.id=%d",class_id);
         Query query = session.createQuery(hql);
         //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
         List<Object> list = query.list();
         if(list.size()>0){
-            schoolID=(Long) list.get(0);
+            garten=(Kindergarten) list.get(0);
         }
-        schoolID=-1;
-        return  schoolID;
+        return  garten;
     }
 
 

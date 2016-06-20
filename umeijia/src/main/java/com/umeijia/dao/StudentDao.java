@@ -23,7 +23,7 @@ public class StudentDao {
     public Student queryStudent(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Student as u where u.id=%ld", id);
+        String sql = String.format("from Student as u where u.id=%d", id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

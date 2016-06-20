@@ -37,7 +37,8 @@ private long id;
 
 		<property name="entrance_date" column="entrance_date" ></property>
 		<property name="vip" column="vip"></property>
-
+		<property name="vip_start" column="vip_start"></property>
+		<property name="vip_end" column="vip_end"></property>
 
 <!-- 		<property name="class_id" column="class_id"></property>  -->  
          

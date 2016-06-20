@@ -29,7 +29,7 @@ public class ClassAlbumDao {
     public ClassAlbum queryClassAlbum(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassAlbum as ca where ca.id=%ld ",id);
+        String sql = String.format("from ClassAlbum as ca where ca.id=%d ",id);
         Query query = session.createQuery(sql);
         List <ClassAlbum> list = query.list();
         session.close();
@@ -44,7 +44,7 @@ public class ClassAlbumDao {
     public List queryClassAlbumList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassAlbum as ca where ca.class_id=%ld order by ca.date desc",class_id);
+        String sql = String.format("from ClassAlbum as ca where ca.class_id=%d order by ca.date desc",class_id);
         Query query = session.createQuery(sql);
         List <ClassAlbum> list = query.list();
         session.close();

@@ -41,7 +41,12 @@
             <set name="classes" cascade="all"  lazy="true"  inverse="true" table="t_teacher_class">     <!-- class主控？？？ -->
                 <key column="teacher_id"></key>
                 <many-to-many column="class_id" class="com.umeijia.vo.Class"/>
-         </set>      
+         </set>
+
+		<set name="gartenNewses" cascade="all" lazy="true" inverse="true" table="t_schoolnews">
+		<key column="teacher_id"></key>
+		<one-to-many class="com.umeijia.vo.Teacher"></one-to-many>
+		</set>
          
           <many-to-one name="kindergarten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
                     

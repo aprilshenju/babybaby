@@ -30,16 +30,15 @@
 		<property name="name" column="name" ></property>		
 		
 		<property name="avatar_path" column="avatar_path" ></property>
-		<property name="class_id" column="class_id" ></property>		
-		<property name="is_vip" column="is_vip"></property> 
+		<property name="class_id" column="class_id" ></property>
+		<property name="garten_id" column="garten_id" ></property>
+
 		<property name="gender" column="gender"></property>   
 		
 		<property name="email" column="email" unique="true"></property>
 		<property name="regist_date" column="regist_date"></property>
 		<property name="relationship" column="relationship"></property>
-		<property name="vip_start" column="vip_start"></property>
-		<property name="vip_end" column="vip_end"></property>
-		
+
          <many-to-one name="student" class="com.umeijia.vo.Student" column="stu_id" cascade="delete"></many-to-one>
           
   		<property name="allow_app_push" column="allow_app_push"></property>  

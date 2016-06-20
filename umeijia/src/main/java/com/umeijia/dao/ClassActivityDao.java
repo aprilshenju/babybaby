@@ -28,7 +28,7 @@ public class ClassActivityDao {
     public ClassActivity queryClassActivity(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassActivity as ca where ca.id=%ld",id);
+        String sql = String.format("from ClassActivity as ca where ca.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -43,7 +43,7 @@ public class ClassActivityDao {
     public List queryOneClassActivitysList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassActivity as ca where ca.class_id=%ld order by ca.start_date desc",class_id);
+        String sql = String.format("from ClassActivity as ca where ca.class_id=%d order by ca.start_date desc",class_id);
         Query query = session.createQuery(sql);
         List <ClassActivity> list = query.list();
         session.close();

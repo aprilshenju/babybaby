@@ -3,25 +3,47 @@ package com.umeijia.vo;
 import java.util.Date;
 
 public class Parents {
-
-
-
-	private  Date vip_start;
-	private Date vip_end; //会员开始结束时间
 	private int gender;
 	private String email;
 	private Date regist_date;
-
 	private boolean allow_app_push; // 家长是否允许app推送
 	private boolean allow_wechat_push; // 家长是否允许微信推送
 	private Student student;
 	private long class_id; // 暂时无法支持多个学生？
+	private long garten_id;
 	private long id;
 	private String phone_num;
 	private String pwd_md;
 	private String name;
 	private String relationship;
+
+	public void setGarten_id(long garten_id) {
+		this.garten_id = garten_id;
+	}
+
 	private String avatar_path;
+
+	public long getGarten_id() {
+		return garten_id;
+	}
+
+	private Date expire; // 过期时间
+	private String token; //登陆token
+
+
+	public Parents(String phone,String email,String name,Student stu,long cla_id,String pwd,String relation,String avatar){
+		this.phone_num=phone;
+		this.email=email;
+		this.name=name;
+		this.student=stu;
+		this.class_id=cla_id;
+		this.pwd_md=pwd;
+		this.relationship=relation;
+		this.avatar_path=avatar;
+		regist_date=new Date();
+		expire=regist_date;
+		token="11";
+	}
 
 	public long getId() {
 		return id;
@@ -59,12 +81,6 @@ public class Parents {
 	public void setClass_id(long class_id) {
 		this.class_id = class_id;
 	}
-	public boolean isIs_vip() {
-		return is_vip;
-	}
-	public void setIs_vip(boolean is_vip) {
-		this.is_vip = is_vip;
-	}
 	public int getGender() {
 		return gender;
 	}
@@ -95,65 +111,30 @@ public class Parents {
 	public void setAllow_wechat_push(boolean allow_wechat_push) {
 		this.allow_wechat_push = allow_wechat_push;
 	}
-
-
 	public String getRelationship() {
 		return relationship;
 	}
-
 	public void setRelationship(String relationship) {
 		this.relationship = relationship;
 	}
-
-
-
 	public void setStudent(Student student) {
 		this.student = student;
 	}
-
 	public Student getStudent() {
 		return student;
 	}
-
-
-	public void setVip_start(Date vip_start) {
-		this.vip_start = vip_start;
-	}
-
-	public void setVip_end(Date vip_end) {
-		this.vip_end = vip_end;
-	}
-
-	private boolean is_vip;
-
-	public Date getVip_end() {
-		return vip_end;
-	}
-
-	public boolean is_vip() {
-		return is_vip;
-	}
-
-	public Date getVip_start() {
-		return vip_start;
-	}
-
 	public Date getExpire() {
 		return expire;
 	}
 	public String getToken() {
 		return token;
 	}
-
 	public void setToken(String token) {
 		this.token = token;
 	}
-
 	public void setExpire(Date expire) {
 		this.expire = expire;
 	}
 
-	private Date expire; // 过期时间
-	private String token; //登陆token
 
 }

@@ -24,7 +24,7 @@ public class GartenNewsDao {
     public GartenNews queryGartenNews(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from GartenNews as gnews where gnews.id=%ld",id);
+        String sql = String.format("from GartenNews as gnews where gnews.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -42,7 +42,7 @@ public class GartenNewsDao {
     public List<GartenNews> queryGartenNewss(long school_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from GartenNews as gnews where gnews.school_id=%ld order by gnews.date desc",school_id);
+        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d order by gnews.modifyDate desc",school_id);
         Query query = session.createQuery(sql);
         List <GartenNews> list = query.list();
         session.close();

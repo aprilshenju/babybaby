@@ -28,7 +28,7 @@ public class ClassNotificationDao {
     public ClassNotification queryClassNotification(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassNotification as ca where ca.id=%ld",id);
+        String sql = String.format("from ClassNotification as ca where ca.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -46,7 +46,7 @@ public class ClassNotificationDao {
     public List<ClassNotification> queryClassNotifications(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassNotification as ca where ca.class_id=%ld order by ca.date desc",class_id);
+        String sql = String.format("from ClassNotification as ca where ca.class_id=%d order by ca.date desc",class_id);
         Query query = session.createQuery(sql);
         List <ClassNotification> list = query.list();
         session.close();
@@ -81,7 +81,7 @@ public class ClassNotificationDao {
         String notificationSubscribers="";
         Session session = DBManager.getSession();
         session.clear();
-        String hql = String.format("select subscribers from ClassNotification as c where c.id=%ld",id);
+        String hql = String.format("select subscribers from ClassNotification as c where c.id=%d",id);
         Query query = session.createQuery(hql);
         //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
         List<Object> list = query.list();

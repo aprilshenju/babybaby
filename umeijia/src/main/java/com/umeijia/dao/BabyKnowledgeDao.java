@@ -28,7 +28,7 @@ public class BabyKnowledgeDao {
     public BabyKnowledge queryBabyKnowledge(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyKnowledge as knowledge where knowledge.id=%ld",id);
+        String sql = String.format("from BabyKnowledge as knowledge where knowledge.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

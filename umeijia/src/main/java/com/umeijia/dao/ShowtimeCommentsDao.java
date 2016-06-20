@@ -24,7 +24,7 @@ public class ShowtimeCommentsDao {
     public ShowtimeComments queryOneShowtimeComments(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ShowtimeComments as comment where comment.id=%ld",id);
+        String sql = String.format("from ShowtimeComments as comment where comment.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -43,7 +43,7 @@ public class ShowtimeCommentsDao {
     public List<ShowtimeComments> queryShowtimeComments(long showtime_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ShowtimeComments as comment where comment.showtime_id=%ld order by comment.date desc",showtime_id);
+        String sql = String.format("from ShowtimeComments as comment where comment.showtime.id=%d order by comment.date desc",showtime_id);
         Query query = session.createQuery(sql);
         List <ShowtimeComments> list = query.list();
         session.close();
