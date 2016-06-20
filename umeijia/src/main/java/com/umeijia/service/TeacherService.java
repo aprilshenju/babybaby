@@ -16,13 +16,13 @@ import java.io.OutputStream;
 @Service
 @Path("/teacher_service")
 public class TeacherService {
-    
-	
+
+
 	@Path("/hello")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
-	
+
 		return "welcom to UMJ server... xiao小峰峰";
 	}
 

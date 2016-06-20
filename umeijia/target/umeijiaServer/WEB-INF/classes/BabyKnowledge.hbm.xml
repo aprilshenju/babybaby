@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private String question;
+	private String answer;
+	private String url; // 可能会有跳转链接 
+	-->
+
+	<class name="com.umeijia.vo.BabyKnowledge" table="t_babyKnowledge">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="question" column="question"></property>	
+		<property name="answer" column="answer"></property>
+		<property name="url" column="url" ></property>		        
+	</class>
+	
+	
+	
+</hibernate-mapping>

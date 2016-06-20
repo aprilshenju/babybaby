@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+  private String company_name;
+    private  String contact;
+    private  String qq;
+    private String email;
+    private  String introduction;
+    private  String addr;
+	-->
+
+	<class name="com.umeijia.vo.BasicInfo" table="t_basicinfo">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="company_name" column="company_name"></property>
+		<property name="contact" column="contact"></property>
+		<property name="qq" column="qq" ></property>
+		<property name="email" column="email" ></property>
+		<property name="introduction" column="introduction"></property>
+		<property name="addr" column="addr"></property>
+	</class>
+	
+	
+	
+</hibernate-mapping>

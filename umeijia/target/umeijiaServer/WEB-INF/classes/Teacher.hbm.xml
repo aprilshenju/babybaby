@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private String name;
+	private String pwd_md;
+	private long garten_id;
+	private String phone_num;
+	private String description;
+	private Set<Long> class_ids;
+	private boolean is_leader;
+	string avatar_path;
+	private String email;
+	private Date regist_date;
+	
+	-->
+
+	<class name="com.umeijia.vo.Teacher" table="t_teacher">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="name" column="name"></property>	
+		<property name="avatar_path" column="avatar_path" ></property>
+		<property name="pwd_md" column="pwd_md"></property>	
+		<property name="phone_num" column="phone_num" unique="true"></property>
+		<property name="description" column="description" ></property>		
+		<property name="is_leader" column="is_leader"></property>   
+
+        <property name="email" column="email" unique="true" not-null="true"></property>
+		<property name="regist_date" column="regist_date"></property> 
+		<property name="wishes" column="wishes"></property>
+
+		<property name="expire" column="expire"></property>
+		<property name="token" column="token"></property>
+
+		
+            <set name="class_ids" cascade="all"  lazy="true"  inverse="true" table="t_teacher_class">     <!-- class主控？？？ -->
+                <key column="teacher_id"></key>
+                <many-to-many column="class_id" class="com.umeijia.vo.Class"/>
+         </set>      
+         
+          <many-to-one name="garten_id" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+                    
+	</class>
+	
+	
+	
+</hibernate-mapping>

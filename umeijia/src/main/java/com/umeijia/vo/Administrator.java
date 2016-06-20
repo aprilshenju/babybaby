@@ -72,4 +72,16 @@ public class Administrator {
 
 	private Date expire; // 过期时间
 	private String token; //登陆token
+
+	public  Administrator(String phone,String email,String pwd,String name,Date date,boolean super_root){
+			phone_num=phone;
+			this.email=email;
+			pwd_md=pwd;
+			this.name=name;
+			regist_date=date;
+			this.is_super=super_root;
+
+	}
+
+
 }

@@ -38,7 +38,7 @@ private long id;
 		<property name="entrance_date" column="entrance_date" ></property>
 		<property name="expire" column="expire"></property>
 		<property name="token" column="token"></property>
-		<property name="is_vip" column="is_vip"></property>
+		<property name="vip" column="vip"></property>
 
 
 <!-- 		<property name="class_id" column="class_id"></property>  -->  

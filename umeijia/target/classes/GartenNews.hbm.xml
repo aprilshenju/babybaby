@@ -14,7 +14,7 @@
 	private long school_id;
 	-->
 
-	<class name="com.umeijia.vo.SchoolNews" table="t_schoolnews">
+	<class name="com.umeijia.vo.GartenNews" table="t_schoolnews">
 		<id name="id" column="id">
 			<generator class="native"></generator>
 		</id>

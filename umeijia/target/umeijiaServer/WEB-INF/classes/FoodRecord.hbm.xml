@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+		private long id;
+	private String name;
+	private long class_id;
+	private long school_id;
+	private String image_thumb_urls;
+	private String image_urls;
+	private Date date; //哪一天
+	private int timeArea; //什么时候的食物，早餐、中餐、晚餐
+	-->
+
+	<class name="com.umeijia.vo.FoodRecord" table="t_foodrecord">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="records" column="records"></property>
+		<many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
+		<property name="school_id" column="school_id" ></property>				
+           <property name="image_urls" column="image_urls"></property> 
+
+	</class>
+	
+	
+	
+</hibernate-mapping>

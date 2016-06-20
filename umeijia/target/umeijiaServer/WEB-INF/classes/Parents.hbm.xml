@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private String phone_num;
+	private String pwd_md;
+	private String name;
+	private String avatar_path;
+	private long stu_ids;
+	private long class_id; // 暂时无法支持多个学生？
+	private boolean is_vip;
+	private int gender;
+	private boolean allow_app_push; // 家长是否允许app推送
+	private boolean allow_wechat_push; // 家长是否允许微信推送 
+
+
+	
+	-->
+
+	<class name="com.umeijia.vo.Parents" table="t_parents">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="phone_num" column="phone_num" unique="true" not-null="true"></property>
+		<property name="pwd_md" column="pwd_md"></property>
+		<property name="name" column="name" ></property>		
+		
+		<property name="avatar_path" column="avatar_path" ></property>
+		<property name="class_id" column="class_id" ></property>		
+		<property name="is_vip" column="is_vip"></property> 
+		<property name="gender" column="gender"></property>   
+		
+		<property name="email" column="email" unique="true"></property>
+		<property name="regist_date" column="regist_date"></property>
+		<property name="relationship" column="relationship"></property>
+		<property name="vip_start" column="vip_start"></property>
+		<property name="vip_end" column="vip_end"></property>
+		
+         <many-to-one name="stu_id" class="com.umeijia.vo.Student" column="stu_id" cascade="delete"></many-to-one>
+          
+  		<property name="allow_app_push" column="allow_app_push"></property>  
+  		<property name="allow_wechat_push" column="allow_wechat_push"></property>  
+                    
+	</class>
+	
+	
+	
+</hibernate-mapping>

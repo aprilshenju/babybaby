@@ -94,5 +94,17 @@ public class Agent {
 
 	private Date expire; // 过期时间
 	private String token; //登陆token
+
+	public Agent(String phone,String email,String pwd,String name,Date date,String company,float price){
+		phone_num=phone;
+		this.email=email;
+		pwd_md=pwd;
+		this.name=name;
+		regist_date=date;
+		company_name=company;
+		price_rate=price;
+
+	}
+
 	
 }

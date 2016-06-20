@@ -117,14 +117,18 @@ public class Student {
 	private Date expire; // 过期时间
 	private String token; //登陆token
 
-	public boolean is_vip() {
-		return is_vip;
+	public boolean isVip() {
+		return vip;
 	}
 
-	public void setIs_vip(boolean is_vip) {
-		this.is_vip = is_vip;
+	public void setVip(boolean vip) {
+		this.vip = vip;
 	}
 
-	private  boolean is_vip; //登陆就得反查
+	private  boolean vip; //登陆就得反查
+
+
+
+
 
 }
