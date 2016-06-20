@@ -108,6 +108,22 @@ public class BabyShowtimeDao {
         }
     }
 
+    /**
+     * 后续改为分页处理
+     * **/
+    public List<BabyShowtime> queryBabyShowtimesByClass(long class_id) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from BabyShowtime as ba where ba.class_id=%ld and ba.valid=1 order by ba.date desc",class_id);
+        Query query = session.createQuery(sql);
+        List <BabyShowtime> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
 
 /*    public boolean changeFootprint2Showtime(long fp_id) {
         boolean result=false;
