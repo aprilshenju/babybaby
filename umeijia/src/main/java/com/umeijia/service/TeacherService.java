@@ -48,14 +48,16 @@ public class TeacherService {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String test() {
-
-        return "welcome to umj server";
+        Student s = studentdao.queryStudent(1);
+        String teststr = s.getNick_name()+"  "+s.isVip();
+        return "welcome to umj server   "+teststr;
     }
 
 
     /***
      * 添加家长
-     * curl -X POST -H "Content-Type:application/json" -d {"phone":"15608036304","password":"123456","email":""} http://127.0.0.1/umeijiaServer/parents_service/login
+     * curl -X POST -H "Content-Type:application/json" -d {"phone":"13534456644","password":"134df","name":"ltt4aoshou","email":"12345@qq.com","class_id":"1","baby_id":"1","relation":"dad","avatar":"fdef.jpg","gender":"0"}
+     * http://127.0.0.1/umeijiaServer/teacher_service/addParents
      * **/
     @Path("/addParents")
     @POST

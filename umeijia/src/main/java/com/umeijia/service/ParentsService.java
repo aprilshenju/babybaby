@@ -35,7 +35,9 @@ public class ParentsService {
     @Produces(MediaType.TEXT_PLAIN)
     public String test2(){
 
-        return "welcom to UMJ parents service....";
+        Parents p = parentsdao.queryParents(1);
+        String s = p.getName()+p.isAllow_app_push()+"  "+p.isAllow_wechat_push();
+        return "welcom to UMJ parents service...."+s;
     }
 
         /***
