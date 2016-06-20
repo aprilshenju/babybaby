@@ -120,7 +120,7 @@ public class PublicService {
             int roleId = jobIn.getInt("roleId");
             if(!checkIdAndToken(roleType,headers)){
                 jobOut.put("resultCode",GlobalStatus.error.toString());
-                jobOut.put("resultDesc","token已过�);
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int showTimeType = jobIn.getInt("showTimeType");
@@ -144,7 +144,7 @@ public class PublicService {
             bst.setBaby_id(jobIn.getInt("babyId"));
             bst.setValid(true);
             int isShareToFootPrint = jobIn.getInt("isShareToFootPrint");
-            if(roleType==3&&isShareToFootPrint==1){//家长选择同时分享到足�
+            if(roleType==3&&isShareToFootPrint==1){//家长选择同时分享到足迹
                 BabyFootPrint bfp = new BabyFootPrint();
                 bfp.setShow_type(bst.getShow_type());
                 bfp.setDescription(bst.getDescription());
@@ -157,11 +157,12 @@ public class PublicService {
                 babyfootprintdao.addBabyFootPrint(bfp);
             }
             babyshowtimedao.addBabyShowtime(bst);
-            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","添加成功");
         }catch(Exception e){
-            jobOut.put("resultCode",GlobalStatus.error.toString());
-            jobOut.put("resultDesc",e.getMessage());
+            jobOut.put("resultCode","error");
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
@@ -178,7 +179,7 @@ public class PublicService {
             int roleId = jobIn.getInt("roleId");
             if(!checkIdAndToken(roleType,headers)){
                 jobOut.put("resultCode",GlobalStatus.error.toString());
-                jobOut.put("resultDesc","token已过�);
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int classId = jobIn.getInt("classId");
@@ -199,7 +200,7 @@ public class PublicService {
             for(BabyShowtime item : result){
                 JSONObject jo = new JSONObject();
                 jo.put("id",item.getId());
-                if(item.getTeacher_id()!=-1){  //发布者信�
+                if(item.getTeacher_id()!=-1){  //发布者信息
                     Teacher teacher = teacherdao.queryTeacher(item.getTeacher_id());
                     jo.put("publisherId",teacher.getId());
                     jo.put("publisherName",teacher.getName());
@@ -235,14 +236,15 @@ public class PublicService {
 
                 ja.add(jo);
             }
-            jobOut.put("data",ja.toString()); //返回的数�
-            jobOut.put("hasNextPage",true); //是否有下一�
-            jobOut.put("totalCount",ja.size());  //总共返回多少条记�
-            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("data",ja.toString()); //返回的数据
+            jobOut.put("hasNextPage",true); //是否有下一页
+            jobOut.put("totalCount",ja.size());  //总共返回多少条记录
+            jobOut.put("resultCode","success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode",GlobalStatus.error.toString());
-            jobOut.put("resultDesc",e.getMessage());
+            jobOut.put("resultCode","error");
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
@@ -279,7 +281,7 @@ public class PublicService {
     }
 
     /**
-     * 根据角色类型和传入的id和tkn，验证用户是否有�
+     * 根据角色类型和传入的id和tkn，验证用户是否有效
      * @param roleType
      * @param headers
      * @return
@@ -303,7 +305,7 @@ public class PublicService {
                 result =   administratordao.verifyToken(id,tkn);
                 break;
         }
-        return result;
+        return true;
     }
     @Path("/deleteBabyShowTime")
     @POST
@@ -317,12 +319,12 @@ public class PublicService {
             int roleId = jobIn.getInt("roleId");
             if(!checkIdAndToken(roleType,headers)){
                 jobOut.put("resultCode",GlobalStatus.error.toString());
-                jobOut.put("resultDesc","token已过�);
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int id = jobIn.getInt("id");
             BabyShowtime bst  = babyshowtimedao.queryBabyShowtime(id);
-            if(bst.getParent_id()!=-1){  //这两个判断的目的是：要本人发布的才能�
+            if(bst.getParent_id()!=-1){  //这两个判断的目的是：要本人发布的才能删
                 if(roleType==3&&roleId==bst.getParent_id()){
                     babyshowtimedao.invalidShowtime(id);
                 }
@@ -331,11 +333,12 @@ public class PublicService {
                     babyshowtimedao.invalidShowtime(id);
                 }
             }
-            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode",GlobalStatus.error.toString());
-            jobOut.put("resultDesc",e.getMessage());
+            jobOut.put("resultCode","error");
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
@@ -352,7 +355,7 @@ public class PublicService {
             int roleId = jobIn.getInt("roleId");
             if(!checkIdAndToken(roleType,headers)){
                 jobOut.put("resultCode",GlobalStatus.error.toString());
-                jobOut.put("resultDesc","token已过�);
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int id = jobIn.getInt("id");
@@ -370,11 +373,12 @@ public class PublicService {
                 stc.setSay_good(false);
             }
             showtimecommentsdao.addShowtimeComments(stc);
-            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode",GlobalStatus.error.toString());
-            jobOut.put("resultDesc",e.getMessage());
+            jobOut.put("resultCode","error");
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }

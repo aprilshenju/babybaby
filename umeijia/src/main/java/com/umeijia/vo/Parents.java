@@ -30,7 +30,9 @@ public class Parents {
 	private Date expire; // 过期时间
 	private String token; //登陆token
 
+    public Parents(){
 
+    }
 	public Parents(String phone,String email,String name,Student stu,long cla_id,String pwd,String relation,String avatar){
 		this.phone_num=phone;
 		this.email=email;
