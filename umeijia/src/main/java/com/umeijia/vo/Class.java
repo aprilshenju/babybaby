@@ -15,30 +15,7 @@ public class Class {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public long getSchool_id() {
-		return school_id;
-	}
-	public void setSchool_id(long school_id) {
-		this.school_id = school_id;
-	}
-	public Set<Long> getStu_ids() {
-		return stu_ids;
-	}
-	public void setStu_ids(Set<Long> stu_ids) {
-		this.stu_ids = stu_ids;
-	}
-	public Set<Long> getCamera_ids() {
-		return camera_ids;
-	}
-	public void setCamera_ids(Set<Long> camera_ids) {
-		this.camera_ids = camera_ids;
-	}
-	public Set<Long> getTeacher_ids() {
-		return teacher_ids;
-	}
-	public void setTeacher_ids(Set<Long> teacher_ids) {
-		this.teacher_ids = teacher_ids;
-	}
+
 
 	public String getCourse_schedule() {
 		return course_schedule;
@@ -59,11 +36,46 @@ public class Class {
 		this.parents_contacts = parents_contacts;
 	}
 	private long id;
+
+	public Kindergarten getSchool() {
+		return school;
+	}
+
+	public void setSchool(Kindergarten school) {
+		this.school = school;
+	}
+
 	private String name;
-	private long school_id;
-	private Set<Long> stu_ids;
-	private Set<Long> camera_ids;
-	private Set<Long> teacher_ids;
+	private Kindergarten school;
+
+	public void setStudents(Set<Student> students) {
+		this.students = students;
+	}
+
+	public void setCameras(Set<Camera> cameras) {
+		this.cameras = cameras;
+	}
+
+	public void setTeachers(Set<Teacher> teachers) {
+		this.teachers = teachers;
+	}
+
+	public Set<Student> getStudents() {
+
+		return students;
+	}
+
+	public Set<Camera> getCameras() {
+		return cameras;
+	}
+
+	public Set<Teacher> getTeachers() {
+		return teachers;
+	}
+
+	private Set<Student> students;
+	private Set<Camera> cameras;
+	private Set<Teacher> teachers;
 /*	
  *  时间概念，系统只需要最新的当天的相关记录。历史所有记录无意义
  * private Set<Long> homework_ids;

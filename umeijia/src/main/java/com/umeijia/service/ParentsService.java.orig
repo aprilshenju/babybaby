@@ -1,0 +1,29 @@
+<<<<<<< HEAD
+package com.umeijia.service;
+
+import com.umeijia.dao.AdministratorDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import javax.ws.rs.Path;
+
+@Service
+@Path("/parents_service")
+public class ParentsService {
+
+
+}
+=======
+package com.umeijia.service;
+
+import javax.ws.rs.Path;
+
+import org.springframework.stereotype.Service;
+
+@Service
+@Path("/parents_service")
+public class ParentsService {
+
+}
+>>>>>>> 7d5f01ec08074385d9c02c3ce6e8f7c93f03d8ca

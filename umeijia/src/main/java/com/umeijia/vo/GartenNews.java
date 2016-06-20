@@ -27,32 +27,61 @@ public class GartenNews {
 	public void setImage_urls(String image_urls) {
 		this.image_urls = image_urls;
 	}
-	public Date getDate() {
-		return date;
-	}
-	public void setDate(Date date) {
-		this.date = date;
-	}
 	public long getTeacher_id() {
 		return teacher_id;
 	}
 	public void setTeacher_id(long teacher_id) {
 		this.teacher_id = teacher_id;
 	}
-	public long getSchool_id() {
+	/*public long getSchool_id() {
 		return school_id;
 	}
 	public void setSchool_id(long school_id) {
 		this.school_id = school_id;
-	}
+	}*/
 	private long id;
 	private String title;
+	private String summary;
 	private String description;
 	private String image_urls;
-	private Date date;
-	private long teacher_id;  // 老师发布的新闻
-	private long school_id;
+	private Date publishDate;
+	private Date modifyDate;
 
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public Date getModifyDate() {
+		return modifyDate;
+	}
+
+	public void setModifyDate(Date modifyDate) {
+		this.modifyDate = modifyDate;
+	}
+
+	public Date getPublishDate() {
+		return publishDate;
+	}
+
+	public void setPublishDate(Date publishDate) {
+		this.publishDate = publishDate;
+	}
+
+	private long teacher_id;  // 老师发布的新闻
+
+	public Kindergarten getKindergarten() {
+		return kindergarten;
+	}
+
+	public void setKindergarten(Kindergarten kindergarten) {
+		this.kindergarten = kindergarten;
+	}
+
+	private Kindergarten kindergarten;
 	
 	
 }

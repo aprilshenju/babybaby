@@ -26,7 +26,7 @@
 		<property name="comment_content" column="comment_content" ></property>
 		<property name="say_good" column="say_good" ></property>
 
-		<many-to-one name="showtime_id" class="com.umeijia.vo.BabyShowtime" column="showtime_id" cascade="delete"></many-to-one>
+		<many-to-one name="showtime" class="com.umeijia.vo.BabyShowtime" column="showtime_id" cascade="delete"></many-to-one>
 	</class>
 	
 	

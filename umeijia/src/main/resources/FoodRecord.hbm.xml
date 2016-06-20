@@ -20,7 +20,7 @@
 			<generator class="native"></generator>
 		</id>
 		<property name="records" column="records"></property>
-		<many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
+		<many-to-one name="cla" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
 		<property name="school_id" column="school_id" ></property>				
            <property name="image_urls" column="image_urls"></property> 
 

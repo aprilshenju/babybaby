@@ -17,12 +17,7 @@ public class FoodRecord {
 	public void setRecords(String records) {
 		this.records = records;
 	}
-	public long getClass_id() {
-		return class_id;
-	}
-	public void setClass_id(long class_id) {
-		this.class_id = class_id;
-	}
+
 	public long getSchool_id() {
 		return school_id;
 	}
@@ -37,9 +32,18 @@ public class FoodRecord {
 	}
 	private long id;
 	private String records;
-	private long class_id;
+
+	public Class getCla() {
+		return cla;
+	}
+
+	private Class cla;
 	private long school_id;
 	private String image_urls;
+
+	public void setCla(Class cla) {
+		this.cla = cla;
+	}
 	// 分号隔离每天的数据，逗号隔离每顿的数据
 
 /*	private Date date; //哪一天*/

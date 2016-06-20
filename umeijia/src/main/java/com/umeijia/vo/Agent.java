@@ -28,12 +28,6 @@ public class Agent {
 	public void setPhone_num(String phone_num) {
 		this.phone_num = phone_num;
 	}
-	public Set<Long> getgarten_ids() {
-		return garten_ids;
-	}
-	public void setgarten_ids(Set<Long> garten_ids) {
-		this.garten_ids = garten_ids;
-	}
 	public String getCompany_name() {
 		return company_name;
 	}
@@ -65,15 +59,16 @@ public class Agent {
 	private String pwd_md;
 	private String phone_num;
 
-	public Set<Long> getGarten_ids() {
-		return garten_ids;
+	public Set<Kindergarten> getGartens() {
+		return gartens;
 	}
 
-	public void setGarten_ids(Set<Long> garten_ids) {
-		this.garten_ids = garten_ids;
+	private Set<Kindergarten> gartens;
+
+	public void setGartens(Set<Kindergarten> gartens) {
+		this.gartens = gartens;
 	}
 
-	private Set<Long> garten_ids;
 	private String company_name;
 	private float price_rate;
 

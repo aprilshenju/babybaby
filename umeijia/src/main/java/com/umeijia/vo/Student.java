@@ -35,18 +35,7 @@ public class Student {
 	public void setAge(int age) {
 		this.age = age;
 	}
-	public long getClass_id() {
-		return class_id;
-	}
-	public void setClass_id(long class_id) {
-		this.class_id = class_id;
-	}
-	public Set<Long> getParents_ids() {
-		return parents_ids;
-	}
-	public void setParents_ids(Set<Long> parents_ids) {
-		this.parents_ids = parents_ids;
-	}
+
 	public Date getEntrance_date() {
 		return entrance_date;
 	}
@@ -92,12 +81,29 @@ public class Student {
 	}
 	private Date birthday;
 	private int height;
+
+	public void setCla(Class cla) {
+		this.cla = cla;
+	}
+
 	private int weight;
 	private String avatar_path;
 
-	private long class_id;
-	private Set<Long> parents_ids;
+	public Class getCla() {
+		return cla;
+	}
+
+	private Class cla;
+	private Set<Parents> parents;
 	private Date entrance_date;
+
+	public Set<Parents> getParents() {
+		return parents;
+	}
+
+	public void setParents(Set<Parents> parents) {
+		this.parents = parents;
+	}
 
 	public Date getExpire() {
 		return expire;

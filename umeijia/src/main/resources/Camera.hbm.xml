@@ -30,8 +30,8 @@
 		<property name="video_url" column="video_url"></property> 
 		
           
-    	<many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
-        <many-to-one name="garten_id" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+    	<many-to-one name="cla" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
+        <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
                     
 	</class>
 	

@@ -52,12 +52,6 @@ public class BabyShowtime {
 	public void setParent_id(long parent_id) {
 		this.parent_id = parent_id;
 	}
-	public Set<Long> getComments_ids() {
-		return comments_ids;
-	}
-	public void setComments_ids(Set<Long> comments_ids) {
-		this.comments_ids = comments_ids;
-	}
 	private long id;
 	private String description;
 	private String image_urls;
@@ -66,9 +60,16 @@ public class BabyShowtime {
 	private long baby_id;
 	private long teacher_id; // 动态是由 老师或家长发布的
 	private long parent_id;
-	private Set<Long> comments_ids;
+	private Set<ShowtimeComments> comments;
 
-	// 足迹要按月查历史。。。？？？
+	public void setComments(Set<ShowtimeComments> comments) {
+		this.comments = comments;
+	}
+
+	public Set<ShowtimeComments> getComments() {
+		return comments;
+	}
+// 足迹要按月查历史。。。？？？
 
 	public int getShow_type() {
 		return show_type;

@@ -8,11 +8,39 @@ public class Teacher {
 	private String name;
 	private String avatar_path;
 	private String pwd_md;
-	private long garten_id;
+
+	public Kindergarten getKindergarten() {
+		return kindergarten;
+	}
+
+	public void setKindergarten(Kindergarten kindergarten) {
+		this.kindergarten = kindergarten;
+	}
+
+	//	private long garten_id;
+	private Kindergarten kindergarten;
 	private String phone_num;
 	private String description;
-	private Set<Long> class_ids;
-	private boolean is_leader;
+
+	public void setClasses(Set<Class> classes) {
+		this.classes = classes;
+	}
+
+	private Set<Class> classes;
+
+	public Set<Class> getClasses() {
+		return classes;
+	}
+
+	public Boolean getIs_leader() {
+		return is_leader;
+	}
+
+	public void setIs_leader(Boolean is_leader) {
+		this.is_leader = is_leader;
+	}
+
+	private Boolean is_leader;
 	private String wishes;
 	
 	public String getWishes() {
@@ -38,9 +66,6 @@ public class Teacher {
 
 
 
-	public boolean is_leader() {
-		return is_leader;
-	}
 
 	public Date getExpire() {
 		return expire;
@@ -85,12 +110,12 @@ public class Teacher {
 	public void setPwd_md(String pwd_md) {
 		this.pwd_md = pwd_md;
 	}
-	public long getGarten_id() {
+	/*public long getGarten_id() {
 		return garten_id;
 	}
 	public void setGarten_id(long school_id) {
 		this.garten_id = school_id;
-	}
+	}*/
 	public String getPhone_num() {
 		return phone_num;
 	}
@@ -103,19 +128,7 @@ public class Teacher {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Set<Long> getClass_ids() {
-		return class_ids;
-	}
-	public void setClass_ids(Set<Long> class_ids) {
-		this.class_ids = class_ids;
-	}
-	public boolean isIs_leader() {
-		return is_leader;
-	}
-	public void setIs_leader(boolean is_leader) {
-		this.is_leader = is_leader;
-	}
-	
+
 	//测试提交——ly
 
 

@@ -27,12 +27,6 @@ public class Camera {
 	public void setManufactory(String manufactory) {
 		this.manufactory = manufactory;
 	}
-	public long getClass_id() {
-		return class_id;
-	}
-	public void setClass_id(long class_id) {
-		this.class_id = class_id;
-	}
 	public String getType() {
 		return type;
 	}
@@ -63,20 +57,38 @@ public class Camera {
 	public void setIs_public(boolean is_public) {
 		this.is_public = is_public;
 	}
-	public long getGarten_id() {
-		return garten_id;
-	}
-	public void setGarten_id(long garten_id) {
-		this.garten_id = garten_id;
-	}
+
 	
 	private long id;
 	private String ip_url;
 	private String video_url;
+
+	public boolean is_public() {
+		return is_public;
+	}
+
+	public void setGarten(Kindergarten garten) {
+		this.garten = garten;
+	}
+
+	public Class getCla() {
+		return cla;
+	}
+
+	public void setCla(Class cla) {
+		this.cla = cla;
+
+	}
+
+	public Kindergarten getGarten() {
+
+		return garten;
+	}
+
 	private String description;
 	private String manufactory;
-	private long class_id;  //公公摄像头 classid为 -1
-	private long garten_id;
+	private Class cla;  //公公摄像头 classid为 -1
+	private Kindergarten garten;
 
 	private String type;  //班级私有还是 公开摄像头
 

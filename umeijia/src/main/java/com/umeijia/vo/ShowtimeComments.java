@@ -12,12 +12,6 @@ public class ShowtimeComments {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public long getShowtime_id() {
-		return showtime_id;
-	}
-	public void setShowtime_id(long showtime_id) {
-		this.showtime_id = showtime_id;
-	}
 	public int getUser_type() {
 		return user_type;
 	}
@@ -49,8 +43,17 @@ public class ShowtimeComments {
 		this.date = date;
 	}
 	private long id;
-	private long showtime_id;
+	private BabyShowtime showtime;
 	private int user_type; // 老师还是家长
+
+	public BabyShowtime getShowtime() {
+		return showtime;
+	}
+
+	public void setShowtime(BabyShowtime showtime) {
+		this.showtime = showtime;
+	}
+
 	private long user_id; //家长或老师id
 	private int response_user_type; //回复目标用户类型
 	private long response_user_id; //回复目标用户的id

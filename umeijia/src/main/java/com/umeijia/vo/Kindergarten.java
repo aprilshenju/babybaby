@@ -3,12 +3,6 @@ package com.umeijia.vo;
 import java.util.Set;
 
 public class Kindergarten {
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
-	}
 	public String getName() {
 		return name;
 	}
@@ -33,52 +27,74 @@ public class Kindergarten {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public long getAgent_id() {
-		return agent_id;
-	}
-	public void setAgent_id(long agent_id) {
-		this.agent_id = agent_id;
-	}
-	public Set<Long> getCamera_ids() {
-		return camera_ids;
-	}
-	public void setCamera_ids(Set<Long> camera_ids) {
-		this.camera_ids = camera_ids;
-	}
-	public Set<Long> getClass_ids() {
-		return class_ids;
-	}
-	public void setClass_ids(Set<Long> class_ids) {
-		this.class_ids = class_ids;
-	}
-	public Set<Long> getTeacher_ids() {
-		return teacher_ids;
-	}
-	public void setTeacher_ids(Set<Long> teacher_ids) {
-		this.teacher_ids = teacher_ids;
-	}
-	public Set<Long> getNews_ids() {
-		return news_ids;
-	}
-	public void setNews_ids(Set<Long> news_ids) {
-		this.news_ids = news_ids;
-	}
+
 	public long getLeader_id() {
 		return leader_id;
 	}
 	public void setLeader_id(long leader_id) {
 		this.leader_id = leader_id;
 	}
-	private long id;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	private Long id;
 	private String name;
+
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+	}
+
+	public Agent getAgent() {
+		return agent;
+	}
+
+	public void setCameras(Set<Camera> cameras) {
+		this.cameras = cameras;
+	}
+
+	public void setClasses(Set<Class> classes) {
+		this.classes = classes;
+	}
+
+	public void setTeachers(Set<Teacher> teachers) {
+		this.teachers = teachers;
+	}
+
+	public void setNews(Set<GartenNews> news) {
+		this.news = news;
+	}
+
 	private String addr;
 	private String contact_num;
 	private String description;
-	private long agent_id; //代理商id
-	private Set<Long> camera_ids;
-	private Set<Long> class_ids; // 班级列表
-	private Set<Long> teacher_ids;
-	private Set<Long> news_ids;// 新闻列表 
+
+	public Set<Camera> getCameras() {
+		return cameras;
+	}
+
+	public Set<Class> getClasses() {
+		return classes;
+	}
+
+	public Set<Teacher> getTeachers() {
+		return teachers;
+	}
+
+	public Set<GartenNews> getNews() {
+		return news;
+	}
+
+	private Agent agent; //代理商id
+	private Set<Camera> cameras;
+	private Set<Class> classes; // 班级列表
+	private Set<Teacher> teachers;
+	private Set<GartenNews> news;// 新闻列表
 	private long leader_id; //园长信息
 
 }

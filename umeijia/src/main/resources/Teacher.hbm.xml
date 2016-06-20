@@ -28,7 +28,7 @@
 		<property name="pwd_md" column="pwd_md"></property>	
 		<property name="phone_num" column="phone_num" unique="true"></property>
 		<property name="description" column="description" ></property>		
-		<property name="is_leader" column="is_leader"></property>   
+		<property name="is_leader" column="is_leader"></property>
 
         <property name="email" column="email" unique="true" not-null="true"></property>
 		<property name="regist_date" column="regist_date"></property> 
@@ -38,12 +38,12 @@
 		<property name="token" column="token"></property>
 
 		
-            <set name="class_ids" cascade="all"  lazy="true"  inverse="true" table="t_teacher_class">     <!-- class主控？？？ -->
+            <set name="classes" cascade="all"  lazy="true"  inverse="true" table="t_teacher_class">     <!-- class主控？？？ -->
                 <key column="teacher_id"></key>
                 <many-to-many column="class_id" class="com.umeijia.vo.Class"/>
          </set>      
          
-          <many-to-one name="garten_id" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+          <many-to-one name="kindergarten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
                     
 	</class>
 	

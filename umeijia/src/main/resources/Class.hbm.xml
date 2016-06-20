@@ -30,17 +30,17 @@ private long id;
         <property name="class_introduction" column="class_introduction"></property>
 
           
-         <set name="stu_ids" cascade="all" inverse="true" lazy="true">                
+         <set name="students" cascade="all" inverse="true" lazy="true">
                 <key column="class_id"></key>   
                 <one-to-many class="com.umeijia.vo.Student"/>   
          </set>  
          
-          <set name="camera_ids" cascade="all" inverse="true" lazy="true">                
+          <set name="cameras" cascade="all" inverse="true" lazy="true">
                 <key column="class_id"></key>   
                 <one-to-many class="com.umeijia.vo.Camera"/>   
          </set>  
          
-         <set name="teacher_ids" cascade="save-update"  lazy="true"  inverse="false" table="t_teacher_class">
+         <set name="teachers" cascade="save-update"  lazy="true"  inverse="false" table="t_teacher_class">
                 <key column="class_id"></key>
                 <many-to-many column="teacher_id" class="com.umeijia.vo.Teacher"/>
          </set>      
@@ -61,7 +61,7 @@ private long id;
          </set>   
 -->
          
-           <many-to-one name="school_id" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+           <many-to-one name="school" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
           
 	</class>
 	

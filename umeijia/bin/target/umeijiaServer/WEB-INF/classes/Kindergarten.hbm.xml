@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	private long id;
+	private String name;
+	private String addr;
+	private String contact_num;
+	private String description;
+	private long agent_id; //代理商id
+	private Set<Long> camera_ids;
+	private Set<Long> class_ids; // 班级列表
+	private Set<Long> teacher_ids;
+	private Set<Long> news_ids;// 新闻列表 
+	private long leader_id; //园长信息
+	-->
+
+	<class name="com.umeijia.vo.Kindergarten" table="t_kindergarten">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="name" column="name"></property>	
+		<property name="addr" column="addr"></property>	
+		<property name="contact_num" column="contact_num"></property>   
+		<property name="description" column="description" ></property>		
+		
+		<property name="leader_id" column="leader_id"></property>
+          
+         <set name="camera_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="garten_id"></key>   
+                <one-to-many class="com.umeijia.vo.Camera"/>   
+         </set>  
+         
+          <set name="class_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="garten_id"></key>   
+                <one-to-many class="com.umeijia.vo.Class"/>   
+         </set>  
+         
+         <set name="teacher_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="garten_id"></key>   
+                <one-to-many class="com.umeijia.vo.Teacher"/>   
+         </set>    
+           <set name="news_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="garten_id"></key>   
+                <one-to-many class="com.umeijia.vo.GartenNews"/>
+         </set> 
+        
+          <many-to-one name="agent_id" class="com.umeijia.vo.Agent" column="agent_id" cascade="delete"></many-to-one>
+                    
+	</class>
+	
+	
+	
+</hibernate-mapping>

@@ -1,0 +1,128 @@
+<<<<<<< HEAD
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+private long id;
+	private String name;
+	private int gender;
+	private int age;
+	private long class_id;
+	private long parents_id;
+	private Set<Long> checkin_ids; //学生的签到记录
+	private Date entrance_date;
+
+			private Date birthday;
+	private int height;
+	private int weight;
+	private String avatar_path;
+
+	-->
+
+	<class name="com.umeijia.vo.Student" table="t_student">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="name" column="name"></property>	
+		<property name="nick_name" column="nick_name"></property>	
+		<property name="gender" column="gender"></property>
+		<property name="age" column="age" ></property>
+
+		<property name="birthday" column="birthday" ></property>
+		<property name="height" column="height" ></property>
+		<property name="weight" column="weight" ></property>
+		<property name="avatar_path" column="avatar_path" ></property>
+
+		<property name="entrance_date" column="entrance_date" ></property>
+		<property name="expire" column="expire"></property>
+		<property name="token" column="token"></property>
+		<property name="vip" column="vip"></property>
+
+
+<!-- 		<property name="class_id" column="class_id"></property>  -->  
+         
+      <set name="parents_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="stu_id"></key>   
+                <one-to-many class="com.umeijia.vo.Parents"/>   
+         </set> 
+     
+     <many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
+     
+<!--       <set name="checkin_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="stu_id"></key>   
+                <one-to-many class="com.umeijia.vo.Student"/>   
+         </set>  
+          -->
+                    
+	</class>
+	
+	
+	
+=======
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+private long id;
+	private String name;
+	private int gender;
+	private int age;
+	private long class_id;
+	private long parents_id;
+	private Set<Long> checkin_ids; //学生的签到记录
+	private Date entrance_date;
+
+			private Date birthday;
+	private int height;
+	private int weight;
+	private String avatar_path;
+
+	-->
+
+	<class name="com.umeijia.vo.Student" table="t_student">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="name" column="name"></property>	
+		<property name="nick_name" column="nick_name"></property>	
+		<property name="gender" column="gender"></property>
+		<property name="age" column="age" ></property>
+
+		<property name="birthday" column="birthday" ></property>
+		<property name="height" column="height" ></property>
+		<property name="weight" column="weight" ></property>
+		<property name="avatar_path" column="avatar_path" ></property>
+
+		<property name="entrance_date" column="entrance_date" ></property>
+		<property name="expire" column="expire"></property>
+		<property name="token" column="token"></property>
+		<property name="is_vip" column="is_vip"></property>
+
+
+<!-- 		<property name="class_id" column="class_id"></property>  -->  
+         
+      <set name="parents_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="stu_id"></key>   
+                <one-to-many class="com.umeijia.vo.Parents"/>   
+         </set> 
+     
+     <many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
+     
+<!--       <set name="checkin_ids" cascade="all" inverse="true" lazy="true">                
+                <key column="stu_id"></key>   
+                <one-to-many class="com.umeijia.vo.Student"/>   
+         </set>  
+          -->
+                    
+	</class>
+	
+	
+	
+>>>>>>> 7d5f01ec08074385d9c02c3ce6e8f7c93f03d8ca
+</hibernate-mapping>

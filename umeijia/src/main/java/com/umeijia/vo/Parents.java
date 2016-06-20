@@ -4,6 +4,25 @@ import java.util.Date;
 
 public class Parents {
 
+
+
+	private  Date vip_start;
+	private Date vip_end; //会员开始结束时间
+	private int gender;
+	private String email;
+	private Date regist_date;
+
+	private boolean allow_app_push; // 家长是否允许app推送
+	private boolean allow_wechat_push; // 家长是否允许微信推送
+	private Student student;
+	private long class_id; // 暂时无法支持多个学生？
+	private long id;
+	private String phone_num;
+	private String pwd_md;
+	private String name;
+	private String relationship;
+	private String avatar_path;
+
 	public long getId() {
 		return id;
 	}
@@ -33,12 +52,6 @@ public class Parents {
 	}
 	public void setAvatar_path(String avatar_path) {
 		this.avatar_path = avatar_path;
-	}
-	public long getStu_id() {
-		return stu_id;
-	}
-	public void setStu_id(long stu_id) {
-		this.stu_id = stu_id;
 	}
 	public long getClass_id() {
 		return class_id;
@@ -82,10 +95,7 @@ public class Parents {
 	public void setAllow_wechat_push(boolean allow_wechat_push) {
 		this.allow_wechat_push = allow_wechat_push;
 	}
-	private long id;
-	private String phone_num;
-	private String pwd_md;
-	private String name;
+
 
 	public String getRelationship() {
 		return relationship;
@@ -95,10 +105,16 @@ public class Parents {
 		this.relationship = relationship;
 	}
 
-	private String relationship;
-	private String avatar_path;
-	private long stu_id;
-	private long class_id; // 暂时无法支持多个学生？
+
+
+	public void setStudent(Student student) {
+		this.student = student;
+	}
+
+	public Student getStudent() {
+		return student;
+	}
+
 
 	public void setVip_start(Date vip_start) {
 		this.vip_start = vip_start;
@@ -122,13 +138,4 @@ public class Parents {
 		return vip_start;
 	}
 
-	private  Date vip_start;
-	private Date vip_end; //会员开始结束时间
-	private int gender;
-	private String email;
-	private Date regist_date;
-	
-	private boolean allow_app_push; // 家长是否允许app推送
-	private boolean allow_wechat_push; // 家长是否允许微信推送 
-	
 }

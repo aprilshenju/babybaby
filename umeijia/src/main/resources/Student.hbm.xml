@@ -43,12 +43,12 @@ private long id;
 
 <!-- 		<property name="class_id" column="class_id"></property>  -->  
          
-      <set name="parents_ids" cascade="all" inverse="true" lazy="true">                
+      <set name="parents" cascade="all" inverse="true" lazy="true">
                 <key column="stu_id"></key>   
                 <one-to-many class="com.umeijia.vo.Parents"/>   
          </set> 
      
-     <many-to-one name="class_id" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
+     <many-to-one name="cla" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
      
 <!--       <set name="checkin_ids" cascade="all" inverse="true" lazy="true">                
                 <key column="stu_id"></key>   
@@ -57,7 +57,5 @@ private long id;
           -->
                     
 	</class>
-	
-	
-	
+
 </hibernate-mapping>
