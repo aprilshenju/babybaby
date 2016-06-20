@@ -18,6 +18,9 @@ public class Teacher {
 	private Date expire; // 过期时间
 	private String token; //登陆token
 
+	public  Teacher(){
+
+	}
 
 	public Teacher(long id){
 		this.id=id;

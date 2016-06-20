@@ -36,7 +36,19 @@ public class ParentsService {
     public String test2(){
 
         Parents p = parentsdao.queryParents(1);
-        String s = p.getName()+p.isAllow_app_push()+"  "+p.isAllow_wechat_push();
+        Student stu=p.getStudent();
+        String s = p.getName()+p.isAllow_app_push()+"  vip "+stu.isVip();
+        return "welcom to UMJ parents service...."+s;
+    }
+
+    @Path("/hello2")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String test22(){
+
+        Parents p = parentsdao.queryParents(1);
+        Student stu=p.getStudent();
+        String s = p.getName()+p.isAllow_app_push()+"  学生昵称 "+stu.getNick_name();
         return "welcom to UMJ parents service...."+s;
     }
 
@@ -64,6 +76,7 @@ public class ParentsService {
                 }
                 if(p!=null)
                 {
+
                     Student stu = p.getStudent();
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","登陆成功");

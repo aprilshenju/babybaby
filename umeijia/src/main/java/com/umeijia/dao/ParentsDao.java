@@ -25,7 +25,7 @@ public class ParentsDao {
     }
 
     public Parents queryParents(long id) {
-        Session session = DBManager.getSession();
+       Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Parents as u where u.id=%d", id);
         Query query = session.createQuery(sql);
@@ -37,6 +37,17 @@ public class ParentsDao {
         }else {
             return null;
         }
+/*        Session session = DBManager.getSession();
+        session.clear();
+        List<Parents> list = session.createCriteria(Parents.class)
+                .add(Restrictions.eq("id",new Long(1)))
+                .list();
+        if(list.size()>0){
+            Parents parents = (Parents) list.get(0);
+            return parents;
+        }else {
+            return null;
+        }*/
     }
 
     public Parents queryParents(String phoneNumber) {

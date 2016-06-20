@@ -48,9 +48,11 @@ public class TeacherService {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String test() {
-        Student s = studentdao.queryStudent(1);
-        String teststr = s.getNick_name()+"  "+s.isVip();
-        return "welcome to umj server   "+teststr;
+
+        Teacher te = teacherdao.queryTeacher(1);
+        Kindergarten garten = te.getKindergarten();
+
+        return "welcome to umj server   "+garten.getName()+"   "+garten.getId();
     }
 
 
