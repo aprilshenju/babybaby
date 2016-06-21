@@ -20,14 +20,6 @@ import java.util.Date;
 @Service
 @Path("/run_service")
 public class RunService {
-    public AdministratorDao getAdministratordao() {
-        return administratordao;
-    }
-
-    public void setAdministratordao(AdministratorDao administratordao) {
-        this.administratordao = administratordao;
-    }
-
     @Autowired
     @Qualifier("administratordao")
     private AdministratorDao administratordao;
@@ -45,7 +37,7 @@ public class RunService {
     private KinderGartenDao kindergartendao;
     @Autowired
     @Qualifier("cameradao")
-    private KinderGartenDao cameradao;
+    private CameraDao cameradao;
 
 
     @Path("/hello")
