@@ -20,9 +20,9 @@
 		</id>
 		<property name="user_type" column="user_type"></property>
 		<property name="user_id" column="user_id"></property>
-		<property name="content" column="content" ></property>
+		<property name="content" column="content" length="1500"></property>
 		<property name="date" column="date" ></property>
-		<property name="response" column="response"></property>
+		<property name="response" column="response" length="1500"></property>
 		<property name="read_or_not" column="read_or_not"></property>
 	</class>
 	

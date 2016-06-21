@@ -1,6 +1,7 @@
 package com.umeijia.vo;
 
 
+import java.util.Date;
 
 public class Camera {
 	public long getId() {
@@ -105,6 +106,27 @@ public class Camera {
 
 	private String active_period;
 	private boolean is_public; // 是否是公共摄像头 
+
+	public Date getCreate_date() {
+		return create_date;
+	}
+
+	public void setCreate_date(Date create_date) {
+		this.create_date = create_date;
+	}
+
+	public void setModified_date(Date modified_date) {
+		this.modified_date = modified_date;
+	}
+
+	public Date getModified_date() {
+		return modified_date;
+
+	}
+
+	private Date create_date; //摄像头创建 日期
+	private Date modified_date; //修改日期
+
 
 	/**
 	 * 根据时间段判断，是否在线开放

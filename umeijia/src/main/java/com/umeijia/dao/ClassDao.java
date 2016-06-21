@@ -130,6 +130,25 @@ public class ClassDao {
         return  garten;
     }
 
+    public boolean updateClass(Class cla) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            session.update(cla);
+            session.flush();
+            session.getTransaction().commit();
+            result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
 
 
 }

@@ -27,6 +27,9 @@
 		<property name="regist_date" column="regist_date"></property>
 		<property name="expire" column="expire"></property>
 		<property name="token" column="token"></property>
+		<property name="avarta" column="avarta"></property>
+
+
          <set name="gartens" cascade="all" inverse="true" lazy="false">
                 <key column="agent_id"></key>   
                 <one-to-many class="com.umeijia.vo.Kindergarten"/>   

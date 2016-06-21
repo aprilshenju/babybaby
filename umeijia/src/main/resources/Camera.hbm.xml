@@ -27,8 +27,9 @@
 		<property name="thumb_path" column="thumb_path"></property>
 		<property name="active_period" column="active_period"></property>
 		<property name="is_public" column="is_public"></property> 
-		<property name="video_url" column="video_url"></property> 
-		
+		<property name="video_url" column="video_url"></property>
+		<property name="create_date" column="create_date"></property>
+		<property name="modified_date" column="modified_date"></property>
           
     	<many-to-one name="cla" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
         <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>

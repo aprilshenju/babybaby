@@ -59,6 +59,18 @@ public class Agent {
 	private String pwd_md;
 	private String phone_num;
 
+	public void setAvarta(String avarta) {
+		this.avarta = avarta;
+	}
+
+	public String getAvarta() {
+
+		return avarta;
+	}
+
+	private  String avarta;
+
+
 	public Set<Kindergarten> getGartens() {
 		return gartens;
 	}
@@ -89,6 +101,14 @@ public class Agent {
 
 	private Date expire; // 过期时间
 	private String token; //登陆token
+
+	public  Agent(){
+
+	}
+
+	public  Agent(long id){
+		this.id=id;
+	}
 
 	public Agent(String phone,String email,String pwd,String name,Date date,String company,float price){
 		phone_num=phone;
