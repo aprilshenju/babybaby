@@ -19,8 +19,8 @@
 			<generator class="native"></generator>
 		</id>
 		<property name="title" column="title"></property>
-		<property name="summary" column="summary"></property>
-		<property name="description" column="description"></property>
+		<property name="summary" column="summary" length="500"></property>
+		<property name="description" column="description" length="2000"></property>
 		<property name="image_urls" column="image_urls" ></property>		
 		<property name="publishDate" column="publishDate"></property>
 		<property name="modifyDate" column="modifyDate"></property>

@@ -18,6 +18,7 @@ public class Teacher {
 	private Date expire; // 过期时间
 	private String token; //登陆token
 
+
 	public  Teacher(){
 
 	}
@@ -25,6 +26,21 @@ public class Teacher {
 	public Teacher(long id){
 		this.id=id;
 	}
+
+	public Teacher(String name,String avatar,String pwd_md,Kindergarten garten,String phone,String descrip,String email,boolean leader,String wishes){
+		this.name=name;
+		this.avatar_path=avatar;
+		this.pwd_md=pwd_md;
+		this.kindergarten=garten;
+		this.phone_num=phone;
+		this.description=descrip;
+		this.email=email;
+		this.regist_date=new Date();
+		this.is_leader=leader;
+		this.wishes=wishes;
+	}
+
+
 	public Kindergarten getKindergarten() {
 		return kindergarten;
 	}
