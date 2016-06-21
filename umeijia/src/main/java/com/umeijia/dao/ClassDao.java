@@ -131,12 +131,31 @@ public class ClassDao {
     }
 
     public boolean updateClass(Class cla) {
-        boolean result=false;
+        boolean result = false;
         Session session = DBManager.getSession();
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
             session.update(cla);
+            session.flush();
+            session.getTransaction().commit();
+            result = true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result = false;
+        } finally {
+            session.close();
+            return result;
+        }
+    }
+    public boolean addClass(Class cla) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            session.save(cla);
             session.flush();
             session.getTransaction().commit();
             result=true;

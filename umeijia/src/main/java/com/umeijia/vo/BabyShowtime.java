@@ -4,6 +4,35 @@ import java.util.Date;
 import java.util.Set;
 
 public class BabyShowtime {
+	private long id;
+	private String description;
+	private String image_urls;
+	private Date date;
+	private long class_id;
+	private long baby_id;
+	private long teacher_id; // 动态是由 老师或家长发布的
+	private long parent_id;
+	private boolean valid; //是否删除
+	private int show_type; // 1 图文 2 视频
+	private Set<ShowtimeComments> comments;
+
+	public BabyShowtime(){
+
+	}
+
+	public BabyShowtime(String des,String imgs,long cid,long bid,long tid,long pid,int type){
+		this.description=des;
+		this.image_urls=imgs;
+		this.class_id=cid;
+		this.baby_id=bid;
+		this.teacher_id=tid;
+		this.parent_id=pid;
+		this.valid=true;
+		this.show_type=type;
+
+	}
+
+
 	public long getId() {
 		return id;
 	}
@@ -52,34 +81,20 @@ public class BabyShowtime {
 	public void setParent_id(long parent_id) {
 		this.parent_id = parent_id;
 	}
-	private long id;
-	private String description;
-	private String image_urls;
-	private Date date;
-	private long class_id;
-	private long baby_id;
-	private long teacher_id; // 动态是由 老师或家长发布的
-	private long parent_id;
-	private Set<ShowtimeComments> comments;
 
 	public void setComments(Set<ShowtimeComments> comments) {
 		this.comments = comments;
 	}
-
 	public Set<ShowtimeComments> getComments() {
 		return comments;
 	}
 // 足迹要按月查历史。。。？？？
-
 	public int getShow_type() {
 		return show_type;
 	}
-
 	public void setShow_type(int show_type) {
 		this.show_type = show_type;
 	}
-
-	private int show_type; // 1 图文 2 视频
 	public boolean isValid() {
 		return valid;
 	}
@@ -88,6 +103,6 @@ public class BabyShowtime {
 		this.valid = valid;
 	}
 
-	private boolean valid; //是否删除
+
 	
 }

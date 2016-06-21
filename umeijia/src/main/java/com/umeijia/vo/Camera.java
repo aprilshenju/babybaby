@@ -4,6 +4,42 @@ package com.umeijia.vo;
 import java.util.Date;
 
 public class Camera {
+	private long id;
+	private String ip_url;
+	private String video_url;
+	private String description;
+	private String manufactory;
+	private Class cla;  //公公摄像头 classid为 -1
+	private Kindergarten garten;
+	private String type;  //
+	private String state;
+	private String thumb_path; //缩略图路径
+	private String active_period;
+	private boolean is_public; // 是否是公共摄像头
+	private Date create_date; //摄像头创建 日期
+	private Date modified_date; //修改日期
+
+	public  Camera(){
+
+	}
+
+	public Camera(String ip,String video_url,String description,String manufactory,Kindergarten garten,String type,boolean ispublic,String img_path,String period,Class cla){
+		this.ip_url=ip;
+		this.video_url=video_url;
+		this.description=description;
+		this.manufactory=manufactory;
+		this.garten=garten;
+		this.type=type;
+		this.state="valid";
+		this.active_period=period;
+		this.is_public=ispublic;
+		this.thumb_path=img_path;
+		this.cla=cla;
+		this.create_date=new Date();
+		this.modified_date=new Date();
+
+	}
+
 	public long getId() {
 		return id;
 	}
@@ -58,12 +94,6 @@ public class Camera {
 	public void setIs_public(boolean is_public) {
 		this.is_public = is_public;
 	}
-
-	
-	private long id;
-	private String ip_url;
-	private String video_url;
-
 	public boolean is_public() {
 		return is_public;
 	}
@@ -86,15 +116,7 @@ public class Camera {
 		return garten;
 	}
 
-	private String description;
-	private String manufactory;
-	private Class cla;  //公公摄像头 classid为 -1
-	private Kindergarten garten;
 
-	private String type;  //班级私有还是 公开摄像头
-
-	private String state;
-	private String thumb_path; //缩略图路径
 
 	public String getActive_period() {
 		return active_period;
@@ -103,9 +125,6 @@ public class Camera {
 	public void setActive_period(String active_period) {
 		this.active_period = active_period;
 	}
-
-	private String active_period;
-	private boolean is_public; // 是否是公共摄像头 
 
 	public Date getCreate_date() {
 		return create_date;
@@ -123,9 +142,6 @@ public class Camera {
 		return modified_date;
 
 	}
-
-	private Date create_date; //摄像头创建 日期
-	private Date modified_date; //修改日期
 
 
 	/**

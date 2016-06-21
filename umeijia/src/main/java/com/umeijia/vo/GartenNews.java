@@ -3,6 +3,31 @@ package com.umeijia.vo;
 import java.util.Date;
 
 public class GartenNews {
+	private long id;
+	private String title;
+	private String summary;
+	private String description;
+	private String image_urls;
+	private Date publishDate;
+	private Date modifyDate;
+	private Teacher teacher;  // 老师发布的新闻
+	private Kindergarten kindergarten;
+
+	public  GartenNews(){
+
+	}
+
+	public  GartenNews(String title,String summary,String descrip,String img_urls,Teacher te,Kindergarten garten){
+			this.title=title;
+			this.summary=summary;
+			this.description=descrip;
+			this.image_urls=img_urls;
+			this.publishDate=new Date();
+			this.modifyDate=new Date();
+			this.teacher=te;
+			this.kindergarten= garten;
+	}
+
 	public long getId() {
 		return id;
 	}
@@ -27,64 +52,36 @@ public class GartenNews {
 	public void setImage_urls(String image_urls) {
 		this.image_urls = image_urls;
 	}
-	/*public long getSchool_id() {
-		return school_id;
-	}
-	public void setSchool_id(long school_id) {
-		this.school_id = school_id;
-	}*/
-	private long id;
-	private String title;
-	private String summary;
-	private String description;
-	private String image_urls;
-	private Date publishDate;
-	private Date modifyDate;
-
 	public String getSummary() {
 		return summary;
 	}
-
 	public void setSummary(String summary) {
 		this.summary = summary;
 	}
-
 	public Date getModifyDate() {
 		return modifyDate;
 	}
-
 	public void setModifyDate(Date modifyDate) {
 		this.modifyDate = modifyDate;
 	}
-
 	public Date getPublishDate() {
 		return publishDate;
 	}
-
 	public void setTeacher(Teacher teacher) {
 		this.teacher = teacher;
 	}
-
 	public Teacher getTeacher() {
 		return teacher;
 
 	}
-
 	public void setPublishDate(Date publishDate) {
 		this.publishDate = publishDate;
 	}
-
-	private Teacher teacher;  // 老师发布的新闻
-
 	public Kindergarten getKindergarten() {
 		return kindergarten;
 	}
-
 	public void setKindergarten(Kindergarten kindergarten) {
 		this.kindergarten = kindergarten;
 	}
-
-	private Kindergarten kindergarten;
-	
 	
 }

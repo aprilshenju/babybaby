@@ -143,6 +143,7 @@ public class TeacherService {
             String phone = job.getString("phone");
             String email = job.getString("email");
             String pwd = job.getString("password");
+            pwd=MD5.GetSaltMD5Code(pwd);
             String name = job.getString("name");
             long class_id = job.getLong("class_id");
             long garten_id=job.getLong("garten_id");

@@ -4,6 +4,7 @@ import com.umeijia.dao.*;
 import com.umeijia.util.GlobalStatus;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.*;
+import com.umeijia.vo.Class;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +39,59 @@ public class RunService {
     @Autowired
     @Qualifier("cameradao")
     private CameraDao cameradao;
+    @Autowired
+    @Qualifier("classdao")
+    private ClassDao classdao;
+    @Autowired
+    @Qualifier("studentdao")
+    private StudentDao studentdao;
+    @Autowired
+    @Qualifier("gartennewsdao")
+    private GartenNewsDao gartennewsdao;
+    @Autowired
+    @Qualifier("babyshowtimedao")
+    private BabyShowtimeDao babyshowtimedao;
 
 
     @Path("/hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String test2(){
+        //初始化数据
+        Administrator admin = new Administrator("1333333333","1233@dd.com",MD5.GetSaltMD5Code("admin123"),"超级管理员",new Date(),true);
+        administratordao.addAdministrator(admin);
+
+        Agent ag = new Agent("1300000000","agent@163.com",MD5.GetSaltMD5Code("agent123"),"小张",new Date(),"新东方",32.5f);
+        agentdao.addAgent(ag);
+        Kindergarten garten = new Kindergarten("光明幼儿园","科华南路","028-85400752","一起呵护祖国的花朵","1.jpg","2.jpg","3.jpg",ag);
+        kindergartendao.addKindergarten(garten);
+        Teacher leader = new Teacher("段园长","1.jpg",MD5.GetSaltMD5Code("leader123"),garten,"1358888888","让我带大家一起学习吧","dff9933@163.com",true,"让孩子们茁壮成长");
+        teacherdao.addTeacher(leader);
+        Teacher te = new Teacher("谢老师","1.jpg",MD5.GetSaltMD5Code("tea123"),garten,"1359999999","一起摇摆","ppj9933@163.com",false," ");
+        Teacher te2 = new Teacher("曾老师","2.jpg",MD5.GetSaltMD5Code("tea123"),garten,"13533333","好男人就是我","db83555@163.com",false," ");
+        teacherdao.addTeacher(te);
+        teacherdao.addTeacher(te2);
+        com.umeijia.vo.Class cla = new Class("大二班","就快要升一年级了，宝宝们","上午:舞蹈;下午:算术;","张宁三:133;","李老师:14553",garten);
+        cla.getTeachers().add(te); //班级追加老师
+        classdao.addClass(cla);
+        Student stu1 = new Student("仝刚","仝小宝",0,5,new Date(),150,30,"1.jpg",cla);
+        Student stu2 = new Student("刘屯屯","小屯屯",0,6,new Date(),138,36,"2.jpg",cla);
+        studentdao.addStudent(stu1);
+        studentdao.addStudent(stu2);
+        Parents parent = new Parents("15608036231","3523535@qq.com","刘洋",stu2,cla.getId(),MD5.GetSaltMD5Code("par123"),"爸爸","1.jpg");
+        parentsdao.addParents(parent);
+
+        Camera ca = new Camera("222.10.13.3","222.10.13.3:355/video","操场转角",
+                "海康威视",garten,"sunfllower_came1.jpg",true,"ccccc","8-10;12-14;15-17;",cla);
+        cameradao.addCamera(ca);
+
+        GartenNews news = new GartenNews("欢庆六一儿童节","为了欢庆六一儿童节，学校举行歌舞表演","歌舞表演啦啦啦。\n活动一开场，一群可爱娃娃带来的舞蹈《中华娃娃响当当》便惊艳了全场。孩子们灵动的舞姿，生动的表情，可爱的小眼神，把台下观众迷得不要不要的。随后，《春天的味道》、《亲爱的朋友》、《左手右手》等精彩舞蹈接连上演，引得观众掌声阵阵，久久不停息。\n" +
+                "在舞蹈《聪明的宝贝》中，孩子们将“聪明”的状态演绎得活灵活现，让人觉得他们就是一群最聪明的宝贝；而舞蹈《枪战CS》，则将大家带入了“枪林弹雨”的情景；还有《维族姑娘》，孩子们惊艳的表演，令大家误以为表演者真是一群来自维族的小朋友。\n" +
+                "舞蹈表演亮点接踵而来，令观众目不暇接。还沉浸在精彩的舞蹈中无法自拔，惊艳的T台模特秀又来了。别看小朋友们年纪小小的，走上T台个个像模像样，举手投足间尽现超模姿态，台下有观众甚至发出“未来他们中一定会诞生国际名模”的言论。",
+                "xd35.jpg",te,garten);
+        gartennewsdao.addGartenNews(news);
+        BabyShowtime showtiem = new BabyShowtime("为了庆祝儿童节的到来,老师们组织了歌舞表演","2.jpg;3.jpg",cla.getId(),stu1.getId(),te2.getId(),parent.getId(),1);
+        babyshowtimedao.addBabyShowtime(showtiem);
 
         return "welcom to UMJ server... run service ";
     }
@@ -78,6 +126,7 @@ public class RunService {
             String phone = job.getString("phone");
             String email = job.getString("email");
             String pwd = job.getString("password");
+            pwd=MD5.GetSaltMD5Code(pwd);
             String name = job.getString("name");
             long garten_id=job.getLong("garten_id");
             String avatar = job.getString("avatar");
@@ -85,6 +134,12 @@ public class RunService {
             String descrip=job.getString("description"); //老师介绍
             //        boolean is_leader = job.getBoolean("leader"); //是否是园长
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
+            if(garten.getLeader_id()>0){
+                //已有园长
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","添加失败:该幼儿园已有园长");
+                return job_out.toString();
+            }
             Teacher leader=new Teacher(name,avatar,pwd,garten,phone,descrip,email,true,wishes); //园长
             if(teacherdao.addTeacher(leader)){
                 garten.setLeader_wishes(wishes); //更新幼儿园 寄语
@@ -172,6 +227,7 @@ public class RunService {
                 }
                 String phone= job.getString("phone");
                 String pwd= job.getString("pwd");
+                pwd=MD5.GetSaltMD5Code(pwd);
                 String name= job.getString("name");
                 String email=job.getString("email");
                 String company=job.getString("company");
@@ -219,6 +275,7 @@ public class RunService {
 
             String phone= job.getString("phone");
             String pwd= job.getString("pwd");
+            pwd=MD5.GetSaltMD5Code(pwd);
             String name= job.getString("name");
             String email=job.getString("email");
             Date date = new Date();
