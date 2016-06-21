@@ -28,7 +28,7 @@ public class CheckinCardDao {
     public CheckinCard queryCheckinCard(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from CheckinCard as ca where ca.id=%ld",id);
+        String sql = String.format("from CheckinCard as ca where ca.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

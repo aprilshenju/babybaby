@@ -28,7 +28,7 @@ public class MessageDao {
     public Message queryMessage(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Message as message where message.id=%ld",id);
+        String sql = String.format("from Message as message where message.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -46,7 +46,7 @@ public class MessageDao {
     public List<Message> queryUnreadMessages(long teacher_id,long parents_id,int dir) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Message as message where message.teacher_id=%ld and message.parents_id=%ld and message.send_direction=%d and message.read_or_not=0 order by message.date desc",teacher_id,parents_id,dir);
+        String sql = String.format("from Message as message where message.teacher_id=%d and message.parents_id=%d and message.send_direction=%d and message.read_or_not=0 order by message.date desc",teacher_id,parents_id,dir);
         Query query = session.createQuery(sql);
         List <Message> list = query.list();
         session.close();
@@ -60,7 +60,7 @@ public class MessageDao {
     public List<Message> queryRecent5Messages(long teacher_id,long parents_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Message as message where message.teacher_id=%ld and message.parents_id=%ld order by message.date desc",teacher_id,parents_id);
+        String sql = String.format("from Message as message where message.teacher_id=%d and message.parents_id=%d order by message.date desc",teacher_id,parents_id);
         Query query = session.createQuery(sql);
         List <Message> list = query.list();
         session.close();
@@ -83,7 +83,7 @@ public class MessageDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Message mg set mg.read_or_not=1 where mg.id=%ld",id);
+            String hql=String.format("update Message mg set mg.read_or_not=1 where mg.id=%d",id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();

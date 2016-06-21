@@ -8,41 +8,41 @@ public class Teacher {
 	private String name;
 	private String avatar_path;
 	private String pwd_md;
-
-	public Kindergarten getKindergarten() {
-		return kindergarten;
-	}
-
-	public void setKindergarten(Kindergarten kindergarten) {
-		this.kindergarten = kindergarten;
-	}
-
 	//	private long garten_id;
 	private Kindergarten kindergarten;
 	private String phone_num;
 	private String description;
+	private String email;
+	private Date regist_date;
+	private Set<GartenNews>gartenNewses;
+	private Date expire; // 过期时间
+	private String token; //登陆token
 
+
+	public Teacher(long id){
+		this.id=id;
+	}
+	public Kindergarten getKindergarten() {
+		return kindergarten;
+	}
+	public void setKindergarten(Kindergarten kindergarten) {
+		this.kindergarten = kindergarten;
+	}
 	public void setClasses(Set<Class> classes) {
 		this.classes = classes;
 	}
-
 	private Set<Class> classes;
-
 	public Set<Class> getClasses() {
 		return classes;
 	}
-
 	public Boolean getIs_leader() {
 		return is_leader;
 	}
-
 	public void setIs_leader(Boolean is_leader) {
 		this.is_leader = is_leader;
 	}
-
 	private Boolean is_leader;
 	private String wishes;
-	
 	public String getWishes() {
 		return wishes;
 	}
@@ -61,31 +61,24 @@ public class Teacher {
 	public void setRegist_date(Date regist_date) {
 		this.regist_date = regist_date;
 	}
-	private String email;
-	private Date regist_date;
-
-
-
-
+	public void setGartenNewses(Set<GartenNews> gartenNewses) {
+		this.gartenNewses = gartenNewses;
+	}
+	public Set<GartenNews> getGartenNewses() {
+		return gartenNewses;
+	}
 	public Date getExpire() {
 		return expire;
 	}
 	public String getToken() {
 		return token;
 	}
-
 	public void setToken(String token) {
 		this.token = token;
 	}
-
 	public void setExpire(Date expire) {
 		this.expire = expire;
 	}
-
-	private Date expire; // 过期时间
-	private String token; //登陆token
-
-
 	public long getId() {
 		return id;
 	}
@@ -110,12 +103,6 @@ public class Teacher {
 	public void setPwd_md(String pwd_md) {
 		this.pwd_md = pwd_md;
 	}
-	/*public long getGarten_id() {
-		return garten_id;
-	}
-	public void setGarten_id(long school_id) {
-		this.garten_id = school_id;
-	}*/
 	public String getPhone_num() {
 		return phone_num;
 	}

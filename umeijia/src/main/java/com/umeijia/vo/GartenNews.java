@@ -27,12 +27,6 @@ public class GartenNews {
 	public void setImage_urls(String image_urls) {
 		this.image_urls = image_urls;
 	}
-	public long getTeacher_id() {
-		return teacher_id;
-	}
-	public void setTeacher_id(long teacher_id) {
-		this.teacher_id = teacher_id;
-	}
 	/*public long getSchool_id() {
 		return school_id;
 	}
@@ -67,11 +61,20 @@ public class GartenNews {
 		return publishDate;
 	}
 
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
+	}
+
+	public Teacher getTeacher() {
+		return teacher;
+
+	}
+
 	public void setPublishDate(Date publishDate) {
 		this.publishDate = publishDate;
 	}
 
-	private long teacher_id;  // 老师发布的新闻
+	private Teacher teacher;  // 老师发布的新闻
 
 	public Kindergarten getKindergarten() {
 		return kindergarten;

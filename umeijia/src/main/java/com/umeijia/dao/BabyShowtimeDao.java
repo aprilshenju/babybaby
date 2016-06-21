@@ -28,7 +28,7 @@ public class BabyShowtimeDao {
     public BabyShowtime queryBabyShowtime(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyShowtime as bs where bs.id=%ld and bs.valid=1",id);
+        String sql = String.format("from BabyShowtime as bs where bs.id=%d and bs.valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -46,7 +46,7 @@ public class BabyShowtimeDao {
     public List<BabyShowtime> queryBabyFootprints(long baby_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyShowtime as ba where ba.baby_id=%ld  order by ba.date desc",baby_id);
+        String sql = String.format("from BabyShowtime as ba where ba.baby_id=%d  order by ba.date desc",baby_id);
         Query query = session.createQuery(sql);
         List <BabyShowtime> list = query.list();
         session.close();
@@ -63,7 +63,7 @@ public class BabyShowtimeDao {
     public List<BabyShowtime> queryBabyShowtimesByBaby(long baby_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyShowtime as ba where ba.baby_id=%ld and ba.valid=1 order by ba.date desc",baby_id);
+        String sql = String.format("from BabyShowtime as ba where ba.baby_id=%d and ba.valid=1 order by ba.date desc",baby_id);
         Query query = session.createQuery(sql);
         List <BabyShowtime> list = query.list();
         session.close();
@@ -80,7 +80,7 @@ public class BabyShowtimeDao {
     public List<BabyShowtime> queryBabyShowtimesByParents(long parent_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyShowtime as ba where ba.parent_id=%ld and ba.valid=1 order by ba.date desc",parent_id);
+        String sql = String.format("from BabyShowtime as ba where ba.parent_id=%d and ba.valid=1 order by ba.date desc",parent_id);
         Query query = session.createQuery(sql);
         List <BabyShowtime> list = query.list();
         session.close();
@@ -97,7 +97,7 @@ public class BabyShowtimeDao {
     public List<BabyShowtime> queryBabyShowtimesByTeacher(long teacher_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyShowtime as ba where ba.teacher_id=%ld and ba.valid=1 order by ba.date desc",teacher_id);
+        String sql = String.format("from BabyShowtime as ba where ba.teacher_id=%d and ba.valid=1 order by ba.date desc",teacher_id);
         Query query = session.createQuery(sql);
         List <BabyShowtime> list = query.list();
         session.close();
@@ -131,7 +131,7 @@ public class BabyShowtimeDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update BabyShowtime bs set bs.is_showtime=1 where bs.id=%ld",fp_id);
+            String hql=String.format("update BabyShowtime bs set bs.is_showtime=1 where bs.id=%d",fp_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -154,7 +154,7 @@ public class BabyShowtimeDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update BabyShowtime bs set bs.valid=0 where bs.id=%ld",fp_id);
+            String hql=String.format("update BabyShowtime bs set bs.valid=0 where bs.id=%d",fp_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();

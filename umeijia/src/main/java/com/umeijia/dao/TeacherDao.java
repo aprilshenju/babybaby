@@ -76,7 +76,7 @@ public class TeacherDao {
     public boolean verifyToken(long id,String tkn){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("select u.expire from Teacher as u where u.id=%ld and u.token=\'%s\'",id,tkn);
+        String sql = String.format("select u.expire from Teacher as u where u.id=%d and u.token=\'%s\'",id,tkn);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -92,8 +92,7 @@ public class TeacherDao {
     /**
      * 登陆成功，设置tkn和有效时间
      * **/
-    public boolean loginCheckByPhone(String phoneNumber, String passwd) {
-        boolean result=false;
+    public Teacher loginCheckByPhone(String phoneNumber, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Teacher as u where u.phone_num=\'%s\'", phoneNumber);
@@ -112,25 +111,23 @@ public class TeacherDao {
                     session.update(teacher);
                     session.flush();
                     session.getTransaction().commit();
-                    result=true;
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                    result=false;
+                    teacher=null;
                 } finally{
                     session.close();
-                    return result;
+                    return teacher;
                 }
             }
         }
-        return  false;
+        return null;
     }
 
     /**
      * 登陆成功，设置tkn和有效时间
      * **/
-    public boolean loginCheckByEmail(String email, String passwd) {
-        boolean result=false;
+    public Teacher loginCheckByEmail(String email, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Teacher as u where u.email=\'%s\'", email);
@@ -149,18 +146,17 @@ public class TeacherDao {
                     session.update(teacher);
                     session.flush();
                     session.getTransaction().commit();
-                    result=true;
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                    result=false;
+                    teacher=null;
                 } finally{
                     session.close();
-                    return result;
+                    return teacher;
                 }
             }
         }
-        return  false;
+        return null;
     }
 
 
@@ -210,7 +206,7 @@ public class TeacherDao {
     public List<Teacher> queryTeachersByGarten(long gartenID) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as u where u.garten_id=%ld",gartenID);
+        String sql = String.format("from Teacher as u where u.kindergarten.id=%d",gartenID);
         Query query = session.createQuery(sql);
         List list =query.list();
         List<Teacher> teachers=new ArrayList<Teacher>();

@@ -29,7 +29,7 @@ public class CameraDao {
     public Camera queryCamera(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.id=%ld",id);
+        String sql = String.format("from Camera as ca where ca.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -47,7 +47,7 @@ public class CameraDao {
     public List queryPrivateCamerasList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.class_id=%ld",class_id);
+        String sql = String.format("from Camera as ca where ca.cla.id=%d",class_id);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();
@@ -63,7 +63,7 @@ public class CameraDao {
     public List queryPublicCamerasList(long garten_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.garten_id=%ld and ca.is_public=1",garten_id);
+        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.is_public=1",garten_id);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();

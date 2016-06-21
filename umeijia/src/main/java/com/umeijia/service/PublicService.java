@@ -157,10 +157,10 @@ public class PublicService {
                 babyfootprintdao.addBabyFootPrint(bfp);
             }
             babyshowtimedao.addBabyShowtime(bst);
-            jobOut.put("resultCode", "success");
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc","添加成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }
@@ -239,10 +239,10 @@ public class PublicService {
             jobOut.put("data",ja.toString()); //返回的数据
             jobOut.put("hasNextPage",true); //是否有下一页
             jobOut.put("totalCount",ja.size());  //总共返回多少条记录
-            jobOut.put("resultCode","success");
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }
@@ -333,10 +333,10 @@ public class PublicService {
                     babyshowtimedao.invalidShowtime(id);
                 }
             }
-            jobOut.put("resultCode", "success");
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }
@@ -373,10 +373,10 @@ public class PublicService {
                 stc.setSay_good(false);
             }
             showtimecommentsdao.addShowtimeComments(stc);
-            jobOut.put("resultCode", "success");
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }

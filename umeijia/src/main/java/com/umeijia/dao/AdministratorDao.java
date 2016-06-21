@@ -25,7 +25,7 @@ public class AdministratorDao {
     public Administrator queryAdministrator(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Administrator as u where u.id=%ld", id);
+        String sql = String.format("from Administrator as u where u.id=%d", id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -67,21 +67,11 @@ public class AdministratorDao {
         }
     }
 
-    public boolean loginCheck(String phoneNumber, String passwd) {
-        Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("select count(*) from Administrator as u where u.phone_num=\'%s\' and u.pwd_md=\'%s\'",phoneNumber,passwd);
-        Query query = session.createQuery(sql);
-        int count = ((Long) query.uniqueResult()).intValue();
-        session.close();
-        return count > 0;
-
-    }
 
     public boolean verifyToken(long id,String tkn){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("select u.expire from Administrator as u where u.id=%ld and u.token=\'%s\'",id,tkn);
+        String sql = String.format("select u.expire from Administrator as u where u.id=%d and u.token=\'%s\'",id,tkn);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -97,8 +87,7 @@ public class AdministratorDao {
     /**
      * 登陆成功，设置tkn和有效时间
      * **/
-    public boolean loginCheckByPhone(String phoneNumber, String passwd) {
-        boolean result=false;
+    public Administrator loginCheckByPhone(String phoneNumber, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Administrator as u where u.phone_num=\'%s\'", phoneNumber);
@@ -117,25 +106,23 @@ public class AdministratorDao {
                     session.update(administrator);
                     session.flush();
                     session.getTransaction().commit();
-                    result=true;
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                    result=false;
+                    administrator=null;
                 } finally{
                     session.close();
-                    return result;
+                    return administrator;
                 }
             }
         }
-        return  false;
+        return null;
     }
 
     /**
      * 登陆成功，设置tkn和有效时间
      * **/
-    public boolean loginCheckByEmail(String email, String passwd) {
-        boolean result=false;
+    public Administrator loginCheckByEmail(String email, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Administrator as u where u.email=\'%s\'", email);
@@ -154,18 +141,17 @@ public class AdministratorDao {
                     session.update(administrator);
                     session.flush();
                     session.getTransaction().commit();
-                    result=true;
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                    result=false;
+                    administrator=null;
                 } finally{
                     session.close();
-                    return result;
+                    return administrator;
                 }
             }
         }
-        return  false;
+        return  null;
     }
 
     public boolean addAdministrator(Administrator admin) {

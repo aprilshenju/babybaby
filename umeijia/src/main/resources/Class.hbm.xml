@@ -61,7 +61,7 @@ private long id;
          </set>   
 -->
          
-           <many-to-one name="school" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+           <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
           
 	</class>
 	

@@ -28,7 +28,7 @@ public class BabyFootPrintDao {
     public BabyFootPrint queryBabyFootPrint(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyFootPrint as bs where bs.id=%ld and bs.valid=1",id);
+        String sql = String.format("from BabyFootPrint as bs where bs.id=%d and bs.valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -46,7 +46,7 @@ public class BabyFootPrintDao {
     public List<BabyFootPrint> queryBabyFootprints(long baby_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyFootPrint as ba where ba.baby_id=%ld and bs.valid=1 order by ba.date desc",baby_id);
+        String sql = String.format("from BabyFootPrint as ba where ba.baby_id=%d and bs.valid=1 order by ba.date desc",baby_id);
         Query query = session.createQuery(sql);
         List <BabyFootPrint> list = query.list();
         session.close();
@@ -63,7 +63,7 @@ public class BabyFootPrintDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update BabyFootPrint bs set bs.valid=0 where bs.id=%ld",fp_id);
+            String hql=String.format("update BabyFootPrint bs set bs.valid=0 where bs.id=%d",fp_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();

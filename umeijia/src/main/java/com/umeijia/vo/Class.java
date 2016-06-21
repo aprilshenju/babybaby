@@ -37,16 +37,16 @@ public class Class {
 	}
 	private long id;
 
-	public Kindergarten getSchool() {
-		return school;
+	public Kindergarten getGarten() {
+		return garten;
 	}
 
-	public void setSchool(Kindergarten school) {
-		this.school = school;
+	public void setGarten(Kindergarten garten) {
+		this.garten = garten;
 	}
 
 	private String name;
-	private Kindergarten school;
+	private Kindergarten garten;
 
 	public void setStudents(Set<Student> students) {
 		this.students = students;

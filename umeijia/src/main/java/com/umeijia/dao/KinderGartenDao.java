@@ -24,7 +24,7 @@ public class KinderGartenDao {
     public Kindergarten queryKindergarten(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Kindergarten as garten where garten.id=%ld",id);
+        String sql = String.format("from Kindergarten as garten where garten.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -42,7 +42,7 @@ public class KinderGartenDao {
     public List<Kindergarten> queryKindergartens(long agent_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Kindergarten as garten where garten.agent_id=%ld order by garten.date desc",agent_id);
+        String sql = String.format("from Kindergarten as garten where garten.agent.id=%d order by garten.create_date desc",agent_id);
         Query query = session.createQuery(sql);
         List <Kindergarten> list = query.list();
         session.close();

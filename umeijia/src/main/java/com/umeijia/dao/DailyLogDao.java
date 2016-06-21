@@ -28,7 +28,7 @@ public class DailyLogDao {
     public DailyLog queryDailyLog(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from DailyLog as log where log.id=%ld",id);
+        String sql = String.format("from DailyLog as log where log.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

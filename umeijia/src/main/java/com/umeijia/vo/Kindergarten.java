@@ -1,5 +1,6 @@
 package com.umeijia.vo;
 
+import java.util.Date;
 import java.util.Set;
 
 public class Kindergarten {
@@ -73,9 +74,55 @@ public class Kindergarten {
 	private String addr;
 	private String contact_num;
 	private String description;
+	private String teacher_presence_imgs; // 教师风采图片列表
+	private String garten_instrument_imgs; // 教学设施列表
+	private String garten_presence_imgs; //幼儿园图片展示列表
+	private String leader_wishes;
+
+	private Date create_date;
+
+	public void setLeader_wishes(String leader_wishes) {
+		this.leader_wishes = leader_wishes;
+	}
+
+	public String getLeader_wishes() {
+		return leader_wishes;
+	}
+
+	public String getTeacher_presence_imgs() {
+		return teacher_presence_imgs;
+
+	}
+
+	public String getGarten_instrument_imgs() {
+		return garten_instrument_imgs;
+	}
+
+	public void setTeacher_presence_imgs(String teacher_presence_imgs) {
+		this.teacher_presence_imgs = teacher_presence_imgs;
+	}
+
+	public void setGarten_instrument_imgs(String garten_instrument_imgs) {
+		this.garten_instrument_imgs = garten_instrument_imgs;
+	}
+
+	public void setGarten_presence_imgs(String garten_presence_imgs) {
+		this.garten_presence_imgs = garten_presence_imgs;
+	}
+
+	public String getGarten_presence_imgs() {
+		return garten_presence_imgs;
+	}
 
 	public Set<Camera> getCameras() {
 		return cameras;
+	}
+
+	public void setCreate_date(Date create_date) {
+		this.create_date = create_date;
+	}
+	public Date getCreate_date() {
+		return create_date;
 	}
 
 	public Set<Class> getClasses() {
@@ -89,6 +136,7 @@ public class Kindergarten {
 	public Set<GartenNews> getNews() {
 		return news;
 	}
+
 
 	private Agent agent; //代理商id
 	private Set<Camera> cameras;

@@ -24,7 +24,7 @@
 		<property name="image_urls" column="image_urls" ></property>		
 		<property name="publishDate" column="publishDate"></property>
 		<property name="modifyDate" column="modifyDate"></property>
-           <property name="teacher_id" column="teacher_id"></property>   
+           <many-to-one name="teacher" class="com.umeijia.vo.Teacher" column="teacher_id" cascade="delete"></many-to-one>
 		 <many-to-one name="kindergarten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
 	</class>
 	

@@ -28,7 +28,7 @@ public class FoodRecordDao {
     public FoodRecord queryFoodRecord(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from FoodRecord as food where food.id=%ld",id);
+        String sql = String.format("from FoodRecord as food where food.id=%d",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -60,13 +60,30 @@ public class FoodRecordDao {
         }
     }
 
+    /**
+     * 后续改为分页处理
+     * **/
+    public List<FoodRecord> queryFoodRecordList(long class_id) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from FoodRecord as fd where fd.cla.id=%d order by fd.date desc",class_id);
+        Query query = session.createQuery(sql);
+        List <FoodRecord> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public boolean setFoodRecord(long class_id,String foodrecord,String images){
         boolean result=false;
         Session session = DBManager.getSession();
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update FoodRecord f set f.records=\'%s\' and f.image_urls=\'%s' where c.class_id=%ld",foodrecord,images,class_id);
+            String hql=String.format("update FoodRecord f set f.records=\'%s\' and f.image_urls=\'%s' where c.class_id=%d",foodrecord,images,class_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -127,4 +144,6 @@ public class FoodRecordDao {
         }
         return false;
     }
+
+
 }
