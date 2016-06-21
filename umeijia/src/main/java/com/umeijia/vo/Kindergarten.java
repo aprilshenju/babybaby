@@ -4,6 +4,42 @@ import java.util.Date;
 import java.util.Set;
 
 public class Kindergarten {
+	private String addr;
+	private String contact_num;
+	private String description;
+	private String teacher_presence_imgs; // 教师风采图片列表
+	private String garten_instrument_imgs; // 教学设施列表
+	private String garten_presence_imgs; //幼儿园图片展示列表
+	private String leader_wishes;
+	private Date create_date;
+	private Long id;
+	private String name;
+	private Agent agent; //代理商id
+	private Set<Camera> cameras;
+	private Set<Class> classes; // 班级列表
+	private Set<Teacher> teachers;
+	private Set<GartenNews> news;// 新闻列表
+	private long leader_id; //园长信息
+
+
+	public Kindergarten(){
+
+	}
+
+	public  Kindergarten(String name,String addr,String contact_num,String description,String t_imgs,String gi_imgs,String gp_imgs,Agent agent){
+		leader_id=0;
+		this.agent=agent;
+		this.name=name;
+		this.addr=addr;
+		this.contact_num=contact_num;
+		this.description=description;
+		this.teacher_presence_imgs=t_imgs;
+		this.garten_instrument_imgs=gi_imgs;
+		this.garten_presence_imgs=gp_imgs;
+	}
+
+
+
 	public String getName() {
 		return name;
 	}
@@ -28,76 +64,49 @@ public class Kindergarten {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
 	public long getLeader_id() {
 		return leader_id;
 	}
 	public void setLeader_id(long leader_id) {
 		this.leader_id = leader_id;
 	}
-
 	public Long getId() {
 		return id;
 	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-	private Long id;
-	private String name;
-
 	public void setAgent(Agent agent) {
 		this.agent = agent;
 	}
-
 	public Agent getAgent() {
 		return agent;
 	}
-
 	public void setCameras(Set<Camera> cameras) {
 		this.cameras = cameras;
 	}
-
 	public void setClasses(Set<Class> classes) {
 		this.classes = classes;
 	}
-
 	public void setTeachers(Set<Teacher> teachers) {
 		this.teachers = teachers;
 	}
-
 	public void setNews(Set<GartenNews> news) {
 		this.news = news;
 	}
-
-	private String addr;
-	private String contact_num;
-	private String description;
-	private String teacher_presence_imgs; // 教师风采图片列表
-	private String garten_instrument_imgs; // 教学设施列表
-	private String garten_presence_imgs; //幼儿园图片展示列表
-	private String leader_wishes;
-
-	private Date create_date;
-
 	public void setLeader_wishes(String leader_wishes) {
 		this.leader_wishes = leader_wishes;
 	}
-
 	public String getLeader_wishes() {
 		return leader_wishes;
 	}
-
 	public String getTeacher_presence_imgs() {
 		return teacher_presence_imgs;
 
 	}
-
 	public String getGarten_instrument_imgs() {
 		return garten_instrument_imgs;
 	}
-
 	public void setTeacher_presence_imgs(String teacher_presence_imgs) {
 		this.teacher_presence_imgs = teacher_presence_imgs;
 	}
@@ -138,11 +147,6 @@ public class Kindergarten {
 	}
 
 
-	private Agent agent; //代理商id
-	private Set<Camera> cameras;
-	private Set<Class> classes; // 班级列表
-	private Set<Teacher> teachers;
-	private Set<GartenNews> news;// 新闻列表
-	private long leader_id; //园长信息
+
 
 }

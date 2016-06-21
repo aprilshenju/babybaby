@@ -41,16 +41,6 @@ public class ParentsService {
         return "welcom to UMJ parents service...."+s;
     }
 
-    @Path("/hello2")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String test22(){
-
-        Parents p = parentsdao.queryParents(1);
-        Student stu=p.getStudent();
-        String s = p.getName()+p.isAllow_app_push()+"  学生昵称 "+stu.getNick_name();
-        return "welcom to UMJ parents service...."+s;
-    }
 
         /***
          * 用户登录
@@ -81,7 +71,7 @@ public class ParentsService {
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","登陆成功");
                     job_out.put("tkn",p.getToken());
-                    job_out.put("tkn_exptime",p.getExpire());
+                    job_out.put("tkn_exptime",p.getExpire().toString());
                     job_out.put("p_id",p.getId());
                     job_out.put("phone",p.getPhone_num());
                     job_out.put("email",p.getEmail());
@@ -167,6 +157,9 @@ public class ParentsService {
                 String name=job.getString("name");
                 boolean app_push=job.getBoolean("app_push");
                 boolean wechat_push=job.getBoolean("wechat_push");
+                String avata=job.getString("avatar");
+        /*        String descrip = job.getString("");
+                String wishes = job.getString("wishes")*/
 
                 Parents p=parentsdao.queryParents(phone);
 
@@ -175,6 +168,7 @@ public class ParentsService {
                     p.setName(name);
                     p.setAllow_app_push(app_push);
                     p.setAllow_wechat_push(wechat_push);
+                    p.setAvatar_path(avata);
                     if(parentsdao.updateParents(p)){
                         job_out.put("resultCode", GlobalStatus.succeed.toString());
                         job_out.put("resultDesc","成功修改信息");

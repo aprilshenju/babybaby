@@ -1,11 +1,13 @@
 package com.umeijia.vo;
 
 
+import java.util.Date;
+
 public class Camera {
     public Camera() {
     }
 
-    public Camera(long id, String ip_url, String video_url, String description, String manufactory, Class cla, Kindergarten garten, String type, String state, String thumb_path, String active_period, boolean is_public) {
+    public Camera(long id, String ip_url, String video_url, String description, String manufactory, Class cla, Kindergarten garten, String type, String state, String thumb_path, String active_period, boolean is_public,  Date modified_date) {
         this.id = id;
         this.ip_url = ip_url;
         this.video_url = video_url;
@@ -18,9 +20,10 @@ public class Camera {
         this.thumb_path = thumb_path;
         this.active_period = active_period;
         this.is_public = is_public;
+        this.modified_date = modified_date;
     }
 
-    public Camera(String ip_url, String video_url, String description, String manufactory, Class cla, Kindergarten garten, String type, String state, String thumb_path, String active_period, boolean is_public) {
+    public Camera(String ip_url, String video_url, String description, String manufactory, Class cla, Kindergarten garten, String type, String state, String thumb_path, String active_period, boolean is_public, Date create_date, Date modified_date) {
         this.ip_url = ip_url;
         this.video_url = video_url;
         this.description = description;
@@ -32,6 +35,8 @@ public class Camera {
         this.thumb_path = thumb_path;
         this.active_period = active_period;
         this.is_public = is_public;
+        this.create_date = create_date;
+        this.modified_date = modified_date;
     }
 
     public long getId() {
@@ -98,19 +103,22 @@ public class Camera {
         this.video_url = video_url;
     }
 
-//    public boolean isIs_public() {
-//        return is_public;
-//    }
-//
-//    public void setIs_public(boolean is_public) {
-//        this.is_public = is_public;
-//    }
+    public boolean isIs_public() {
+        return is_public;
+    }
+
+    public void setIs_public(boolean is_public) {
+        this.is_public = is_public;
+    }
 
 
     private long id;
     private String ip_url;
     private String video_url;
 
+    public boolean is_public() {
+        return is_public;
+    }
 
     public void setGarten(Kindergarten garten) {
         this.garten = garten;
@@ -149,16 +157,28 @@ public class Camera {
     }
 
     private String active_period;
-
-    public boolean is_public() {
-        return is_public;
-    }
-
-    public void setIs_public(boolean is_public) {
-        this.is_public = is_public;
-    }
-
     private boolean is_public; // 是否是公共摄像头
+
+    public Date getCreate_date() {
+        return create_date;
+    }
+
+    public void setCreate_date(Date create_date) {
+        this.create_date = create_date;
+    }
+
+    public void setModified_date(Date modified_date) {
+        this.modified_date = modified_date;
+    }
+
+    public Date getModified_date() {
+        return modified_date;
+
+    }
+
+    private Date create_date; //摄像头创建 日期
+    private Date modified_date; //修改日期
+
 
     /**
      * 根据时间段判断，是否在线开放

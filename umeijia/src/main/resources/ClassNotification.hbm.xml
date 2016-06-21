@@ -21,7 +21,7 @@
 			<generator class="native"></generator>
 		</id>
 		<property name="title" column="title"></property>	
-		<property name="description" column="description"></property>	
+		<property name="description" column="description" length="1500"></property>
 		<property name="image_urls" column="image_urls"></property>   
 		<property name="date" column="date" ></property>			
 		<property name="teacher_id" column="teacher_id"></property>
