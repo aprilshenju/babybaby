@@ -147,7 +147,7 @@ public class TeacherService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public String publishOrUpdateSchoolNews(@RequestBody String reqJson) {
-        System.out.println("接收到请");
+        System.out.println("接收到发布或更新校园新闻的请求");
         JSONObject job = JSONObject.fromObject(reqJson);
         JSONObject returnJsoObject = new JSONObject();
 
