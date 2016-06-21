@@ -36,21 +36,21 @@
         <property name="leader_wishes" column="leader_wishes"></property>
 
 
-         <set name="cameras" cascade="all" inverse="true" lazy="true">
+         <set name="cameras" cascade="all" inverse="true" lazy="false">
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Camera"/>   
          </set>  
          
-          <set name="classes" cascade="all" inverse="true" lazy="true">
+          <set name="classes" cascade="all" inverse="true" lazy="false">
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Class"/>   
          </set>  
          
-         <set name="teachers" cascade="all" inverse="true" lazy="true">
+         <set name="teachers" cascade="all" inverse="true" lazy="false">
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Teacher"/>   
          </set>    
-           <set name="news" cascade="all" inverse="true" lazy="true">
+           <set name="news" cascade="all" inverse="true" lazy="false">
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.GartenNews"/>
          </set> 
