@@ -109,8 +109,9 @@ public class PublicService {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String test2(){
-
-        return "welcom to UMJ server... public service ";
+        BabyFootPrint bfp = babyfootprintdao.queryBabyFootPrint(1);
+        return bfp.getDate()+bfp.getDescription();
+//        return "welcom to UMJ server... public service ";
     }
 
 
@@ -192,7 +193,11 @@ public class PublicService {
                 return jobOut.toString();
             }
             int classId = jobIn.getInt("classId");
-            int pageNum = jobIn.getInt("pageNum");  //分页
+            /**
+             * @shanji
+             * 分页
+             */
+            int pageNum = jobIn.getInt("pageNum");
             List<BabyShowtime> result = new ArrayList<BabyShowtime>();
             switch(roleType){
                 case 1: //老师查询
@@ -393,6 +398,73 @@ public class PublicService {
                 stc.setSay_good(false);
             }
             showtimecommentsdao.addShowtimeComments(stc);
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    @Path("/addOrEditFootPrint")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addOrEditFootPrint(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int type = jobIn.getInt("type");
+            int id = jobIn.getInt("id");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            if(roleType!=3){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","只有家长能发布足迹");
+                return jobOut.toString();
+            }
+            int footPrintType = jobIn.getInt("footPrintType");
+            BabyFootPrint bfp = new BabyFootPrint();
+            bfp.setParent_id(roleId);
+            bfp.setDescription(jobIn.getString("description"));
+            bfp.setShow_type(footPrintType);
+            bfp.setValid(true);
+            bfp.setBaby_id(jobIn.getInt("babyId"));
+            bfp.setClass_id(jobIn.getInt("classId"));
+            bfp.setDate(new Date());
+            bfp.setImage_urls("");
+
+            if(type==1){ //新增
+                /**
+                 * @shanji
+                 * 需要在footprintdao里面添加一个每天只能发布一条记录的接口
+                 */
+                babyfootprintdao.addBabyFootPrint(bfp);
+            }else if(type==2){ //编辑
+                bfp.setId(id);
+                babyfootprintdao.updateBabyFootPrint(bfp);
+            }
+            if(jobIn.getInt("isShareToBabyShowTime")==1){
+                BabyShowtime bst = new BabyShowtime();
+                bst.setShow_type(footPrintType);
+                bst.setDescription(bfp.getDescription());
+                bst.setDate(bfp.getDate());
+                bst.setImage_urls(bfp.getImage_urls());
+                bst.setClass_id(bfp.getClass_id());
+                bst.setBaby_id(bfp.getBaby_id());
+                bst.setValid(bfp.isValid());
+                bst.setTeacher_id(-1);
+                bst.setParent_id(bfp.getParent_id());
+                babyshowtimedao.addBabyShowtime(bst);
+            }
+            jobOut.put("id",bfp.getId());
             jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
@@ -402,6 +474,137 @@ public class PublicService {
         }
         return jobOut.toString();
     }
+
+    @Path("/queryFootPrint")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryFootPrint(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
+            int roleType = 3;
+            int roleId = jobIn.getInt("id");
+            int babyId = jobIn.getInt("babyId");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            int pageNum = jobIn.getInt("pageNum");  //分页
+            List<BabyFootPrint> result =
+            babyfootprintdao.queryBabyFootprints(babyId);
+            if(result==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
+                return jobOut.toString();
+            }
+            JSONArray ja = new JSONArray();
+            for(BabyFootPrint item : result){
+                JSONObject jo = new JSONObject();
+                jo.put("id",item.getId());
+                jo.put("description",item.getDescription());
+                jo.put("date",item.getDate().toString());
+                jo.put("type",item.getShow_type());
+                jo.put("urls",item.getImage_urls());
+                ja.add(jo);
+            }
+            jobOut.put("data",ja.toString()); //返回的数据
+            jobOut.put("hasNextPage",true); //是否有下一页
+            jobOut.put("totalCount",ja.size());  //总共返回多少条记录
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    @Path("/queryFootPrintByMonth")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryFootPrintByMonth(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
+            int roleType = 3;
+            int roleId = jobIn.getInt("id");
+            int babyId = jobIn.getInt("babyId");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            int year = jobIn.getInt("year");
+            int month = jobIn.getInt("month");
+            List<BabyFootPrint> result =
+            babyfootprintdao.queryBabyFootprintsByMonth(babyId,year,month);
+            if(result==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
+                return jobOut.toString();
+            }
+            JSONArray ja = new JSONArray();
+            for(BabyFootPrint item : result){
+                JSONObject jo = new JSONObject();
+                jo.put("id",item.getId());
+                jo.put("description",item.getDescription());
+                jo.put("date",item.getDate().toString());
+                jo.put("type",item.getShow_type());
+                jo.put("urls",item.getImage_urls());
+                ja.add(jo);
+            }
+            jobOut.put("data",ja.toString()); //返回的数据
+            jobOut.put("hasNextPage",true); //是否有下一页
+            jobOut.put("totalCount",ja.size());  //总共返回多少条记录
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    @Path("/deleteFootPrint")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteFootPrint(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
+            int roleType = 3;
+            int roleId = jobIn.getInt("roleId");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            BabyFootPrint bfp  = babyfootprintdao.queryBabyFootPrint(id);
+            if(bfp.getParent_id()==roleId){  //判断的目的是：要本人发布的才能删
+              babyfootprintdao.invalidFootPrint(id);
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc","足迹不是该用户发布，不能删除");
+                return jobOut.toString();
+            }
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
 
     /**
      * 查询校园新闻

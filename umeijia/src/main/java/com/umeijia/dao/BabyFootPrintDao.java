@@ -46,7 +46,26 @@ public class BabyFootPrintDao {
     public List<BabyFootPrint> queryBabyFootprints(long baby_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyFootPrint as ba where ba.baby_id=%d and bs.valid=1 order by ba.date desc",baby_id);
+        String sql = String.format("from BabyFootPrint as ba where ba.baby_id=%d and ba.valid=1 order by ba.date desc",baby_id);
+        Query query = session.createQuery(sql);
+        List <BabyFootPrint> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 按月查
+     * @param
+     * @return
+     */
+    public List<BabyFootPrint> queryBabyFootprintsByMonth(long baby_id,int year,int month) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from BabyFootPrint as ba where ba.baby_id=%d and year(ba.date)=%d and month(ba.date)=%d and ba.valid=1 order by ba.date desc",baby_id,year,month);
         Query query = session.createQuery(sql);
         List <BabyFootPrint> list = query.list();
         session.close();
@@ -57,7 +76,7 @@ public class BabyFootPrintDao {
         }
     }
     
-    public boolean invalidShowtime(long fp_id) {
+    public boolean invalidFootPrint(long fp_id) {
         boolean result=false;
         Session session = DBManager.getSession();
         try {

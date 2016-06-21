@@ -114,7 +114,7 @@ public class BabyShowtimeDao {
     public List<BabyShowtime> queryBabyShowtimesByClass(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyShowtime as ba where ba.class_id=%ld and ba.valid=1 order by ba.date desc",class_id);
+        String sql = String.format("from BabyShowtime as ba where ba.class_id=%d and ba.valid=1 order by ba.date desc",class_id);
         Query query = session.createQuery(sql);
         List <BabyShowtime> list = query.list();
         session.close();
