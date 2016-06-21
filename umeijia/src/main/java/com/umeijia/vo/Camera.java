@@ -98,22 +98,19 @@ public class Camera {
         this.video_url = video_url;
     }
 
-    public boolean isIs_public() {
-        return is_public;
-    }
-
-    public void setIs_public(boolean is_public) {
-        this.is_public = is_public;
-    }
+//    public boolean isIs_public() {
+//        return is_public;
+//    }
+//
+//    public void setIs_public(boolean is_public) {
+//        this.is_public = is_public;
+//    }
 
 
     private long id;
     private String ip_url;
     private String video_url;
 
-    public boolean is_public() {
-        return is_public;
-    }
 
     public void setGarten(Kindergarten garten) {
         this.garten = garten;
@@ -152,6 +149,15 @@ public class Camera {
     }
 
     private String active_period;
+
+    public boolean is_public() {
+        return is_public;
+    }
+
+    public void setIs_public(boolean is_public) {
+        this.is_public = is_public;
+    }
+
     private boolean is_public; // 是否是公共摄像头
 
     /**

@@ -22,10 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by shenju on 2016/6/20.
@@ -397,6 +394,7 @@ public class PublicService {
 
     /**
      * 查询校园新闻
+     *
      * @param reqJson
      * @return
      */
@@ -460,6 +458,7 @@ public class PublicService {
 
     /**
      * 添加或更新摄像头
+     *
      * @param reqJson
      * @return
      */
@@ -541,9 +540,9 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "找不到参数manufactory");
             return returnJsonObject.toString();
         }
-        if (jsonObject.containsKey("classId")){
+        if (jsonObject.containsKey("classId")) {
             classId = jsonObject.getLong("classId");
-        }else {
+        } else {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "找不到参数classId");
             return returnJsonObject.toString();
@@ -632,7 +631,7 @@ public class PublicService {
                 Kindergarten kindergarten1 = new Kindergarten();
                 kindergarten1.setId(gartenId);
                 Camera camera1 = new Camera(id, ipUrl, videoUrl, description, manufactory, clz1, kindergarten1, cameraType, state, thumbPath, activePeriod, isPublic);
-                if(cameradao.updateCamera(camera1)){
+                if (cameradao.updateCamera(camera1)) {
                     returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
                     returnJsonObject.put("resultDesc", "操作成功");
                 } else {
@@ -651,6 +650,7 @@ public class PublicService {
     /**
      * 文件上传
      * 单个文件上传
+     *
      * @param ins
      * @param reqJson
      * @return
@@ -688,7 +688,8 @@ public class PublicService {
     }
 
     /**
-     *发布或更新校园新闻
+     * 发布或更新校园新闻
+     *
      * @param reqJson
      * @return
      */
@@ -719,8 +720,8 @@ public class PublicService {
             modifyDate = simpleDateFormat.parse(modifyDateStr);
         } catch (ParseException e) {
             e.printStackTrace();
-            returnJsoObject.put("resultCode","000002");
-            returnJsoObject.put("resultDesc","日期格式有误");
+            returnJsoObject.put("resultCode", "000002");
+            returnJsoObject.put("resultDesc", "日期格式有误");
             return returnJsoObject.toString();
         }
 
@@ -732,28 +733,28 @@ public class PublicService {
         gartenNews.setDescription(description);
         gartenNews.setPublishDate(publisDate);
         gartenNews.setModifyDate(modifyDate);
-        switch (optType){
+        switch (optType) {
             case 0: //发布
-                if(gartennewsdao.addGartenNews(gartenNews)){
+                if (gartennewsdao.addGartenNews(gartenNews)) {
                     long newsId = gartenNews.getId();
-                    returnJsoObject.put("id",newsId);
-                    returnJsoObject.put("resultCode","000000");
-                    returnJsoObject.put("resultDesc","操作成功");
-                }else{
-                    returnJsoObject.put("resultCode","000001");
-                    returnJsoObject.put("resultDesc","操作失败");
+                    returnJsoObject.put("id", newsId);
+                    returnJsoObject.put("resultCode", "000000");
+                    returnJsoObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsoObject.put("resultCode", "000001");
+                    returnJsoObject.put("resultDesc", "操作失败");
                 }
                 break;
             case 1: //更新
                 long newsId = job.getLong("id");
                 gartenNews.setId(newsId);
-                if(gartennewsdao.updateGartenNews(gartenNews)){
-                    returnJsoObject.put("id",newsId);
-                    returnJsoObject.put("resultCode","000000");
-                    returnJsoObject.put("resultDesc","操作成功");
-                }else{
-                    returnJsoObject.put("resultCode","000001");
-                    returnJsoObject.put("resultDesc","操作失败");
+                if (gartennewsdao.updateGartenNews(gartenNews)) {
+                    returnJsoObject.put("id", newsId);
+                    returnJsoObject.put("resultCode", "000000");
+                    returnJsoObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsoObject.put("resultCode", "000001");
+                    returnJsoObject.put("resultDesc", "操作失败");
                 }
                 break;
             default:
@@ -765,13 +766,14 @@ public class PublicService {
 
     /**
      * 显示摄像头列表
+     *
      * @return
      */
     @Path("/publishOrUpdateSchoolNews")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String queryCamera(@RequestBody String reqJson){
+    public String queryCamera(@RequestBody String reqJson) {
         JSONObject returnJsonObject = new JSONObject();
         JSONObject jsonObject = JSONObject.fromObject(reqJson);
         if (jsonObject == null) {
@@ -780,31 +782,219 @@ public class PublicService {
             return returnJsonObject.toString();
         }
 
-        long gardenId,classId;
+        long gardenId, classId;
         int pageNum;
-        if(jsonObject.containsKey("gardenId")){
+        if (jsonObject.containsKey("gardenId")) {
             gardenId = jsonObject.getLong("gardenId");
-        }else {
+        } else {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "找不到参数gardenId");
             return returnJsonObject.toString();
         }
-        if(jsonObject.containsKey("classId")){
+        if (jsonObject.containsKey("classId")) {
             classId = jsonObject.getLong("classId");
-        }else {
+        } else {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "找不到参数classId");
             return returnJsonObject.toString();
         }
-        if(jsonObject.containsKey("pageNum")){
+        if (jsonObject.containsKey("pageNum")) {
             pageNum = jsonObject.getInt("pageNum");
-        }else {
+        } else {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "找不到参数pageNum");
             return returnJsonObject.toString();
         }
 
+        List<Camera> privateCameraList = cameradao.queryPrivateCamerasList(classId);
+        List<Camera> publicCameraList = cameradao.queryPublicCamerasList(gardenId);
+        if (privateCameraList == null && publicCameraList == null) {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "显示摄像头列表失败");
+        } else {
+            int privateCameraCount = 0, publicCameraCount = 0;
+            JSONArray data = new JSONArray();
+            if (privateCameraList != null) {
+                privateCameraCount = privateCameraList.size();
+                for (int i = 0; i < privateCameraCount; i++) {
+                    Camera camera = privateCameraList.get(i);
+                    JSONObject item = new JSONObject();
+                    item.put("cameraId", camera.getId());
+                    item.put("classId", camera.getCla().getId());
+                    item.put("className", camera.getCla().getName());
+                    item.put("openTimeArea", camera.getActive_period());
+                    item.put("thumbPath", camera.getThumb_path());
+                    item.put("state", camera.getState());
+                    item.put("isPublic", camera.is_public());
+                    data.add(item);
+                }
+
+            }
+            if (publicCameraList != null) {
+                publicCameraCount = publicCameraList.size();
+                for (int j = 0; j < publicCameraCount; j++) {
+                    Camera camera = publicCameraList.get(j);
+                    JSONObject item = new JSONObject();
+                    item.put("cameraId", camera.getId());
+                    item.put("classId", camera.getCla().getId());
+                    item.put("className", camera.getCla().getName());
+                    item.put("openTimeArea", camera.getActive_period());
+                    item.put("thumbPath", camera.getThumb_path());
+                    item.put("state", camera.getState());
+                    item.put("isPublic", camera.is_public());
+                    data.add(item);
+                }
+            }
+            int totalCount = privateCameraList == null && publicCameraList == null ? 0 : privateCameraCount + publicCameraCount;
+            returnJsonObject.put("data", data);
+            returnJsonObject.put("totalCount", totalCount);
+            //分页功能待修改
+            returnJsonObject.put("hasNextPage", false);
+            returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+            returnJsonObject.put("resultDesc", "操作成功");
+        }
         return returnJsonObject.toString();
     }
 
+    /**
+     * 查询摄像头
+     * @param reqJson
+     * @return
+     */
+    @Path("/queryVideo")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String queryVideo(@RequestBody String reqJson) {
+        JSONObject jsonObject = JSONObject.fromObject(reqJson);
+        JSONObject returnJsonObject = new JSONObject();
+        if (jsonObject == null) {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "请求参数异常");
+            return returnJsonObject.toString();
+        }
+        int roleType;
+        long roleId;
+        long cameraId;
+        long classId;
+        boolean isPublic;
+
+        if (jsonObject.containsKey("roleType")) {
+            roleType = jsonObject.getInt("roleType");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数roleType");
+            return returnJsonObject.toString();
+        }
+        if (jsonObject.containsKey("roleId")) {
+            roleId = jsonObject.getLong("roleId");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数roleId");
+            return returnJsonObject.toString();
+        }
+        if (jsonObject.containsKey("cameraId")) {
+            cameraId = jsonObject.getLong("cameraId");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数cameraId");
+            return returnJsonObject.toString();
+        }
+        if (jsonObject.containsKey("classId")) {
+            classId = jsonObject.getLong("classId");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数classId");
+            return returnJsonObject.toString();
+        }
+        if (jsonObject.containsKey("isPublic")) {
+            isPublic = jsonObject.getBoolean("isPublic");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数isPublic");
+            return returnJsonObject.toString();
+        }
+
+        Camera camera = cameradao.queryCamera(cameraId);
+        if (camera == null) {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "获取摄像头失败");
+        } else {
+            switch (roleType) {
+                case 1://老师角色,只能看自己班级的和公共的
+                    if (isPublic) {
+                        returnJsonObject.put("videoUrl", camera.getVideo_url());
+                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                        returnJsonObject.put("resultDesc", "操作成功");
+                    } else {
+                        Teacher teacher = teacherdao.queryTeacher(roleId);
+                        if (teacher != null) {
+                            Set<Class> classes = teacher.getClasses();
+                            boolean belongTeacher = false;
+                            Iterator iterator = classes.iterator();
+                            while (iterator.hasNext()) {
+                                Class clazz = (Class) iterator.next();
+                                if (classId == clazz.getId()) {
+                                    belongTeacher = true;
+                                    break;
+                                }
+                            }
+                            if (belongTeacher) {//班级属于老师
+                                returnJsonObject.put("videoUrl", camera.getVideo_url());
+                                returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                                returnJsonObject.put("resultDesc", "操作成功");
+                            } else {
+                                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                                returnJsonObject.put("resultDesc", "只能查看自己的班级");
+                            }
+                        } else {
+                            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                            returnJsonObject.put("resultDesc", "获取老师信息失败");
+                        }
+                    }
+                    break;
+                case 3: //家长角色，只有vip才能看（且只能看孩子班级和公共的）
+                    Parents parents = parentsdao.queryParents(roleId);
+                    if (parents != null) {
+                        Student student = parents.getStudent();
+                        if (student != null) {
+                            boolean isVip = student.isVip();
+                            long clazzId = student.getCla().getId();
+                            if (isVip) {
+                                if (isPublic || classId == clazzId) {
+                                    returnJsonObject.put("videoUrl", camera.getVideo_url());
+                                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                                    returnJsonObject.put("resultDesc", "操作成功");
+                                } else {
+                                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                                    returnJsonObject.put("resultDesc", "不能查看其他班和公共以外的摄像头");
+                                }
+                            } else {
+                                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                                returnJsonObject.put("resultDesc", "该用户不是vip");
+                            }
+                        } else {
+                            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                            returnJsonObject.put("resultDesc", "获取baby信息失败");
+                        }
+                    } else {
+                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                        returnJsonObject.put("resultDesc", "获取家长信息失败");
+                    }
+                    break;
+                case 2://其他角色，园长、管理员、运营商和赞助商所有都可以看
+                case 4:
+                case 5:
+                    returnJsonObject.put("videoUrl", camera.getVideo_url());
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                    break;
+                default://未知角色，直接返回异常
+                    returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+                    returnJsonObject.put("resultDesc", "未知的角色");
+                    break;
+            }
+        }
+        return returnJsonObject.toString();
+    }
 }
