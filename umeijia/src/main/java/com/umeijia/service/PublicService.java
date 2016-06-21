@@ -160,10 +160,11 @@ public class PublicService {
                 babyfootprintdao.addBabyFootPrint(bfp);
             }
             babyshowtimedao.addBabyShowtime(bst);
+            jobOut.put("id",bst.getId());
             jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","添加成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }
@@ -193,11 +194,16 @@ public class PublicService {
                     result = babyshowtimedao.queryBabyShowtimesByTeacher(roleId);
                     break;
                 case 2:
-                    result = babyshowtimedao.queryBabyShowtimesByClass(roleId);
+                    result = babyshowtimedao.queryBabyShowtimesByClass(classId);
                     break;
                 case 3:  //家长查询
                     result = babyshowtimedao.queryBabyShowtimesByParents(roleId);
                     break;
+            }
+            if(result==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
+                return jobOut.toString();
             }
             JSONArray ja = new JSONArray();
             for(BabyShowtime item : result){
@@ -215,7 +221,7 @@ public class PublicService {
                     jo.put("avatar",parents.getAvatar_path());
                 }
                 jo.put("description",item.getDescription());
-                jo.put("date",item.getDate());
+                jo.put("date",item.getDate().toString());
                 jo.put("type",item.getShow_type());
                 jo.put("urls",item.getImage_urls());
                 JSONArray commentsArray = new JSONArray();
@@ -223,29 +229,30 @@ public class PublicService {
                  * comments的jsonarray
                  */
                 List<ShowtimeComments> comments = showtimecommentsdao.queryShowtimeComments(item.getId());
-                for (ShowtimeComments commentsItem : comments){
-                    JSONObject job = new JSONObject();
-                    job.put("userRoleType",commentsItem.getUser_type());
-                    job.put("userId",commentsItem.getUser_id());
-                    job.put("userName",getNameFromRoleTypeAndRoleId(commentsItem.getUser_type(),commentsItem.getUser_id()));
-                    job.put("isLike",commentsItem.isSay_good());
-                    job.put("responseUserType",commentsItem.getResponse_user_type());
-                    job.put("responseUserId",commentsItem.getResponse_user_id());
-                    job.put("responseUserName",getNameFromRoleTypeAndRoleId(commentsItem.getResponse_user_type(),commentsItem.getResponse_user_id()));
-                    job.put("content",commentsItem.getComment_content());
-                    commentsArray.add(job);
+                if(comments!=null&&comments.size()!=0){
+                    for (ShowtimeComments commentsItem : comments){
+                        JSONObject job = new JSONObject();
+                        job.put("userRoleType",commentsItem.getUser_type());
+                        job.put("userId",commentsItem.getUser_id());
+                        job.put("userName",getNameFromRoleTypeAndRoleId(commentsItem.getUser_type(),commentsItem.getUser_id()));
+                        job.put("isLike",commentsItem.isSay_good());
+                        job.put("responseUserType",commentsItem.getResponse_user_type());
+                        job.put("responseUserId",commentsItem.getResponse_user_id());
+                        job.put("responseUserName",getNameFromRoleTypeAndRoleId(commentsItem.getResponse_user_type(),commentsItem.getResponse_user_id()));
+                        job.put("content",commentsItem.getComment_content());
+                        commentsArray.add(job);
+                    }
+                    jo.put("comments", commentsArray.toString());
                 }
-                jo.put("comments", commentsArray.toString());
-
                 ja.add(jo);
             }
             jobOut.put("data",ja.toString()); //返回的数据
             jobOut.put("hasNextPage",true); //是否有下一页
             jobOut.put("totalCount",ja.size());  //总共返回多少条记录
-            jobOut.put("resultCode","success");
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }
@@ -335,11 +342,16 @@ public class PublicService {
                 if((roleType==1||roleType==2)&&roleId==bst.getTeacher_id()){
                     babyshowtimedao.invalidShowtime(id);
                 }
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc","动态不是该用户发布，不能删除");
+                return jobOut.toString();
             }
-            jobOut.put("resultCode", "success");
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }
@@ -379,7 +391,7 @@ public class PublicService {
             jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
-            jobOut.put("resultCode","error");
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc","操作失败");
         }
