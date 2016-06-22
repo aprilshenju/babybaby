@@ -39,6 +39,53 @@ public class CheckinRecordsDao {
             return null;
         }
     }
+
+    /**
+     * 家长查询
+     * @param babyId
+     * @param year
+     * @param month
+     * @param day
+     * @return
+     */
+    public List<CheckinRecords> queryCheckinRecordsByBabyAndTime(long babyId,int year,int month,int day){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.stu_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d group by date desc",babyId,year,month,day);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    /**
+     * 老师或园长查询
+     * @param classId
+     * @param year
+     * @param month
+     * @param day
+     * @return
+     */
+    public List<CheckinRecords> queryCheckinRecordsByClassAndTime(long classId,int year,int month,int day){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.class_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d group by stu_id desc",classId,year,month,day);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
     
     public boolean addCheckinRecords(CheckinRecords checkincard) {
         boolean result=false;
