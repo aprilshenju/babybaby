@@ -2,7 +2,9 @@ package com.umeijia.service;
 
 import com.sun.jersey.multipart.FormDataParam;
 import com.umeijia.dao.*;
+import com.umeijia.enums.InterfaceTypeEnum;
 import com.umeijia.util.GlobalStatus;
+import com.umeijia.util.ThumbGenerateThread;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
 import net.sf.json.JSONArray;
@@ -16,10 +18,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -1230,8 +1230,8 @@ public class PublicService {
                 item.put("description", news.getDescription());
                 item.put("imageUrls", news.getImage_urls());
                 item.put("teacherName", news.getTeacher().getName());
-                item.put("publishDate", news.getPublishDate());
-                item.put("modifyDate", news.getModifyDate());
+                item.put("publishDate", news.getPublishDate().toString());
+                item.put("modifyDate", news.getModifyDate().toString());
                 data.add(item);
             }
             returnJsonObject.put("data", data);
@@ -1382,7 +1382,7 @@ public class PublicService {
             return returnJsonObject.toString();
         }
         switch (type) {
-            case 0://添加
+            case 1://添加
                 Class clz = new Class();
                 clz.setId(classId);
                 Kindergarten kindergarten = new Kindergarten();
@@ -1398,7 +1398,7 @@ public class PublicService {
                     returnJsonObject.put("resultDesc", "添加摄像头失败");
                 }
                 break;
-            case 1://更新
+            case 2://更新
                 if (jsonObject.containsKey("id")) {
                     id = jsonObject.getLong("id");
                 } else {
@@ -1422,7 +1422,7 @@ public class PublicService {
                 break;
             default:
                 returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
-                returnJsonObject.put("resultDesc", "操作类型错误，type应该为0或1");
+                returnJsonObject.put("resultDesc", "操作类型错误，type应该为1或2");
                 break;
         }
         return returnJsonObject.toString();
@@ -1441,33 +1441,139 @@ public class PublicService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String fileUpload(@FormDataParam("fileData") InputStream ins, @FormDataParam("jsonArgs") String reqJson) {
-        String path = "D:/work/";
-        File dir = new File("D:/imgs");
-        if (!dir.exists()) {
-            dir.mkdirs();
-            System.out.println("创建图片目录...");
-        }
         JSONObject job = JSONObject.fromObject(reqJson);
         JSONObject returnJsonObject = new JSONObject();
-        String imgName = job.getString("imgName");
-        File img = new File(path + "/" + imgName);
+        int fileType;
+        long recordId;
+        long roleId;
+        int roleType;
+        InterfaceTypeEnum interfaceType;
+        String imgName;
+
+        if(job.containsKey("fileType")){
+            fileType = job.getInt("fileType");
+        }else{
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数fileType");
+            return returnJsonObject.toString();
+        }
+        if(job.containsKey("recordId")){
+            recordId = job.getLong("recordId");
+        }else{
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数recordId");
+            return returnJsonObject.toString();
+        }
+        if(job.containsKey("roleId")){
+            roleId = job.getLong("roleId");
+        }else{
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数roleId");
+            return returnJsonObject.toString();
+        }
+        if(job.containsKey("roleType")){
+            roleType = job.getInt("roleType");
+        }else{
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数roleType");
+            return returnJsonObject.toString();
+        }
+        if(job.containsKey("interfaceType")){
+            interfaceType = (InterfaceTypeEnum) job.get("interfaceType");
+        }else{
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数interfaceType");
+            return returnJsonObject.toString();
+        }
+        if(job.containsKey("imgName")){
+            imgName = job.getString("imgName");
+        }else{
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数imgName");
+            return returnJsonObject.toString();
+        }
+        //根路径
+        String baseDir = "E:/file";
+        //类别路径
+        String filePath = null;
+        String imgUrls = null;
+        //原始图片存放路径
+        String imgPath = null;
+        //小图存放路径
+        String thumbDir = null;
+        Thread thumbImgThread = null;
+        switch (interfaceType){
+            case publishOrUpdateSchoolNews://发布编辑校园新闻接口
+                GartenNews gartenNews = gartennewsdao.queryGartenNews(recordId);
+                if(gartenNews!=null){
+                    long gardenId = gartenNews.getKindergarten().getId();
+                    filePath = "/garden/"+gardenId+"/news";
+                    File dir = new File(baseDir+filePath);
+                    if(!dir.exists()){
+                        dir.mkdirs();
+                        System.out.println("创建图片目录:"+dir.getPath());
+                    }
+                    //存储原图
+                    imgPath = dir.getPath()+"/origin/"+imgName;
+                    storeImg(imgPath,ins);
+                    //存储缩略图
+                    thumbDir = dir.getParent()+"/thumb";
+                    thumbImgThread = new ThumbGenerateThread(imgPath,thumbDir);
+                    //线程处理图片缩放和存储
+                    thumbImgThread.start();
+                    imgUrls = gartenNews.getImage_urls();
+                    if(imgUrls!=null){
+                        imgUrls += imgName+";";
+                    }else{
+                        imgUrls = imgName+";";
+                    }
+                    gartenNews.setImage_urls(imgUrls);
+                    if(gartennewsdao.updateGartenNews(gartenNews)){
+                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                        returnJsonObject.put("resultDesc", "操作成功");
+                    }else{
+                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                        returnJsonObject.put("resultDesc", "更新数据库失败");
+                    }
+                }else{
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "没有找到对应的新闻记录");
+                }
+                break;
+            default:
+                break;
+        }
+        return returnJsonObject.toString();
+    }
+
+    /**
+     * 将流转换为图片，并存储到指定路径
+     * @param imgPath 图片存储路径
+     * @param ins
+     */
+    private void storeImg(String imgPath,InputStream ins){
+        File file = new File(imgPath);
+        OutputStream os = null;
         try {
-            OutputStream os = new FileOutputStream(img);
+            os = new FileOutputStream(file);
             int bytesRead = 0;
             byte[] buffer = new byte[1024];
             while ((bytesRead = ins.read(buffer)) != -1) {
                 os.write(buffer, 0, bytesRead);
             }
-            os.close();
-            ins.close();
-        } catch (Exception e) {
-            returnJsonObject.put("status", "error");
-            return returnJsonObject.toString();
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            try {
+                os.close();
+                ins.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        returnJsonObject.put("status", "success");
-        return returnJsonObject.toString();
     }
-
     /**
      * 发布或更新校园新闻
      *
@@ -1493,9 +1599,9 @@ public class PublicService {
 //        String teacherName = teacher.getName();
 //        String publishDateStr = job.getString("publishDate");
 //        String modifyDateStr = job.getString("modifyDate");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd HH:mm");
-        Date publisDate;
-        Date modifyDate;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date publisDate = null;
+        Date modifyDate =null;
 //        try {
 //            publisDate = simpleDateFormat.parse(publishDateStr);
 //            modifyDate = simpleDateFormat.parse(modifyDateStr);
@@ -1515,7 +1621,7 @@ public class PublicService {
 
 
         switch (optType) {
-            case 0: //发布
+            case 1: //发布
                 publisDate = new Date();
                 gartenNews.setPublishDate(publisDate);
                 gartenNews.setModifyDate(publisDate);
@@ -1529,21 +1635,30 @@ public class PublicService {
                     returnJsoObject.put("resultDesc", "操作失败");
                 }
                 break;
-            case 1: //更新
+            case 2: //更新
+                String publishDateStr = job.getString("publishDate");
+                try {
+                    publisDate=simpleDateFormat.parse(publishDateStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 modifyDate = new Date();
+                gartenNews.setPublishDate(publisDate);
                 gartenNews.setModifyDate(modifyDate);
                 long newsId = job.getLong("id");
                 gartenNews.setId(newsId);
                 if (gartennewsdao.updateGartenNews(gartenNews)) {
                     returnJsoObject.put("id", newsId);
-                    returnJsoObject.put("resultCode", "000000");
+                    returnJsoObject.put("resultCode", GlobalStatus.succeed.toString());
                     returnJsoObject.put("resultDesc", "操作成功");
                 } else {
-                    returnJsoObject.put("resultCode", "000001");
+                    returnJsoObject.put("resultCode", GlobalStatus.error.toString());
                     returnJsoObject.put("resultDesc", "操作失败");
                 }
                 break;
             default:
+                returnJsoObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsoObject.put("resultDesc", "type类型错误，应为1或2");
                 break;
         }
 
