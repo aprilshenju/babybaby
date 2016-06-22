@@ -13,9 +13,11 @@ public class BasicInfo {
         return id;
     }
 
-    public String getVersion_no() {
-        return version_no;
+    public String getTeacher_version_no() {
+        return teacher_version_no;
     }
+
+    public String getParent_version_no() {return  parent_version_no; }
 
     public String getCompany_name() {
         return company_name;
@@ -37,7 +39,8 @@ public class BasicInfo {
         return introduction;
     }
     private long id;
-    private String version_no;
+    private String teacher_version_no;
+    private String parent_version_no;
 
     public void setAddr(String addr) {
         this.addr = addr;
@@ -47,9 +50,11 @@ public class BasicInfo {
         this.id = id;
     }
 
-    public void setVersion_no(String version_no) {
-        this.version_no = version_no;
+    public void setTeacher_version_no(String teacher_version_no) {
+        this.teacher_version_no = teacher_version_no;
     }
+
+    public void setParent_version_no(String parent_version_no) {this.parent_version_no = parent_version_no;}
 
     public void setCompany_name(String company_name) {
         this.company_name = company_name;

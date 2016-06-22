@@ -9,6 +9,7 @@ import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +31,31 @@ public class StudentDao {
         if(list.size()>0){
             Student student = (Student) list.get(0);
             return student;
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 根据班级返回所有学生的id，用于查看未读家长时使用
+     * @param classId
+     * @return
+     */
+    public List<Long> queryStudentByClass(long classId){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Student as u where u.cla.id=%d", classId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        List<Long> result = new ArrayList<Long>();
+        if(list!=null){
+            for(int i=0;i<list.size();i++){
+                result.add(((Student)list.get(i)).getId());
+            }
+        }
+        session.close();
+        if(result.size()>0){
+           return result;
         }else {
             return null;
         }
