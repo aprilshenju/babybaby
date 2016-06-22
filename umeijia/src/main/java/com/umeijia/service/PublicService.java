@@ -1146,7 +1146,7 @@ public class PublicService {
      *
      * @return
      */
-    @Path("/publishOrUpdateSchoolNews")
+    @Path("/queryCamera")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
