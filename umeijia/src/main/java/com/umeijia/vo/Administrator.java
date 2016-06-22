@@ -73,6 +73,10 @@ public class Administrator {
 	private Date expire; // 过期时间
 	private String token; //登陆token
 
+	public  Administrator(){
+
+	}
+
 	public  Administrator(String phone,String email,String pwd,String name,Date date,boolean super_root){
 			phone_num=phone;
 			this.email=email;

@@ -17,6 +17,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 
 @Service
 @Path("/run_service")
@@ -160,6 +162,103 @@ public class RunService {
         }
     }
 
+    @Path("/agentLogin")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String loginAgent(@RequestBody String userinfo, @Context HttpHeaders headers){
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out=new JSONObject();
+        try {
+            String phone=job.getString("phone");
+            String email=job.getString("email");
+            String pwd=job.getString("password");
+            String pwd_md=MD5.GetSaltMD5Code(pwd);
+            Agent ag=null;
+            if (!phone.isEmpty()) {
+                ag = agentdao.loginCheckByPhone(phone,pwd_md);
+            } else if(!email.isEmpty()){ // 邮箱登录
+                ag= agentdao.loginCheckByEmail(email,pwd_md);
+            }
+            if(ag!=null)
+            {
+                Set<Kindergarten> gartens = ag.getGartens();
+                job_out.put("resultCode", GlobalStatus.succeed.toString());
+                job_out.put("resultDesc","登陆成功");
+                job_out.put("tkn",ag.getToken());
+                job_out.put("tkn_exptime",ag.getExpire().toString());
+                job_out.put("p_id",ag.getId());
+                job_out.put("phone",ag.getPhone_num());
+                job_out.put("email",ag.getEmail());
+                job_out.put("name",ag.getName());
+                job_out.put("price",ag.getPrice_rate());
+                job_out.put("company",ag.getCompany_name());
+                job_out.put("regis_date",ag.getRegist_date().toString());
+                job_out.put("avatar",ag.getAvarta());
+                String garten_ids="";
+                String garten_names="";
+                Iterator<Kindergarten> it=gartens.iterator();
+                while (it.hasNext()){
+                    Kindergarten kg = (Kindergarten)it.next();
+                    garten_ids+=kg.getId();
+                    garten_ids+=";";
+                    garten_names+=kg.getName();
+                    garten_names+=";";
+                }
+                job_out.put("garten_ids",garten_ids);
+                job_out.put("garten_names",garten_names);
+            }else{
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","登录用户名、邮箱或密码无效");
+            }
+        }catch (JSONException e){
+            return "error";  //json  构造异常，直接返回error
+        }
+        return job_out.toString();
+    }
+
+
+    @Path("/adminLogin")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String loginAdmin(@RequestBody String userinfo, @Context HttpHeaders headers){
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out=new JSONObject();
+        try {
+            String phone=job.getString("phone");
+            String email=job.getString("email");
+            String pwd=job.getString("password");
+            String pwd_md=MD5.GetSaltMD5Code(pwd);
+            Administrator admin=null;
+            if (!phone.isEmpty()) {
+                admin = administratordao.loginCheckByPhone(phone,pwd_md);
+            } else if(!email.isEmpty()){ // 邮箱登录
+                admin = administratordao.loginCheckByEmail(email,pwd_md);
+            }
+            if(admin!=null)
+            {
+
+                job_out.put("resultCode", GlobalStatus.succeed.toString());
+                job_out.put("resultDesc","登陆成功");
+                job_out.put("tkn",admin.getToken());
+                job_out.put("tkn_exptime",admin.getExpire().toString());
+                job_out.put("p_id",admin.getId());
+                job_out.put("phone",admin.getPhone_num());
+                job_out.put("email",admin.getEmail());
+                job_out.put("name",admin.getName());
+                job_out.put("is_super",admin.isIs_super());
+
+            }else{
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","登录用户名、邮箱或密码无效");
+            }
+        }catch (JSONException e){
+            return "error";  //json  构造异常，直接返回error
+        }
+        return job_out.toString();
+    }
+
     /***
      *
      *运营人员天添加 幼儿园
@@ -268,7 +367,7 @@ public class RunService {
                 return job_out.toString();
             }
             Administrator root = administratordao.queryAdministrator(tid);
-            if(root==null){
+            if(root==null||root.isIs_super()==false){
                 job_out.put("resultCode",GlobalStatus.error.toString());
                 job_out.put("resultDesc","只有超级管理员才有该权限");
                 return job_out.toString();
@@ -361,7 +460,7 @@ public class RunService {
             String newPasswordMD=MD5.GetSaltMD5Code(job.getString("newPassword"));
             Agent a=agentdao.queryAgent(phone);
 
-            if(a!=null && newPasswordMD.equals(a.getPwd_md()))
+            if(a!=null && oldPasswordMD.equals(a.getPwd_md()))
             {
                 a.setPwd_md(newPasswordMD);
                 a.setToken(MD5.GetSaltMD5Code(newPasswordMD+new Date().toString())); //token重置
@@ -378,7 +477,7 @@ public class RunService {
         }
         return job_out.toString();
     }
-    @Path("/correctAdminAgentPwd")
+    @Path("/correctAdminPwd")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -400,7 +499,7 @@ public class RunService {
             String newPasswordMD=MD5.GetSaltMD5Code(job.getString("newPassword"));
             Administrator a=administratordao.queryAdministrator(phone);
 
-            if(a!=null && newPasswordMD.equals(a.getPwd_md()))
+            if(a!=null && oldPasswordMD.equals(a.getPwd_md()))
             {
                 a.setPwd_md(newPasswordMD);
                 a.setToken(MD5.GetSaltMD5Code(newPasswordMD+new Date().toString())); //token重置

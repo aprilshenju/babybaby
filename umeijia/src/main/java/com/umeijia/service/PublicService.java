@@ -1,4 +1,3 @@
-/*
 package com.umeijia.service;
 
 import com.sun.jersey.multipart.FormDataParam;
@@ -24,11 +23,9 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-*/
 /**
  * Created by shenju on 2016/6/20.
- *//*
-
+ */
 
 @Service
 @Path("/public_service")
@@ -119,6 +116,7 @@ public class PublicService {
 
 
 
+
     @Path("/addBabyShowTime")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -195,12 +193,10 @@ public class PublicService {
                 return jobOut.toString();
             }
             int classId = jobIn.getInt("classId");
-            */
-/**
+            /**
              * @shanji
              * 分页
-             *//*
-
+             */
             int pageNum = jobIn.getInt("pageNum");
             List<BabyShowtime> result = new ArrayList<BabyShowtime>();
             switch(roleType){
@@ -239,11 +235,9 @@ public class PublicService {
                 jo.put("type",item.getShow_type());
                 jo.put("urls",item.getImage_urls());
                 JSONArray commentsArray = new JSONArray();
-                */
-/**
+                /**
                  * comments的jsonarray
-                 *//*
-
+                 */
                 List<ShowtimeComments> comments = showtimecommentsdao.queryShowtimeComments(item.getId());
                 if(comments!=null&&comments.size()!=0){
                     for (ShowtimeComments commentsItem : comments){
@@ -276,14 +270,12 @@ public class PublicService {
     }
 
 
-    */
-/**
+    /**
      * 根据角色类型和角色id，返回name
      * @param type
      * @param id
      * @return
-     *//*
-
+     */
     public String getNameFromRoleTypeAndRoleId(int type,long id){
         String result = "";
         switch(type){
@@ -308,14 +300,12 @@ public class PublicService {
         return result;
     }
 
-    */
-/**
+    /**
      * 根据角色类型和传入的id和tkn，验证用户是否有效
      * @param roleType
      * @param headers
      * @return
-     *//*
-
+     */
     public boolean checkIdAndToken(int roleType,HttpHeaders headers){
         boolean result = false;
         String tkn = headers.getRequestHeader("tkn").get(0);
@@ -452,12 +442,10 @@ public class PublicService {
             bfp.setImage_urls("");
 
             if(type==1){ //新增
-                */
-/**
+                /**
                  * @shanji
                  * 需要在footprintdao里面添加一个每天只能发布一条记录的接口
-                 *//*
-
+                 */
                 babyfootprintdao.addBabyFootPrint(bfp);
             }else if(type==2){ //编辑
                 bfp.setId(id);
@@ -618,14 +606,12 @@ public class PublicService {
 
 
 
-    */
-/**
+    /**
      * 查询校园新闻
      *
      * @param reqJson
      * @return
-     *//*
-
+     */
     @Path("/querySchoolNews")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -685,14 +671,12 @@ public class PublicService {
         return returnJsonObject.toString();
     }
 
-    */
-/**
+    /**
      * 添加或更新摄像头
      *
      * @param reqJson
      * @return
-     *//*
-
+     */
     @Path("/addOrUpdateCamera")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -868,16 +852,14 @@ public class PublicService {
         return returnJsonObject.toString();
     }
 
-    */
-/**
+    /**
      * 文件上传
      * 单个文件上传
      *
      * @param ins
      * @param reqJson
      * @return
-     *//*
-
+     */
     @Path("/fileUpload")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -910,14 +892,12 @@ public class PublicService {
         return returnJsonObject.toString();
     }
 
-    */
-/**
+    /**
      * 发布或更新校园新闻
      *
      * @param reqJson
      * @return
-     *//*
-
+     */
     @Path("/publishOrUpdateSchoolNews")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -994,14 +974,12 @@ public class PublicService {
         return returnJsoObject.toString();
     }
 
-    */
-/**
+    /**
      * 显示摄像头列表
      *
      * @return
-     *//*
-
-    @Path("/publishOrUpdateSchoolNews")
+     */
+    @Path("/queryCamera")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -1089,13 +1067,11 @@ public class PublicService {
         return returnJsonObject.toString();
     }
 
-    */
-/**
+    /**
      * 查询摄像头
      * @param reqJson
      * @return
-     *//*
-
+     */
     @Path("/queryVideo")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -1234,4 +1210,3 @@ public class PublicService {
         return returnJsonObject.toString();
     }
 }
-*/

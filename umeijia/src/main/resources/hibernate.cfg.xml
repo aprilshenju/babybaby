@@ -8,9 +8,9 @@
 <!--		<property name="hibernate.connection.username">umj</property>
 		<property name="hibernate.connection.password">f7h8d5hjg4n3560nuyermpl</property>-->
 	<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-	<property name="hibernate.connection.url">jdbc:mysql://182.150.6.36:3306/umj_database?characterEncoding=UTF-8</property>
-	<property name="hibernate.connection.username">umj</property>
-	<property name="hibernate.connection.password">f7h8d5hjg4n3560nuyermpl</property>
+	<property name="hibernate.connection.url">jdbc:mysql://121.199.78.235:3306/umj_database?characterEncoding=UTF-8</property>
+	<property name="hibernate.connection.username">root</property>
+	<property name="hibernate.connection.password">zRqafryLPc5tVTQ3</property>
 	<property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
 	<property name="hibernate.show_sql">false</property>		
 		

@@ -118,7 +118,7 @@ public class ParentsService {
                 String newPasswordMD=MD5.GetSaltMD5Code(job.getString("newPassword"));
                 Parents p=parentsdao.queryParents(phone);
 
-                if(p!=null && newPasswordMD.equals(p.getPwd_md()))
+                if(p!=null && oldPasswordMD.equals(p.getPwd_md()))
                 {
                     p.setPwd_md(newPasswordMD);
                     p.setToken(MD5.GetSaltMD5Code(newPasswordMD+new Date().toString())); //token重置
