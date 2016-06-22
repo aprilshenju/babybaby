@@ -31,8 +31,8 @@
 		<property name="create_date" column="create_date"></property>
 		<property name="modified_date" column="modified_date"></property>
           
-    	<many-to-one name="cla" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>
-        <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+    	<many-to-one name="cla" class="com.umeijia.vo.Class" column="class_id" cascade="delete" lazy="false"></many-to-one>
+        <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete" lazy="false"></many-to-one>
                     
 	</class>
 	

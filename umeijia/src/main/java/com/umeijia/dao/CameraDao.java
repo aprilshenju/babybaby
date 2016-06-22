@@ -47,7 +47,7 @@ public class CameraDao {
     public List queryPrivateCamerasList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.cla.id=%d",class_id);
+        String sql = String.format("from Camera as ca where ca.cla.id=%d and ca.is_public=0",class_id);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();
