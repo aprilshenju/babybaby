@@ -23,10 +23,12 @@ public class Student {
 	public Student(){
 
 	}
-	public  Student(String name,String nick,int gender,int age,Date birthday,int height,int weight,String avatar,Class cla){
-		vip=false;
+	public  Student(String name,String nick,int gender,int age,Date birthday,int height,int weight,String avatar,Class cla,boolean isvip,Date start,Date end,Date enter_date){
+		vip=isvip;
+		this.vip_start=start;
+		this.vip_end=end;
 		this.name=name;
-		this.nick_name=nick_name;
+		this.nick_name=nick;
 		this.gender=gender;
 		this.age=age;
 		this.birthday= birthday;
@@ -34,6 +36,7 @@ public class Student {
 		this.weight=weight;
 		this.avatar_path=avatar;
 		this.cla=cla;
+		this.entrance_date=enter_date;
 	}
 
 

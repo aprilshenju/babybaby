@@ -9,14 +9,14 @@ public class Camera {
 	private String video_url;
 	private String description;
 	private String manufactory;
-	private Class cla;  //公公摄像头 classid为 -1
+	private Class cla;  //公公摄像�classid�-1
 	private Kindergarten garten;
 	private String type;  //
 	private String state;
-	private String thumb_path; //缩略图路径
+	private String thumb_path; //缩略图路�
 	private String active_period;
 	private boolean is_public; // 是否是公共摄像头
-	private Date create_date; //摄像头创建 日期
+	private Date create_date; //摄像头创�日期
 	private Date modified_date; //修改日期
 
 	public  Camera(){
@@ -38,6 +38,38 @@ public class Camera {
 		this.create_date=new Date();
 		this.modified_date=new Date();
 
+	}
+
+	public Camera(long id, String ip_url, String video_url, String description, String manufactory, Class cla, Kindergarten garten, String type, String state, String thumb_path, String active_period, boolean is_public,  Date modified_date) {
+		this.id = id;
+		this.ip_url = ip_url;
+		this.video_url = video_url;
+		this.description = description;
+		this.manufactory = manufactory;
+		this.cla = cla;
+		this.garten = garten;
+		this.type = type;
+		this.state = state;
+		this.thumb_path = thumb_path;
+		this.active_period = active_period;
+		this.is_public = is_public;
+		this.modified_date = modified_date;
+	}
+
+	public Camera(String ip_url, String video_url, String description, String manufactory, Class cla, Kindergarten garten, String type, String state, String thumb_path, String active_period, boolean is_public, Date create_date, Date modified_date) {
+		this.ip_url = ip_url;
+		this.video_url = video_url;
+		this.description = description;
+		this.manufactory = manufactory;
+		this.cla = cla;
+		this.garten = garten;
+		this.type = type;
+		this.state = state;
+		this.thumb_path = thumb_path;
+		this.active_period = active_period;
+		this.is_public = is_public;
+		this.create_date = create_date;
+		this.modified_date = modified_date;
 	}
 
 	public long getId() {
@@ -145,7 +177,7 @@ public class Camera {
 
 
 	/**
-	 * 根据时间段判断，是否在线开放
+	 * 根据时间段判断，是否在线开�
 	 * **/
 	public boolean isActive(){
 

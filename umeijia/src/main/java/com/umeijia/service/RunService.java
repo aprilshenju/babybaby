@@ -74,8 +74,9 @@ public class RunService {
         com.umeijia.vo.Class cla = new Class("大二班","就快要升一年级了，宝宝们","上午:舞蹈;下午:算术;","张宁三:133;","李老师:14553",garten);
         cla.getTeachers().add(te); //班级追加老师
         classdao.addClass(cla);
-        Student stu1 = new Student("仝刚","仝小宝",0,5,new Date(),150,30,"1.jpg",cla);
-        Student stu2 = new Student("刘屯屯","小屯屯",0,6,new Date(),138,36,"2.jpg",cla);
+        Date d = new Date();
+        Student stu1 = new Student("仝刚","仝小宝",0,5,new Date(),150,30,"1.jpg",cla,false,d,d,d);
+        Student stu2 = new Student("刘屯屯","小屯屯",0,6,new Date(),138,36,"2.jpg",cla,false,d,d,d);
         studentdao.addStudent(stu1);
         studentdao.addStudent(stu2);
         Parents parent = new Parents("15608036231","3523535@qq.com","刘洋",stu2,cla.getId(),MD5.GetSaltMD5Code("par123"),"爸爸","1.jpg");
