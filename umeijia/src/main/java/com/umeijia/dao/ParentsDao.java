@@ -50,6 +50,26 @@ public class ParentsDao {
         }*/
     }
 
+    /**
+     * 根据学生id返回对应家长，默认返回查到的第一个，用于做班级通知查看未读家长列表时使用
+     * @param studentId
+     * @return
+     */
+    public Parents queryParentsByStudentId(long studentId){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Parents as u where u.student.id=%d", studentId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            Parents parents = (Parents) list.get(0);
+            return parents;
+        }else {
+            return null;
+        }
+    }
+
     public Parents queryParents(String phoneNumber) {
         Session session = DBManager.getSession();
         session.clear();

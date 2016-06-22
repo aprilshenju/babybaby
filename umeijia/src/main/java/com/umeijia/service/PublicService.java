@@ -875,7 +875,7 @@ public class PublicService {
                 jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
-            if(roleType!=1||roleType!=2){
+            if(roleType!=1&&roleType!=2){
                 jobOut.put("resultCode",GlobalStatus.error.toString());
                 jobOut.put("resultDesc","没有权限发布/更新班级通知");
                 return jobOut.toString();
@@ -894,6 +894,7 @@ public class PublicService {
                 cn.setId(id);
                 classnotificationdao.updateClassNotification(cn);
             }
+            jobOut.put("id",cn.getId());
             jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
@@ -919,8 +920,14 @@ public class PublicService {
             int id = jobIn.getInt("id");
             int studentId = jobIn.getInt("studentId");
             ClassNotification cn = classnotificationdao.queryClassNotification(id);
-            cn.setSubscribers(cn.getSubscribers()+";"+studentId);
+            if(cn.getSubscribers().equals("")){
+                cn.setSubscribers(""+studentId);
+            }else{
+                cn.setSubscribers(cn.getSubscribers()+";"+studentId);
+            }
+
             classnotificationdao.updateClassNotification(cn);
+
             jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){
@@ -1012,7 +1019,7 @@ public class PublicService {
             jobOut.put("resultDesc","token已过期");
             return jobOut.toString();
         }
-        if(roleType!=1||roleType!=2){
+        if(roleType!=1&&roleType!=2){
             jobOut.put("resultCode",GlobalStatus.error.toString());
             jobOut.put("resultDesc","无权查看");
             return jobOut.toString();
@@ -1027,9 +1034,17 @@ public class PublicService {
                 /**
                  * 还需要家长的各种信息
                  */
-                jo.put("parentName","");
-                jo.put("phoneNum","");
-                jo.put("avatar","");
+                Parents parent = parentsdao.queryParentsByStudentId(Integer.parseInt(ids[i]));
+                if(parent!=null){
+                    jo.put("parentName",parent.getName());
+                    jo.put("phoneNum",parent.getPhone_num());
+                    jo.put("avatar",parent.getAvatar_path());
+                }else{
+                    jo.put("parentName","");
+                    jo.put("phoneNum","");
+                    jo.put("avatar","");
+                }
+
                 ja.add(jo);
             }
         }
@@ -1059,7 +1074,7 @@ public class PublicService {
                 jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
-            if(roleType!=1||roleType!=2){
+            if(roleType!=1&&roleType!=2){
                 jobOut.put("resultCode",GlobalStatus.error.toString());
                 jobOut.put("resultDesc","没有权限添加考勤记录");
                 return jobOut.toString();
@@ -1073,6 +1088,7 @@ public class PublicService {
             cir.setStu_id(checkincarddao.queryCheckinCard(cardId).getStu_id());
             cir.setTemperature((float) jobIn.getDouble("temperature"));
             checkinrecorddao.addCheckinRecords(cir);
+            jobOut.put("id",cir.getId());
             jobOut.put("resultCode", "success");
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){

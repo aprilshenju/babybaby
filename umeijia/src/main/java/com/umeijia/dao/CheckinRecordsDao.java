@@ -51,7 +51,7 @@ public class CheckinRecordsDao {
     public List<CheckinRecords> queryCheckinRecordsByBabyAndTime(long babyId,int year,int month,int day){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from CheckinRecords as cr where cr.stu_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d group by date desc",babyId,year,month,day);
+        String sql = String.format("from CheckinRecords as cr where cr.stu_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d order by date desc",babyId,year,month,day);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -74,7 +74,7 @@ public class CheckinRecordsDao {
     public List<CheckinRecords> queryCheckinRecordsByClassAndTime(long classId,int year,int month,int day){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from CheckinRecords as cr where cr.class_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d group by stu_id desc",classId,year,month,day);
+        String sql = String.format("from CheckinRecords as cr where cr.class_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d order by cr.stu_id desc",classId,year,month,day);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
