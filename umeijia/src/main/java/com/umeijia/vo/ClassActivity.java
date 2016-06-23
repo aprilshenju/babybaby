@@ -40,12 +40,12 @@ public class ClassActivity {
 	public void setEnd_date(Date end_date) {
 		this.end_date = end_date;
 	}
-	public long getClass_id() {
-		return class_id;
-	}
-	public void setClass_id(long class_id) {
-		this.class_id = class_id;
-	}
+//	public long getClass_id() {
+//		return class_id;
+//	}
+//	public void setClass_id(long class_id) {
+//		this.class_id = class_id;
+//	}
 	public long getTeacher_id() {
 		return teacher_id;
 	}
@@ -82,12 +82,21 @@ public class ClassActivity {
 	private String image_urls;
 	private Date start_date;
 	private Date end_date;
-	private long class_id;
+//	private long class_id;
 	private long teacher_id;
 	private int participate_num; //参与人数
 	private String baby_ids; //谁参与了
 	private String parent_ids; //参与人的家长
 	private String participate_time; //参与时间
+	private long class_id;
+
+	public long getClass_id() {
+		return class_id;
+	}
+
+	public void setClass_id(long class_id) {
+		this.class_id = class_id;
+	}
 
 	public void setContact_name(String contact_name) {
 		this.contact_name = contact_name;
