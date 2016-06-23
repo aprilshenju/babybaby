@@ -36,6 +36,8 @@ public class Kindergarten {
 		this.teacher_presence_imgs=t_imgs;
 		this.garten_instrument_imgs=gi_imgs;
 		this.garten_presence_imgs=gp_imgs;
+		this.create_date=new Date();
+		this.leader_wishes="";
 	}
 
 
