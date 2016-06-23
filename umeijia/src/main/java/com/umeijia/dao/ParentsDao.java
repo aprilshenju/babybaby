@@ -290,6 +290,22 @@ public class ParentsDao {
         }
     }
 
+    public  List<Parents> getParentsByClass(Long class_id){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Parents as u where u.class_id=%d", class_id);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        List<Parents> parents=new ArrayList<Parents>();
+        session.close();
+        for (int i = 0; i < list.size(); i++){
+            Parents t=(Parents)list.get(i);
+            parents.add(t);
+        }
+        return  parents;
+    }
+
     public boolean correctParentsWechatPush(String phoneNumber,boolean is_push) {
         boolean result=false;
         Session session = DBManager.getSession();

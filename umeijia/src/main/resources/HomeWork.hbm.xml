@@ -24,8 +24,7 @@
 		<property name="teacher_id" column="teacher_id" ></property>
 		<property name="image_urls" column="image_urls" ></property>		
       
-          <property name="class_id" column="homework_id"></property>
-                    
+          <property name="class_id" column="class_id"></property>
 	</class>
 	
 	

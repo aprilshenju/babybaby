@@ -1,5 +1,6 @@
 package com.umeijia.service;
 
+
 import com.umeijia.dao.*;
 import com.umeijia.util.GlobalStatus;
 import com.umeijia.util.MD5;
@@ -18,6 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 // ip/umeijia/teacher_service/hello
@@ -98,6 +100,11 @@ public class TeacherService {
             if(parentsdao.addParents(p)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加家长");
+
+                // 添加成功，后台异步更新通讯录
+                UpdateParentContractsThread th_update=new UpdateParentContractsThread(class_id);
+                th_update.start();
+
             }else{
                 job_out.put("resultCode",GlobalStatus.error.toString());
                 job_out.put("resultDesc","添加家长失败");
@@ -107,6 +114,61 @@ public class TeacherService {
             return "error";  //json  构造异常，直接返回error
         }
         return job_out.toString();
+    }
+    /***
+     * 添加家长
+     * curl -X POST -H "Content-Type:application/json" -d {"phone":"13534456644","password":"134df","name":"ltt4aoshou","email":"12345@qq.com","class_id":"1","baby_id":"1","relation":"dad","avatar":"fdef.jpg","gender":"0"}
+     * http://127.0.0.1/umeijiaServer/teacher_service/addParents
+     * **/
+    @Path("/addClass")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addClass(@RequestBody String userinfo, @Context HttpHeaders headers) {
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out = new JSONObject();
+        try {
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","token已过期");
+                return job_out.toString();
+            }
+                String name = job.getString("name");
+                String introduciton=job.getString("introduciton");
+                long garten_id=job.getLong("garten");
+                String schedule=job.getString("schedule");
+                String teacher_ids=job.getString("teachers"); // ; 号隔离的 id列表
+                Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
+                if(garten==null){
+                    job_out.put("resultCode",GlobalStatus.error.toString());
+                    job_out.put("resultDesc","无此幼儿园");
+                    return  job_out.toString();
+                }
+
+                Class cla = new Class(name,introduciton,schedule,"","",garten);
+                if(!teacher_ids.isEmpty()){
+                    String [] id_arr = teacher_ids.split(";");
+                    for (int i=0;i<id_arr.length;i++){
+                        long t_id=Long.parseLong(id_arr[i]);
+                        Teacher t=teacherdao.queryTeacher(t_id);
+                        if(t!=null){
+                            cla.getTeachers().add(t);
+                        }
+                    }
+                    if(classdao.addClass(cla)){
+                        job_out.put("resultCode",GlobalStatus.succeed.toString());
+                        job_out.put("resultDesc","成功添加班级");
+                        return job_out.toString();
+                    }
+                }
+            job_out.put("resultCode",GlobalStatus.error.toString());
+            job_out.put("resultDesc","添加班级失败");
+            return job_out.toString();
+        } catch (JSONException e) {
+            return "error";  //json  构造异常，直接返回error
+        }
     }
 
     /***
@@ -145,7 +207,7 @@ public class TeacherService {
             String pwd = job.getString("password");
             pwd=MD5.GetSaltMD5Code(pwd);
             String name = job.getString("name");
-            long class_id = job.getLong("class_id");
+/*            long class_id = job.getLong("class_id");*/
             long garten_id=job.getLong("garten_id");
             String avatar = job.getString("avatar");
      //       String wishes = job.getString("wishes"); //园长寄语，老师不传
@@ -154,7 +216,7 @@ public class TeacherService {
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
             Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-"); //普通老师
             if(teacherdao.addTeacher(ordTeacher)){
-                Class cla =classdao.queryClass(class_id);
+            /*    Class cla =classdao.queryClass(class_id);
                 if(cla==null){
                     job_out.put("resultCode",GlobalStatus.error.toString());
                     job_out.put("resultDesc","班级id无效");
@@ -166,7 +228,9 @@ public class TeacherService {
                     job_out.put("resultCode",GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功添加老师");
                     return  job_out.toString();
-                }
+                }*/
+                UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten_id);
+                thread.start();
                 job_out.put("resultCode",GlobalStatus.error.toString());
                 job_out.put("resultDesc","更新班级老师列表失败");
                 return job_out.toString();
@@ -321,108 +385,62 @@ public class TeacherService {
     }
 
 
-
-    /*@Path("/imgUpload")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String imgUpload(@FormDataParam("imgData") InputStream ins, @FormDataParam("jsonArgs") String reqJson) {
-        String path = "D:/work/";
-        File dir = new File("D:/imgs");
-        if (!dir.exists()) {
-            dir.mkdirs();
-            System.out.println("创建图片目录...");
+    /***
+     *更新一个班级的 家长通信录
+     * **/
+     class UpdateParentContractsThread extends Thread {
+        long cla_id=0;
+        public UpdateParentContractsThread(long class_id) {
+            cla_id=class_id;
         }
-        JSONObject job = JSONObject.fromObject(reqJson);
-        JSONObject returnJsonObject = new JSONObject();
-        String imgName = job.getString("imgName");
-        File img = new File(path + "/" + imgName);
-        try {
-            OutputStream os = new FileOutputStream(img);
-            int bytesRead = 0;
-            byte[] buffer = new byte[1024];
-            while ((bytesRead = ins.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
+        public void run() {
+            Class cla = classdao.queryClass(cla_id);
+            if(cla==null)   return ;
+          List<Parents> parents= parentsdao.getParentsByClass(cla_id);
+            String parents_contact="";
+           Iterator<Parents>it = parents.iterator();
+            while (it.hasNext()){
+                Parents p =it.next();
+                parents_contact+=p.getStudent().getName()+"-"+p.getStudent().getNick_name()+p.getRelationship()+
+                        "-"+p.getName()+"-"+p.getPhone_num()+"-"+p.getAvatar_path();
+                // baby名称-baby妈妈-家长名字-电话-头像路径
+                parents_contact+=";"; //下一条记录
             }
-            os.close();
-            ins.close();
-        } catch (Exception e) {
-            returnJsonObject.put("status", "error");
-            return returnJsonObject.toString();
+            cla.setParents_contacts(parents_contact);
+            classdao.updateClass(cla);
         }
-        returnJsonObject.put("status", "success");
-        return returnJsonObject.toString();
     }
 
-    @Path("/publishOrUpdateSchoolNews")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public String publishOrUpdateSchoolNews(@RequestBody String reqJson) {
-        System.out.println("接收到请");
-        JSONObject job = JSONObject.fromObject(reqJson);
-        JSONObject returnJsoObject = new JSONObject();
-
-        int optType = job.getInt("type");
-        long teacherId = job.getLong("teacher_id");
-        Teacher teacher = teacherdao.queryTeacher(teacherId);
-        Kindergarten kindergarten = teacher.getKindergarten();
-        String title = job.getString("title");
-        String summary = job.getString("summary");
-        String description = job.getString("description");
-//        String teacherName = teacher.getName();
-        String publishDateStr = job.getString("publishDate");
-        String modifyDateStr = job.getString("modifyDate");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd HH:mm");
-        Date publisDate;
-        Date modifyDate;
-        try {
-            publisDate = simpleDateFormat.parse(publishDateStr);
-            modifyDate = simpleDateFormat.parse(modifyDateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            returnJsoObject.put("resultCode","000002");
-            returnJsoObject.put("resultDesc","日期格式有误");
-            return returnJsoObject.toString();
+    /***
+     *更新一个幼儿园 老师通信录
+     * **/
+    class UpdateTeacherContractsThread extends Thread {
+        long garten_id=0;
+        public UpdateTeacherContractsThread(long garten_id) {
+            garten_id=garten_id;
         }
-
-        GartenNews gartenNews = new GartenNews();
-        gartenNews.setTeacher(teacherdao.queryTeacher(teacherId));
-        gartenNews.setKindergarten(kindergarten);
-        gartenNews.setTitle(title);
-        gartenNews.setSummary(summary);
-        gartenNews.setDescription(description);
-        gartenNews.setPublishDate(publisDate);
-        gartenNews.setModifyDate(modifyDate);
-        switch (optType){
-            case 0: //发布
-                if(gartennewsdao.addGartenNews(gartenNews)){
-                    long newsId = gartenNews.getId();
-                    returnJsoObject.put("id",newsId);
-                    returnJsoObject.put("resultCode","000000");
-                    returnJsoObject.put("resultDesc","操作成功");
-                }else{
-                    returnJsoObject.put("resultCode","000001");
-                    returnJsoObject.put("resultDesc","操作失败");
+        public void run() {
+            Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
+            if(garten==null)   return ;
+            List<Teacher> teachers= teacherdao.getTeachersByGarten(garten_id);
+            String teachers_contact="";
+            Iterator<Teacher>it = teachers.iterator();
+            while (it.hasNext()){
+                Teacher t =it.next();
+                Set<Class> t_clses=t.getClasses();
+                Iterator<Class> it_set=t_clses.iterator();
+                String clas_arrs="";
+                while (it_set.hasNext()){
+                    Class cla = (Class)it_set.next();
+                    clas_arrs+=cla.getName();
                 }
-                break;
-            case 1: //更新
-                long newsId = job.getLong("id");
-                gartenNews.setId(newsId);
-                if(gartennewsdao.updateGartenNews(gartenNews)){
-                    returnJsoObject.put("id",newsId);
-                    returnJsoObject.put("resultCode","000000");
-                    returnJsoObject.put("resultDesc","操作成功");
-                }else{
-                    returnJsoObject.put("resultCode","000001");
-                    returnJsoObject.put("resultDesc","操作失败");
-                }
-                break;
-            default:
-                break;
+                teachers_contact+=t.getName()+"-"+t.getPhone_num()+"-"+t.getAvatar_path()+"-"+clas_arrs;
+                // 老师名字-老师电话-头像路径-老师班级
+                teachers_contact+=";"; //下一条记录
+            }
+           garten.setTeacher_contacts(teachers_contact);
+            kindergartendao.updateKindergarten(garten);
         }
-
-        return returnJsoObject.toString();
-    }*/
+    }
 
 }

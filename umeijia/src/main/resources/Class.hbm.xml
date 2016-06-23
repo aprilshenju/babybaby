@@ -60,8 +60,7 @@ private long id;
                 <many-to-many class="com.umeijia.vo.ClassActivity"/>   
          </set>   
 -->
-         
-           <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
+        <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
           
 	</class>
 	
