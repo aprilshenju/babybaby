@@ -2,6 +2,8 @@ package com.umeijia.util;
 
 import org.apache.log4j.Logger;
 
+import java.io.File;
+
 /**
  * Created by Administrator on 2016/6/22.
  */
@@ -21,6 +23,10 @@ public class ThumbGenerateThread extends Thread {
     public void run() {
         String imgName = imgPath.substring(imgPath.lastIndexOf("/")+1,imgPath.length());
         String dirPath = imgPath.substring(0,imgPath.lastIndexOf("/"));
+        File dir = new File(thumbDir);
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
         String thumbImgName = imgName.substring(0,imgName.lastIndexOf(".jpg"))+"_thumb.jpg";
         String thumbImgPath = thumbDir+"/"+thumbImgName;
 

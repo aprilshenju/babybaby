@@ -39,5 +39,8 @@ public enum InterfaceTypeEnum{
      * 上传/编辑宝贝饮食接口
      */
     addOrEditBabyFood,
-
+    /**
+     * 上传头像接口
+     */
+    uploadAvatar;
 }
