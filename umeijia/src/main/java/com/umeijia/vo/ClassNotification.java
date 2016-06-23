@@ -1,7 +1,6 @@
 package com.umeijia.vo;
 
 import java.util.Date;
-import java.util.Set;
 
 public class ClassNotification {
 	public long getId() {
@@ -59,6 +58,7 @@ public class ClassNotification {
 	private Date date;
 	private long teacher_id;
 	private long class_id;
+
 	private String subscribers; // 分号分割,已查看通知的宝贝集合
 	
 	

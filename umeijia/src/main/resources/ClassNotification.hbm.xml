@@ -25,10 +25,9 @@
 		<property name="image_urls" column="image_urls"></property>   
 		<property name="date" column="date" ></property>			
 		<property name="teacher_id" column="teacher_id"></property>
-        <property name="class_id" column="class_id"></property>
+        <!--<property name="class_id" column="class_id"></property>-->
         <property name="subscribers" column="subscribers"></property>
-            
-                    
+
 	</class>
 	
 	

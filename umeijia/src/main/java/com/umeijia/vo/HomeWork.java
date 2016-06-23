@@ -1,7 +1,6 @@
 package com.umeijia.vo;
 
 import java.util.Date;
-import java.util.Set;
 
 public class HomeWork {
 	private long id;
@@ -53,5 +52,4 @@ public class HomeWork {
 	private Date date;
 	private long teacher_id;
 	private long class_id;
-	
 }

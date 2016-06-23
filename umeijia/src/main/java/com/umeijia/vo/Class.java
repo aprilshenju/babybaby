@@ -76,7 +76,8 @@ public class Class {
 	private Set<Student> students;
 	private Set<Camera> cameras;
 	private Set<Teacher> teachers;
-/*	
+
+	/*
  *  时间概念，系统只需要最新的当天的相关记录。历史所有记录无意义
  * private Set<Long> homework_ids;
 	private Set<Long> checkin_ids;
