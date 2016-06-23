@@ -80,8 +80,8 @@ public class ParentsService {
                     job_out.put("class_id",p.getClass_id());
                     job_out.put("relation",p.getRelationship());
                     job_out.put("is_vip",stu.isVip());
-                    job_out.put("vip_start",stu.getVip_start());
-                    job_out.put("vip_end",stu.getVip_end());
+                    job_out.put("vip_start",stu.getVip_start().toString());
+                    job_out.put("vip_end",stu.getVip_end().toString());
                     job_out.put("avatar",p.getAvatar_path());
                     job_out.put("app_push",p.isAllow_app_push());
                     job_out.put("wechat_push",p.isAllow_wechat_push());
@@ -118,7 +118,7 @@ public class ParentsService {
                 String newPasswordMD=MD5.GetSaltMD5Code(job.getString("newPassword"));
                 Parents p=parentsdao.queryParents(phone);
 
-                if(p!=null && newPasswordMD.equals(p.getPwd_md()))
+                if(p!=null && oldPasswordMD.equals(p.getPwd_md()))
                 {
                     p.setPwd_md(newPasswordMD);
                     p.setToken(MD5.GetSaltMD5Code(newPasswordMD+new Date().toString())); //token重置

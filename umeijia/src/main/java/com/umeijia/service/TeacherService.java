@@ -143,6 +143,7 @@ public class TeacherService {
             String phone = job.getString("phone");
             String email = job.getString("email");
             String pwd = job.getString("password");
+            pwd=MD5.GetSaltMD5Code(pwd);
             String name = job.getString("name");
             long class_id = job.getLong("class_id");
             long garten_id=job.getLong("garten_id");
@@ -258,7 +259,7 @@ public class TeacherService {
             String newPasswordMD=MD5.GetSaltMD5Code(job.getString("newPassword"));
             Teacher t=teacherdao.queryTeacher(phone);
 
-            if(t!=null && newPasswordMD.equals(t.getPwd_md()))
+            if(t!=null && oldPasswordMD.equals(t.getPwd_md()))
             {
                 t.setPwd_md(newPasswordMD);
                 t.setToken(MD5.GetSaltMD5Code(newPasswordMD+new Date().toString())); //token重置
@@ -276,7 +277,7 @@ public class TeacherService {
         return job_out.toString();
     }
 
-    @Path("/correctPInfo")
+    @Path("/correctTInfo")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

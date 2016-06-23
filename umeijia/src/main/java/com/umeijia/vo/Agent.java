@@ -118,6 +118,9 @@ public class Agent {
 		regist_date=date;
 		company_name=company;
 		price_rate=price;
+		this.avarta=" ";
+		this.expire=new Date();
+		this.token=" ";
 
 	}
 

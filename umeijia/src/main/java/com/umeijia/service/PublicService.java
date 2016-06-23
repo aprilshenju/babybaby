@@ -108,31 +108,37 @@ public class PublicService {
     @Path("/hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String test2() {
-        BabyFootPrint bfp = babyfootprintdao.queryBabyFootPrint(1);
-        return bfp.getDate() + bfp.getDescription();
-//        return "welcom to UMJ server... public service ";
+    public String test2(){
+//        BabyFootPrint bfp = babyfootprintdao.queryBabyFootPrint(1);
+//        return bfp.getDate()+bfp.getDescription();
+        return "welcom to UMJ server... public service ";
     }
 
 
+    /**
+     * 添加宝贝动态
+     * @param showTimeInfo
+     * @param headers
+     * @return
+     */
     @Path("/addBabyShowTime")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String addBabyShowTime(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(showTimeInfo);
+    public String addBabyShowTime(@RequestBody String showTimeInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(showTimeInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int showTimeType = jobIn.getInt("showTimeType");
             BabyShowtime bst = new BabyShowtime();
-            switch (roleType) {
+            switch(roleType){
                 case 1: //1,2为老师
                 case 2:
                     bst.setTeacher_id(roleId);
@@ -145,13 +151,13 @@ public class PublicService {
             }
             bst.setShow_type(showTimeType);
             bst.setDescription(jobIn.getString("description"));
-            bst.setDate(new Date(jobIn.getString("date")));
+            bst.setDate(new Date());
             bst.setImage_urls(jobIn.getString("urls"));
             bst.setClass_id(jobIn.getInt("classId"));
             bst.setBaby_id(jobIn.getInt("babyId"));
             bst.setValid(true);
             int isShareToFootPrint = jobIn.getInt("isShareToFootPrint");
-            if (roleType == 3 && isShareToFootPrint == 1) {//家长选择同时分享到足迹
+            if(roleType==3&&isShareToFootPrint==1){//家长选择同时分享到足迹
                 BabyFootPrint bfp = new BabyFootPrint();
                 bfp.setShow_type(bst.getShow_type());
                 bfp.setDescription(bst.getDescription());
@@ -164,30 +170,36 @@ public class PublicService {
                 babyfootprintdao.addBabyFootPrint(bfp);
             }
             babyshowtimedao.addBabyShowtime(bst);
-            jobOut.put("id", bst.getId());
+            jobOut.put("id",bst.getId());
             jobOut.put("resultCode", "success");
-            jobOut.put("resultDesc", "添加成功");
-        } catch (Exception e) {
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("resultDesc","添加成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
 
+    /**
+     * 查询宝贝动态
+     * @param showTimeInfo
+     * @param headers
+     * @return
+     */
     @Path("/queryBabyShowTime")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String queryBabyShowTime(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(showTimeInfo);
+    public String queryBabyShowTime(@RequestBody String showTimeInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(showTimeInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int classId = jobIn.getInt("classId");
@@ -197,7 +209,7 @@ public class PublicService {
              */
             int pageNum = jobIn.getInt("pageNum");
             List<BabyShowtime> result = new ArrayList<BabyShowtime>();
-            switch (roleType) {
+            switch(roleType){
                 case 1: //老师查询
                     result = babyshowtimedao.queryBabyShowtimesByTeacher(roleId);
                     break;
@@ -208,63 +220,61 @@ public class PublicService {
                     result = babyshowtimedao.queryBabyShowtimesByParents(roleId);
                     break;
             }
-            if (result == null) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "无记录");
+            if(result==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
                 return jobOut.toString();
             }
             JSONArray ja = new JSONArray();
-            for (BabyShowtime item : result) {
+            for(BabyShowtime item : result){
                 JSONObject jo = new JSONObject();
-                jo.put("id", item.getId());
-                if (item.getTeacher_id() != -1) {  //发布者信息
+                jo.put("id",item.getId());
+                if(item.getTeacher_id()!=-1){  //发布者信息
                     Teacher teacher = teacherdao.queryTeacher(item.getTeacher_id());
-                    jo.put("publisherId", teacher.getId());
-                    jo.put("publisherName", teacher.getName());
-                    jo.put("avatar", teacher.getAvatar_path());
-                } else if (item.getParent_id() != -1) {
+                    jo.put("publisherId",teacher.getId());
+                    jo.put("publisherName",teacher.getName());
+                    jo.put("avatar",teacher.getAvatar_path());
+                }else if(item.getParent_id()!=-1){
                     Parents parents = parentsdao.queryParents(item.getParent_id());
-                    jo.put("publisherId", parents.getId());
-                    jo.put("publisherName", parents.getName());
-                    jo.put("avatar", parents.getAvatar_path());
+                    jo.put("publisherId",parents.getId());
+                    jo.put("publisherName",parents.getName());
+                    jo.put("avatar",parents.getAvatar_path());
                 }
-                jo.put("description", item.getDescription());
-                jo.put("date", item.getDate().toString());
-                jo.put("type", item.getShow_type());
-                jo.put("urls", item.getImage_urls());
+                jo.put("description",item.getDescription());
+                jo.put("date",item.getDate().toString());
+                jo.put("type",item.getShow_type());
+                jo.put("urls",item.getImage_urls());
                 JSONArray commentsArray = new JSONArray();
                 /**
                  * comments的jsonarray
                  */
                 List<ShowtimeComments> comments = showtimecommentsdao.queryShowtimeComments(item.getId());
-                if (comments != null && comments.size() != 0) {
-                    for (ShowtimeComments commentsItem : comments) {
+                if(comments!=null&&comments.size()!=0){
+                    for (ShowtimeComments commentsItem : comments){
                         JSONObject job = new JSONObject();
-                        job.put("userRoleType", commentsItem.getUser_type());
-                        job.put("userId", commentsItem.getUser_id());
-                        job.put("userName", getNameFromRoleTypeAndRoleId(commentsItem.getUser_type(), commentsItem
-                                .getUser_id()));
-                        job.put("isLike", commentsItem.isSay_good());
-                        job.put("responseUserType", commentsItem.getResponse_user_type());
-                        job.put("responseUserId", commentsItem.getResponse_user_id());
-                        job.put("responseUserName", getNameFromRoleTypeAndRoleId(commentsItem.getResponse_user_type()
-                                , commentsItem.getResponse_user_id()));
-                        job.put("content", commentsItem.getComment_content());
+                        job.put("userRoleType",commentsItem.getUser_type());
+                        job.put("userId",commentsItem.getUser_id());
+                        job.put("userName",getNameFromRoleTypeAndRoleId(commentsItem.getUser_type(),commentsItem.getUser_id()));
+                        job.put("isLike",commentsItem.isSay_good());
+                        job.put("responseUserType",commentsItem.getResponse_user_type());
+                        job.put("responseUserId",commentsItem.getResponse_user_id());
+                        job.put("responseUserName",getNameFromRoleTypeAndRoleId(commentsItem.getResponse_user_type(),commentsItem.getResponse_user_id()));
+                        job.put("content",commentsItem.getComment_content());
                         commentsArray.add(job);
                     }
                     jo.put("comments", commentsArray.toString());
                 }
                 ja.add(jo);
             }
-            jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("hasNextPage", true); //是否有下一页
-            jobOut.put("totalCount", ja.size());  //总共返回多少条记录
-            jobOut.put("resultCode", GlobalStatus.succeed.toString());
-            jobOut.put("resultDesc", "操作成功");
-        } catch (Exception e) {
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("data",ja.toString()); //返回的数据
+            jobOut.put("hasNextPage",true); //是否有下一页
+            jobOut.put("totalCount",ja.size());  //总共返回多少条记录
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
@@ -272,14 +282,13 @@ public class PublicService {
 
     /**
      * 根据角色类型和角色id，返回name
-     *
      * @param type
      * @param id
      * @return
      */
-    public String getNameFromRoleTypeAndRoleId(int type, long id) {
+    public String getNameFromRoleTypeAndRoleId(int type,long id){
         String result = "";
-        switch (type) {
+        switch(type){
             case 1:
             case 2:
                 Teacher t = teacherdao.queryTeacher(id);
@@ -303,87 +312,99 @@ public class PublicService {
 
     /**
      * 根据角色类型和传入的id和tkn，验证用户是否有效
-     *
      * @param roleType
      * @param headers
      * @return
      */
-    public boolean checkIdAndToken(int roleType, HttpHeaders headers) {
+    public boolean checkIdAndToken(int roleType,HttpHeaders headers){
         boolean result = false;
         String tkn = headers.getRequestHeader("tkn").get(0);
-        long id = Long.parseLong(headers.getRequestHeader("id").get(0));
-        switch (roleType) {
+        long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+        switch(roleType){
             case 1:
             case 2:
-                result = teacherdao.verifyToken(id, tkn);
+                result =  teacherdao.verifyToken(id,tkn);
                 break;
             case 3:
-                result = parentsdao.verifyToken(id, tkn);
+                result =  parentsdao.verifyToken(id,tkn);
                 break;
             case 4:
-                result = agentdao.verifyToken(id, tkn);
+                result =  agentdao.verifyToken(id,tkn);
                 break;
             case 5:
-                result = administratordao.verifyToken(id, tkn);
+                result =   administratordao.verifyToken(id,tkn);
                 break;
         }
         return true;
     }
 
+    /**
+     * 删除宝贝动态
+     * @param showTimeInfo
+     * @param headers
+     * @return
+     */
+
     @Path("/deleteBabyShowTime")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteBabyShowTime(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(showTimeInfo);
+    public String deleteBabyShowTime(@RequestBody String showTimeInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(showTimeInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int id = jobIn.getInt("id");
-            BabyShowtime bst = babyshowtimedao.queryBabyShowtime(id);
-            if (bst.getParent_id() != -1) {  //这两个判断的目的是：要本人发布的才能删
-                if (roleType == 3 && roleId == bst.getParent_id()) {
+            BabyShowtime bst  = babyshowtimedao.queryBabyShowtime(id);
+            if(bst.getParent_id()!=-1){  //这两个判断的目的是：要本人发布的才能删
+                if(roleType==3&&roleId==bst.getParent_id()){
                     babyshowtimedao.invalidShowtime(id);
                 }
-            } else if (bst.getTeacher_id() != -1) {
-                if ((roleType == 1 || roleType == 2) && roleId == bst.getTeacher_id()) {
+            }else if(bst.getTeacher_id()!=-1){
+                if((roleType==1||roleType==2)&&roleId==bst.getTeacher_id()){
                     babyshowtimedao.invalidShowtime(id);
                 }
-            } else {
+            }else{
                 jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "动态不是该用户发布，不能删除");
+                jobOut.put("resultDesc","动态不是该用户发布，不能删除");
                 return jobOut.toString();
             }
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
-            jobOut.put("resultDesc", "操作成功");
-        } catch (Exception e) {
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
 
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
 
+    /**
+     * 对宝贝动态进行点赞或评论
+     * @param showTimeInfo
+     * @param headers
+     * @return
+     */
     @Path("/likeOrComment")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String likeOrComment(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(showTimeInfo);
+    public String likeOrComment(@RequestBody String showTimeInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(showTimeInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int id = jobIn.getInt("id");
@@ -395,42 +416,48 @@ public class PublicService {
             stc.setComment_content(jobIn.getString("content"));
             stc.setResponse_user_id(jobIn.getInt("responseUserId"));
             stc.setResponse_user_type(jobIn.getInt("responseUserType"));
-            if (jobIn.getInt("type") == 1) { //点赞
+            if(jobIn.getInt("type")==1){ //点赞
                 stc.setSay_good(true);
-            } else if (jobIn.getInt("type") == 2) {
+            }else if(jobIn.getInt("type")==2){
                 stc.setSay_good(false);
             }
             showtimecommentsdao.addShowtimeComments(stc);
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
-            jobOut.put("resultDesc", "操作成功");
-        } catch (Exception e) {
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
 
+    /**
+     * 添加或更新宝贝成长足迹
+     * @param footPrintInfo
+     * @param headers
+     * @return
+     */
     @Path("/addOrEditFootPrint")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String addOrEditFootPrint(@RequestBody String footPrintInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(footPrintInfo);
+    public String addOrEditFootPrint(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
             int type = jobIn.getInt("type");
             int id = jobIn.getInt("id");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
-            if (roleType != 3) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "只有家长能发布足迹");
+            if(roleType!=3){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","只有家长能发布足迹");
                 return jobOut.toString();
             }
             int footPrintType = jobIn.getInt("footPrintType");
@@ -444,17 +471,17 @@ public class PublicService {
             bfp.setDate(new Date());
             bfp.setImage_urls("");
 
-            if (type == 1) { //新增
+            if(type==1){ //新增
                 /**
                  * @shanji
                  * 需要在footprintdao里面添加一个每天只能发布一条记录的接口
                  */
                 babyfootprintdao.addBabyFootPrint(bfp);
-            } else if (type == 2) { //编辑
+            }else if(type==2){ //编辑
                 bfp.setId(id);
                 babyfootprintdao.updateBabyFootPrint(bfp);
             }
-            if (jobIn.getInt("isShareToBabyShowTime") == 1) {
+            if(jobIn.getInt("isShareToBabyShowTime")==1){
                 BabyShowtime bst = new BabyShowtime();
                 bst.setShow_type(footPrintType);
                 bst.setDescription(bfp.getDescription());
@@ -467,147 +494,695 @@ public class PublicService {
                 bst.setParent_id(bfp.getParent_id());
                 babyshowtimedao.addBabyShowtime(bst);
             }
-            jobOut.put("id", bfp.getId());
+            jobOut.put("id",bfp.getId());
             jobOut.put("resultCode", "success");
-            jobOut.put("resultDesc", "操作成功");
-        } catch (Exception e) {
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
 
+    /**
+     * 查询宝贝成长足迹
+     * @param footPrintInfo
+     * @param headers
+     * @return
+     */
     @Path("/queryFootPrint")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String queryFootPrint(@RequestBody String footPrintInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(footPrintInfo);
+    public String queryFootPrint(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
             int roleType = 3;
             int roleId = jobIn.getInt("id");
             int babyId = jobIn.getInt("babyId");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int pageNum = jobIn.getInt("pageNum");  //分页
             List<BabyFootPrint> result =
-                    babyfootprintdao.queryBabyFootprints(babyId);
-            if (result == null) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "无记录");
+            babyfootprintdao.queryBabyFootprints(babyId);
+            if(result==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
                 return jobOut.toString();
             }
             JSONArray ja = new JSONArray();
-            for (BabyFootPrint item : result) {
+            for(BabyFootPrint item : result){
                 JSONObject jo = new JSONObject();
-                jo.put("id", item.getId());
-                jo.put("description", item.getDescription());
-                jo.put("date", item.getDate().toString());
-                jo.put("type", item.getShow_type());
-                jo.put("urls", item.getImage_urls());
+                jo.put("id",item.getId());
+                jo.put("description",item.getDescription());
+                jo.put("date",item.getDate().toString());
+                jo.put("type",item.getShow_type());
+                jo.put("urls",item.getImage_urls());
                 ja.add(jo);
             }
-            jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("hasNextPage", true); //是否有下一页
-            jobOut.put("totalCount", ja.size());  //总共返回多少条记录
-            jobOut.put("resultCode", GlobalStatus.succeed.toString());
-            jobOut.put("resultDesc", "操作成功");
-        } catch (Exception e) {
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("data",ja.toString()); //返回的数据
+            jobOut.put("hasNextPage",true); //是否有下一页
+            jobOut.put("totalCount",ja.size());  //总共返回多少条记录
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
 
+    /**
+     * 按月查询宝贝成长足迹
+     * @param footPrintInfo
+     * @param headers
+     * @return
+     */
     @Path("/queryFootPrintByMonth")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String queryFootPrintByMonth(@RequestBody String footPrintInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(footPrintInfo);
+    public String queryFootPrintByMonth(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
             int roleType = 3;
             int roleId = jobIn.getInt("id");
             int babyId = jobIn.getInt("babyId");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
                 return jobOut.toString();
             }
             int year = jobIn.getInt("year");
             int month = jobIn.getInt("month");
             List<BabyFootPrint> result =
-                    babyfootprintdao.queryBabyFootprintsByMonth(babyId, year, month);
-            if (result == null) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "无记录");
+            babyfootprintdao.queryBabyFootprintsByMonth(babyId,year,month);
+            if(result==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
                 return jobOut.toString();
             }
             JSONArray ja = new JSONArray();
-            for (BabyFootPrint item : result) {
+            for(BabyFootPrint item : result){
                 JSONObject jo = new JSONObject();
-                jo.put("id", item.getId());
-                jo.put("description", item.getDescription());
-                jo.put("date", item.getDate().toString());
-                jo.put("type", item.getShow_type());
-                jo.put("urls", item.getImage_urls());
+                jo.put("id",item.getId());
+                jo.put("description",item.getDescription());
+                jo.put("date",item.getDate().toString());
+                jo.put("type",item.getShow_type());
+                jo.put("urls",item.getImage_urls());
                 ja.add(jo);
             }
-            jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("hasNextPage", true); //是否有下一页
-            jobOut.put("totalCount", ja.size());  //总共返回多少条记录
-            jobOut.put("resultCode", GlobalStatus.succeed.toString());
-            jobOut.put("resultDesc", "操作成功");
-        } catch (Exception e) {
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("data",ja.toString()); //返回的数据
+            jobOut.put("hasNextPage",true); //是否有下一页
+            jobOut.put("totalCount",ja.size());  //总共返回多少条记录
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
 
+    /**
+     * 删除宝贝成长足迹
+     * @param footPrintInfo
+     * @param headers
+     * @return
+     */
     @Path("/deleteFootPrint")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteFootPrint(@RequestBody String footPrintInfo, @Context HttpHeaders headers) {
-        JSONObject jobOut = new JSONObject();
-        try {
-            JSONObject jobIn = JSONObject.fromObject(footPrintInfo);
-            int roleType = 3;
+    public String deleteFootPrint(@RequestBody String footPrintInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(footPrintInfo);
+            int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            if(roleType!=3){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","家长才能删除足迹");
                 return jobOut.toString();
             }
             int id = jobIn.getInt("id");
-            BabyFootPrint bfp = babyfootprintdao.queryBabyFootPrint(id);
-            if (bfp.getParent_id() == roleId) {  //判断的目的是：要本人发布的才能删
-                babyfootprintdao.invalidFootPrint(id);
-            } else {
+            BabyFootPrint bfp  = babyfootprintdao.queryBabyFootPrint(id);
+            if(bfp.getParent_id()==roleId){  //判断的目的是：要本人发布的才能删
+              babyfootprintdao.invalidFootPrint(id);
+            }else{
                 jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "足迹不是该用户发布，不能删除");
+                jobOut.put("resultDesc","足迹不是该用户发布，不能删除");
                 return jobOut.toString();
             }
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
-            jobOut.put("resultDesc", "操作成功");
-        } catch (Exception e) {
-            jobOut.put("resultCode", GlobalStatus.error.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
             e.printStackTrace();
-            jobOut.put("resultDesc", "操作失败");
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 添加反馈
+     * @param feedbackInfo
+     * @param headers
+     * @return
+     */
+    @Path("/addFeedback")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addFeedback(@RequestBody String feedbackInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(feedbackInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+
+            FeedBack fb = new FeedBack();
+            fb.setUser_type(roleType);
+            fb.setUser_id(roleId);
+            fb.setDate(new Date());
+            fb.setContent(jobIn.getString("content"));
+            fb.setRead_or_not(0);
+            fb.setResponse("");
+            feedbackdao.addFeedBack(fb);
+            jobOut.put("resultCode", "success");
+            jobOut.put("resultDesc","反馈成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
         }
         return jobOut.toString();
     }
 
 
+    /**
+     * 查询反馈
+     * @param feedbackInfo
+     * @param headers
+     * @return
+     */
+    @Path("/queryFeedBack")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryFeedBack(@RequestBody String feedbackInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(feedbackInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+           if(roleType!=5){
+               jobOut.put("resultCode",GlobalStatus.error.toString());
+               jobOut.put("resultDesc","没有权限查看反馈");
+               return jobOut.toString();
+           }
+            int pageNum = jobIn.getInt("pageNum");
+            List<FeedBack> result = feedbackdao.getFeedBackList();
+            if(result==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
+                return jobOut.toString();
+            }
+            JSONArray ja = new JSONArray();
+            for(FeedBack item : result){
+                JSONObject jo = new JSONObject();
+                jo.put("id",item.getId());
+                jo.put("roleType",item.getUser_type());
+                jo.put("roleId",item.getUser_id());
+                jo.put("date",item.getDate().toString());
+                jo.put("content",item.getContent());
+                jo.put("response",item.getResponse());
+                jo.put("readOrNot",item.getRead_or_not());
+                ja.add(jo);
+            }
+            jobOut.put("data",ja.toString()); //返回的数据
+            jobOut.put("hasNextPage",true); //是否有下一页
+            jobOut.put("totalCount",ja.size());  //总共返回多少条记录
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 更新关于我们
+     * @param aboutUsInfo
+     * @param headers
+     * @return
+     */
+    @Path("/updateAboutUs")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addOrUpdateAboutUs(@RequestBody String aboutUsInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(aboutUsInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+//            int type = jobIn.getInt("type");
+            int id = jobIn.getInt("id");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            if(roleType!=5){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","没有权限更新关于我们");
+                return jobOut.toString();
+            }
+
+            BasicInfo bi = new BasicInfo();
+            bi.setAddr(jobIn.getString("companyAddress"));
+            bi.setCompany_name(jobIn.getString("companyName"));
+            bi.setContact(jobIn.getString("phoneNum"));
+            bi.setEmail(jobIn.getString("email"));
+            bi.setIntroduction(jobIn.getString("description"));
+            bi.setQq(jobIn.getString("qq"));
+            bi.setTeacher_version_no(jobIn.getString("currentVersion_teacher"));
+            bi.setParent_version_no(jobIn.getString("currentVersion_parent"));
+//            if(type==1){ //添加(数据库默认有一条记录，不添加)
+//
+//            }else if(type==2){ //更新
+//                bi.setId(id);
+//                basicinfodao.updateBasicInfo(bi);
+//            }
+            bi.setId(id);
+            basicinfodao.updateBasicInfo(bi);
+            jobOut.put("resultCode", "success");
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 查询关于我们
+     * @param aboutUsInfo
+     * @param headers
+     * @return
+     */
+    @Path("/queryAboutUs")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryAboutUs(@RequestBody String aboutUsInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(aboutUsInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            BasicInfo bi = new BasicInfo();
+            bi = basicinfodao.queryBasicInfo();
+            jobOut.put("id",bi.getId());
+            jobOut.put("currentVersion_teacher",bi.getTeacher_version_no());
+            jobOut.put("currentVersion_parent",bi.getParent_version_no());
+            jobOut.put("companyName",bi.getCompany_name());
+            jobOut.put("companyAddress",bi.getAddr());
+            jobOut.put("phoneNum",bi.getContact());
+            jobOut.put("email",bi.getEmail());
+            jobOut.put("qq",bi.getQq());
+            jobOut.put("description",bi.getIntroduction());
+            jobOut.put("resultCode",GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 发布或编辑班级通知
+     */
+
+    @Path("/publishOrUpdateClassNotification")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String publishOrUpdateClassNotification(@RequestBody String classNotificationInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(classNotificationInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int type = jobIn.getInt("type");
+            int id = jobIn.getInt("id");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            if(roleType!=1&&roleType!=2){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","没有权限发布/更新班级通知");
+                return jobOut.toString();
+            }
+            ClassNotification cn = new ClassNotification();
+            cn.setDescription(jobIn.getString("description"));
+            cn.setDate(new Date());
+            cn.setClass_id(jobIn.getInt("classId"));
+            cn.setImage_urls("");
+            cn.setSubscribers("");
+            cn.setTeacher_id(roleId);
+            cn.setTitle(jobIn.getString("title"));
+            if(type==1){ //发布
+                classnotificationdao.addClassNotification(cn);
+            }else if(type==2){ //更新
+                cn.setId(id);
+                classnotificationdao.updateClassNotification(cn);
+            }
+            jobOut.put("id",cn.getId());
+            jobOut.put("resultCode", "success");
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 更新班级通知_已读家长列表
+     */
+
+    @Path("/updateReadStudentInClassNotification")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String updateReadStudentInClassNotification(@RequestBody String classNotificationInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(classNotificationInfo);
+            int id = jobIn.getInt("id");
+            int studentId = jobIn.getInt("studentId");
+            ClassNotification cn = classnotificationdao.queryClassNotification(id);
+            if(cn.getSubscribers().equals("")){
+                cn.setSubscribers(""+studentId);
+            }else{
+                cn.setSubscribers(cn.getSubscribers()+";"+studentId);
+            }
+
+            classnotificationdao.updateClassNotification(cn);
+
+            jobOut.put("resultCode", "success");
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 查询班级通知接口
+     */
+
+    @Path("/queryClassNotification")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryClassNotification(@RequestBody String classNotificationInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        JSONObject jobIn =JSONObject.fromObject(classNotificationInfo);
+        int roleType = jobIn.getInt("roleType");
+        int roleId = jobIn.getInt("roleId");
+        int classId = jobIn.getInt("classId");
+        int pageNum = jobIn.getInt("pageNum");
+        if(!checkIdAndToken(roleType,headers)){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            jobOut.put("resultDesc","token已过期");
+            return jobOut.toString();
+        }
+        List<ClassNotification> result = classnotificationdao.queryClassNotifications(classId);
+        if(result==null){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            jobOut.put("resultDesc","无记录");
+            return jobOut.toString();
+        }
+        JSONArray ja = new JSONArray();
+        for(ClassNotification item : result){
+            JSONObject jo = new JSONObject();
+            jo.put("id",item.getId());
+            jo.put("title", item.getTitle());
+            jo.put("description",item.getDescription());
+            jo.put("imageUrls",item.getImage_urls());
+            jo.put("teacherId",item.getTeacher_id());
+            jo.put("teacherName",teacherdao.queryTeacher(item.getTeacher_id()).getName());
+            jo.put("date",item.getDate().toString());
+            List<Long> allStudents = studentdao.queryStudentByClass(classId); //得到全班所有同学的id，然后去除已读的id
+            if(!item.getSubscribers().isEmpty()){
+                String[] readIds = item.getSubscribers().split(";");
+                for(int i=0;i<readIds.length;i++){
+                    allStudents.remove(Long.parseLong(readIds[i]));
+                }
+            }
+            String unReadIds = "";
+            if(allStudents!=null&&allStudents.size()>0){
+                for(Long idItem : allStudents){
+                    unReadIds+=idItem+";";
+                }
+                unReadIds = unReadIds.substring(0,unReadIds.length()-1);
+            }
+            jo.put("unReadIds",unReadIds);
+            ja.add(jo);
+        }
+        jobOut.put("data",ja.toString());
+        jobOut.put("resultCode", "success");
+        jobOut.put("resultDesc","操作成功");
+        return jobOut.toString();
+    }
+
+    /**
+     * 查询未读学生的信息
+     * @param unReadInfo
+     * @param headers
+     * @return
+     */
+    @Path("/queryUnreadStudent")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryUnreadStudent(@RequestBody String unReadInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        JSONObject jobIn =JSONObject.fromObject(unReadInfo);
+        int roleType = jobIn.getInt("roleType");
+        int roleId = jobIn.getInt("roleId");
+        int id = jobIn.getInt("id");
+        String unReadIds = jobIn.getString("unReadIds");
+        if(!checkIdAndToken(roleType,headers)){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            jobOut.put("resultDesc","token已过期");
+            return jobOut.toString();
+        }
+        if(roleType!=1&&roleType!=2){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            jobOut.put("resultDesc","无权查看");
+            return jobOut.toString();
+        }
+        JSONArray ja = new JSONArray();
+        if(!unReadIds.equals("")){
+            String[] ids = unReadIds.split(";");
+            for(int i=0;i<ids.length;i++){
+                JSONObject jo = new JSONObject();
+                jo.put("className",classdao.queryClass(classnotificationdao.queryClassNotification(id).getClass_id()).getName());
+                jo.put("babyName",studentdao.queryStudent(Integer.parseInt(ids[i])).getName());
+                /**
+                 * 还需要家长的各种信息
+                 */
+                Parents parent = parentsdao.queryParentsByStudentId(Integer.parseInt(ids[i]));
+                if(parent!=null){
+                    jo.put("parentName",parent.getName());
+                    jo.put("phoneNum",parent.getPhone_num());
+                    jo.put("avatar",parent.getAvatar_path());
+                }else{
+                    jo.put("parentName","");
+                    jo.put("phoneNum","");
+                    jo.put("avatar","");
+                }
+
+                ja.add(jo);
+            }
+        }
+        jobOut.put("data",ja.toString());
+        jobOut.put("resultCode", "success");
+        jobOut.put("resultDesc","操作成功");
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 上传考勤记录
+     */
+    @Path("/addCheckinRecord")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addCheckinRecord(@RequestBody String checkinInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(checkinInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int cardId = jobIn.getInt("cardId");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            if(roleType!=1&&roleType!=2){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","没有权限添加考勤记录");
+                return jobOut.toString();
+            }
+            CheckinRecords cir = new CheckinRecords();
+            cir.setClass_id(jobIn.getInt("classId"));
+            cir.setDate(new Date());
+            cir.setImage_path("");
+            cir.setPeriod(jobIn.getInt("period"));
+            cir.setState(jobIn.getString("state"));
+            cir.setStu_id(checkincarddao.queryCheckinCard(cardId).getStu_id());
+            cir.setTemperature((float) jobIn.getDouble("temperature"));
+            checkinrecorddao.addCheckinRecords(cir);
+            jobOut.put("id",cir.getId());
+            jobOut.put("resultCode", "success");
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 查看考勤记录(按天查)
+     * @param checkinInfo
+     * @param headers
+     * @return
+     */
+    @Path("/queryCheckinRecord")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryCheckinRecord(@RequestBody String checkinInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        JSONObject jobIn =JSONObject.fromObject(checkinInfo);
+        int roleType = jobIn.getInt("roleType");
+        int roleId = jobIn.getInt("roleId");
+        int classId = jobIn.getInt("classId");
+        int babyId = jobIn.getInt("babyId");
+        int year = jobIn.getInt("year");
+        int month = jobIn.getInt("month");
+        int day = jobIn.getInt("day");
+        if(!checkIdAndToken(roleType,headers)){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            jobOut.put("resultDesc","token已过期");
+            return jobOut.toString();
+        }
+        List<CheckinRecords> cirs = new ArrayList<CheckinRecords>();
+        if(roleType==1||roleType==2){  //老师或园长按照班级查询
+            cirs = checkinrecorddao.queryCheckinRecordsByClassAndTime(classId,year,month,day);
+        }
+        else if(roleType==3){  //家长按照baby查询
+            cirs = checkinrecorddao.queryCheckinRecordsByBabyAndTime(babyId,year,month,day);
+        }
+        if(cirs==null){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            jobOut.put("resultDesc","无记录");
+            return jobOut.toString();
+        }
+        JSONArray result = new JSONArray();
+        if(roleType==3){  //家长只有一个学生最多一天4条记录
+            JSONArray ja = new JSONArray();
+            for(CheckinRecords item : cirs){
+                JSONObject jo = new JSONObject();
+                jo.put("studentId",item.getStu_id());
+                jo.put("studentName",studentdao.queryStudent(item.getStu_id()).getName());
+                jo.put("date",item.getDate().toString());
+                jo.put("temperature",item.getTemperature());
+                jo.put("images",item.getImage_path());
+                jo.put("period",item.getPeriod());
+                jo.put("state",item.getState());
+                ja.add(jo);
+            }
+            result.add(ja.toString());
+        }else if(roleType==1||roleType==2){  //老师或者园长可以查看一个班所有学生的一天的记录
+            long tmpStudentId = -1;
+            JSONArray ja = new JSONArray();
+            for(CheckinRecords item : cirs){
+                JSONObject jo = new JSONObject();
+                jo.put("studentId",item.getStu_id());
+                jo.put("studentName",studentdao.queryStudent(item.getStu_id()).getName());
+                jo.put("date",item.getDate().toString());
+                jo.put("temperature",item.getTemperature());
+                jo.put("images",item.getImage_path());
+                jo.put("period",item.getPeriod());
+                jo.put("state",item.getState());
+                if(tmpStudentId==-1){
+                    tmpStudentId = item.getStu_id();
+                }
+                if(item.getStu_id()==tmpStudentId){
+                    tmpStudentId = item.getStu_id();
+                    ja.add(jo);
+                }else{
+                    result.add(ja);
+                    ja.clear();
+                    ja.add(jo);
+                    tmpStudentId = item.getStu_id();
+                }
+            }
+        }
+        jobOut.put("data",result.toString());
+        jobOut.put("resultCode", "success");
+        jobOut.put("resultDesc","操作成功");
+        return jobOut.toString();
+    }
     /**
      * 查询校园新闻
      *

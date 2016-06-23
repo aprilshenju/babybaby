@@ -24,6 +24,8 @@
 		<property name="email" column="email" ></property>
 		<property name="introduction" column="introduction"></property>
 		<property name="addr" column="addr"></property>
+        <property name="teacher_version_no" column="teacher_version_no"></property>
+        <property name="parent_version_no" column="parent_version_no"></property>
 	</class>
 	
 	

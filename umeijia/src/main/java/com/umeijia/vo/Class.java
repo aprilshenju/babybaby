@@ -1,8 +1,17 @@
 package com.umeijia.vo;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Class {
+	private  String class_introduction;
+	private String course_schedule; //课程表
+	private String teachers_contacts; //联系方式
+	private String parents_contacts; // 家长联系方式
+	private long id;
+	private Set<Student> students;
+	private Set<Camera> cameras;
+	private Set<Teacher> teachers;
 	public long getId() {
 		return id;
 	}
@@ -15,7 +24,28 @@ public class Class {
 	public void setName(String name) {
 		this.name = name;
 	}
+	private String name;
+	private Kindergarten garten;
+	public Set<Camera> getCameras() {
+		return cameras;
+	}
+	public Set<Teacher> getTeachers() {
+		return teachers;
+	}
 
+
+	public Class(){
+
+	}
+	public  Class(String name,String class_introduction,String schedule,String tcontacts,String pcontacts,Kindergarten garten){
+		this.name=name;
+		this.class_introduction=class_introduction;
+		this.course_schedule = schedule;
+		this.teachers_contacts=tcontacts;
+		this.parents_contacts=pcontacts;
+		this.garten=garten;
+		this.teachers = new LinkedHashSet<Teacher>();
+	}
 
 	public String getCourse_schedule() {
 		return course_schedule;
@@ -35,72 +65,30 @@ public class Class {
 	public void setParents_contacts(String parents_contacts) {
 		this.parents_contacts = parents_contacts;
 	}
-	private long id;
-
 	public Kindergarten getGarten() {
 		return garten;
 	}
-
 	public void setGarten(Kindergarten garten) {
 		this.garten = garten;
 	}
-
-	private String name;
-	private Kindergarten garten;
-
 	public void setStudents(Set<Student> students) {
 		this.students = students;
 	}
-
 	public void setCameras(Set<Camera> cameras) {
 		this.cameras = cameras;
 	}
-
 	public void setTeachers(Set<Teacher> teachers) {
 		this.teachers = teachers;
 	}
-
 	public Set<Student> getStudents() {
-
 		return students;
 	}
-
-	public Set<Camera> getCameras() {
-		return cameras;
-	}
-
-	public Set<Teacher> getTeachers() {
-		return teachers;
-	}
-
-	private Set<Student> students;
-	private Set<Camera> cameras;
-	private Set<Teacher> teachers;
-
-	/*
- *  时间概念，系统只需要最新的当天的相关记录。历史所有记录无意义
- * private Set<Long> homework_ids;
-	private Set<Long> checkin_ids;
-	private Set<Long> activity_ids; //班级活动集合
-*/
-
 	public String getClass_introduction() {
 		return class_introduction;
 	}
-
 	public void setClass_introduction(String class_introduction) {
 		this.class_introduction = class_introduction;
 	}
 
-	/*	public Set<Long> getActivity_ids() {
-                return activity_ids;
-            }
-            public void setActivity_ids(Set<Long> activity_ids) {
-                this.activity_ids = activity_ids;
-            }
-        */
-	private  String class_introduction;
-	private String course_schedule; //课程表
-	private String teachers_contacts; //联系方式
-	private String parents_contacts; // 家长联系方式
+
 }
