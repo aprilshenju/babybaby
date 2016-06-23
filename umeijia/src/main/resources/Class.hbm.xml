@@ -38,27 +38,33 @@ private long id;
           <set name="cameras" cascade="all" inverse="true" lazy="false">
                 <key column="class_id"></key>   
                 <one-to-many class="com.umeijia.vo.Camera"/>   
-         </set>  
-         
-         <set name="teachers" cascade="save-update"  lazy="false"  inverse="false" table="t_teacher_class">
+         </set>
+
+        <set name="foodRecords" cascade="all" inverse="true" lazy="false">
+            <key column="class_id"></key>
+            <one-to-many class="com.umeijia.vo.FoodRecord"/>
+        </set>
+        <set name="teachers" cascade="save-update"  lazy="false"  inverse="false" table="t_teacher_class">
                 <key column="class_id"></key>
                 <many-to-many column="teacher_id" class="com.umeijia.vo.Teacher"/>
-         </set>      
-                 
-         <!--   <set name="homework_ids" cascade="all" inverse="true" lazy="false">                
-                <key column="class_id"></key>   
-                <many-to-many class="com.umeijia.vo.HomeWork"/>   
-         </set>   
+         </set>
 
-		 <set name="checkin_ids" cascade="all" inverse="true" lazy="false">                
-                <key column="class_id"></key>   
-                <one-to-many class="com.umeijia.vo.CheckinRecords"/>   
-         </set>    
-         
-          <set name="activity_ids" cascade="all" inverse="true" lazy="false">                
-                <key column="class_id"></key>   
-                <many-to-many class="com.umeijia.vo.ClassActivity"/>   
-         </set>   
+
+
+        <!--   <set name="homework_ids" cascade="all" inverse="true" lazy="false">
+               <key column="class_id"></key>
+               <many-to-many class="com.umeijia.vo.HomeWork"/>
+        </set>
+
+        <set name="checkin_ids" cascade="all" inverse="true" lazy="false">
+               <key column="class_id"></key>
+               <one-to-many class="com.umeijia.vo.CheckinRecords"/>
+        </set>
+
+         <set name="activity_ids" cascade="all" inverse="true" lazy="false">
+               <key column="class_id"></key>
+               <many-to-many class="com.umeijia.vo.ClassActivity"/>
+        </set>
 -->
          
            <many-to-one name="garten" class="com.umeijia.vo.Kindergarten" column="garten_id" cascade="delete"></many-to-one>
