@@ -12,15 +12,24 @@ public class Kindergarten {
 	private String garten_presence_imgs; //幼儿园图片展示列表
 	private String leader_wishes;
 	private Date create_date;
+	private  String teacher_contacts; //老师联系方式
 	private Long id;
 	private String name;
 	private Agent agent; //代理商id
 	private Set<Camera> cameras;
 	private Set<Class> classes; // 班级列表
 	private Set<Teacher> teachers;
+
+	public void setTeacher_contacts(String teacher_contacts) {
+		this.teacher_contacts = teacher_contacts;
+	}
+
 	private Set<GartenNews> news;// 新闻列表
 	private long leader_id; //园长信息
 
+	public String getTeacher_contacts() {
+		return teacher_contacts;
+	}
 
 	public Kindergarten(){
 
@@ -28,6 +37,7 @@ public class Kindergarten {
 
 	public  Kindergarten(String name,String addr,String contact_num,String description,String t_imgs,String gi_imgs,String gp_imgs,Agent agent){
 		leader_id=0;
+		teacher_contacts="";//初始化时，没有老师
 		this.agent=agent;
 		this.name=name;
 		this.addr=addr;
@@ -36,6 +46,8 @@ public class Kindergarten {
 		this.teacher_presence_imgs=t_imgs;
 		this.garten_instrument_imgs=gi_imgs;
 		this.garten_presence_imgs=gp_imgs;
+		this.create_date=new Date();
+		this.leader_wishes="";
 	}
 
 

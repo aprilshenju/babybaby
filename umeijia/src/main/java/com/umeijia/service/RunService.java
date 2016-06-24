@@ -147,6 +147,8 @@ public class RunService {
             if(teacherdao.addTeacher(leader)){
                 garten.setLeader_wishes(wishes); //更新幼儿园 寄语
                 garten.setLeader_id(leader.getId()); //更新幼儿园 园长
+                String leader_contact=name+"-"+phone+"-"+avatar+"-"+"园长";
+                garten.setTeacher_contacts(leader_contact);
                 if( kindergartendao.updateKindergarten(garten))
                 {
                     job_out.put("resultCode",GlobalStatus.succeed.toString());

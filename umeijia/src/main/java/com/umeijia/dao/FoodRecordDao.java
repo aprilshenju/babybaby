@@ -40,6 +40,26 @@ public class FoodRecordDao {
         }
     }
 
+    /**
+     * 根据classId来查找饮食记录
+     * @param classId
+     * @return
+     */
+    public FoodRecord queryFoodRecordByClassId(long classId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from FoodRecord as food where food.cla.id=%d",classId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            FoodRecord food = (FoodRecord) list.get(0);
+            return food;
+        }else {
+            return null;
+        }
+    }
+
     public boolean addFoodRecord(FoodRecord food) {
         boolean result=false;
         Session session = DBManager.getSession();

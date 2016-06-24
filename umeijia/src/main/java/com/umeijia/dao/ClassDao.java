@@ -40,7 +40,7 @@ public class ClassDao {
         }
     }
 
-    public String getTeacherContacts(long class_id){
+ /*   public String getTeacherContacts(long class_id){
         String teacherContacts="";
         Session session = DBManager.getSession();
         session.clear();
@@ -76,7 +76,7 @@ public class ClassDao {
             session.close();
             return result;
         }
-    }
+    }*/
 
     public String getParentsContacts(long class_id){
         String parentsContacts="";

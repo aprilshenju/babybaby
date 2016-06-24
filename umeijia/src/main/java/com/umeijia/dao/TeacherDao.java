@@ -58,6 +58,22 @@ public class TeacherDao {
         }
     }
 
+    public  List<Teacher> getTeachersByGarten(Long garten_id){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Teacher as t where t.kindergarten.id=%d",garten_id);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        List<Teacher> teachers=new ArrayList<Teacher>();
+        session.close();
+        for (int i = 0; i < list.size(); i++){
+            Teacher t=(Teacher) list.get(i);
+            teachers.add(t);
+        }
+        return  teachers;
+    }
+
     public Teacher queryTeacherByEmail(String email) {
         Session session = DBManager.getSession();
         session.clear();

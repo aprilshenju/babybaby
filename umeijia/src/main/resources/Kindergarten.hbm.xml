@@ -34,6 +34,7 @@
         <property name="garten_instrument_imgs" column="garten_instrument_imgs"></property>
         <property name="garten_presence_imgs" column="garten_presence_imgs"></property>
         <property name="leader_wishes" column="leader_wishes"></property>
+        <property name="teacher_contacts" column="teacher_contacts"></property>
 
 
          <set name="cameras" cascade="all" inverse="true" lazy="false">
