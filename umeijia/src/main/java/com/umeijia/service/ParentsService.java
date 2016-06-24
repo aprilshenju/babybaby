@@ -1,9 +1,11 @@
 package com.umeijia.service;
 
+import com.umeijia.dao.ClassDao;
 import com.umeijia.dao.ParentsDao;
 import com.umeijia.dao.StudentDao;
 import com.umeijia.util.GlobalStatus;
 import com.umeijia.util.MD5;
+import com.umeijia.vo.Class;
 import com.umeijia.vo.Parents;
 import com.umeijia.vo.Student;
 import net.sf.json.JSONException;
@@ -17,6 +19,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
@@ -28,7 +32,9 @@ public class ParentsService {
     @Autowired
     @Qualifier("studentdao")
     private StudentDao studentdao;
-
+    @Autowired
+    @Qualifier("classdao")
+    private  ClassDao classdao;
 
     @Path("/hello")
     @GET
@@ -182,6 +188,119 @@ public class ParentsService {
             }
             return job_out.toString();
         }
+
+    @Path("/getBabyInfo")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getBabyInfo(@RequestBody String userinfo, @Context HttpHeaders headers){
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out=new JSONObject();
+        try {
+            // 用户 登陆token 验证
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","token已过期");
+                return job_out.toString();
+            }
+
+            Parents p = parentsdao.queryParents(tid);
+            if(p==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效家长id");
+                return job_out.toString();
+            }
+            Student stu = p.getStudent(); //获取 当前家长的宝贝
+            if(stu==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","当前家长还没宝贝");
+                return job_out.toString();
+            }
+            job_out.put("baby_id",stu.getId());
+            job_out.put("name",stu.getName());
+            job_out.put("nick_name",stu.getNick_name());
+            job_out.put("avatar",stu.getAvatar_path());
+            job_out.put("gender",stu.getGender());
+            job_out.put("birthday",stu.getBirthday());
+            job_out.put("weight",stu.getWeight());
+            job_out.put("height",stu.getHeight()); //baby相关基本信息
+            job_out.put("relation",p.getRelationship()); //宝贝关系
+
+        }catch (JSONException e){
+            return "error";  //json  构造异常，直接返回error
+        }
+        return job_out.toString();
+    }
+
+
+
+    @Path("/correctBabyInfo")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String correctBabyInfo(@RequestBody String userinfo, @Context HttpHeaders headers){
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out=new JSONObject();
+        try {
+            // 用户 登陆token 验证
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","token已过期");
+                return job_out.toString();
+            }
+
+            long baby_id=job.getLong("baby_id"); // 后去 宝贝id
+            String name = job.getString("name");
+            String nick_name = job.getString("nick_name");
+            long class_id = job.getLong("class_id");
+            String avatar = job.getString("avatar");
+            String gender=job.getString("gender");
+            String birth_str=job.getString("birthday");
+            int weight=job.getInt("weight");
+            int height = job.getInt("height");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+            Date birth = sdf.parse(birth_str);
+            Student stu = studentdao.queryStudent(baby_id);
+            if(stu==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","宝贝id无效");
+                return  job_out.toString();
+            }
+            Class cla = classdao.queryClass(class_id);
+            if(cla==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","新班级id无效");
+                return  job_out.toString();
+            }
+
+            //设置宝贝信息为新设置的值
+            stu.setName(name);
+            stu.setNick_name(nick_name);
+            stu.setAvatar_path(avatar);
+            stu.setCla(cla);
+            stu.setGender(gender);
+            stu.setBirthday(birth);
+            stu.setWeight(weight);
+            stu.setHeight(height);
+            if(studentdao.addStudent(stu)){
+                job_out.put("resultCode", GlobalStatus.succeed.toString());
+                job_out.put("resultDesc","成功修改宝贝信息");
+                return  job_out.toString();
+            }
+            job_out.put("resultCode", GlobalStatus.error.toString());
+            job_out.put("resultDesc","修改信息失败");
+        }catch (JSONException e){
+            return "error";  //json  构造异常，直接返回error
+        } catch (ParseException e) {
+            job_out.put("resultCode",GlobalStatus.error.toString());
+            job_out.put("resultDesc","生日解析失败");
+        }
+        return job_out.toString();
+    }
 
 
 

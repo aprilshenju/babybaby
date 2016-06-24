@@ -17,12 +17,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.awt.*;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * Created by shenju on 2016/6/20.
@@ -2270,386 +2268,385 @@ public class PublicService {
         String thumbDir = null;
         Thread thumbImgThread = null;
         //根据接口类型处理文件上传
-        switch (interfaceType) {
-            case "publishOrUpdateSchoolNews"://发布编辑校园新闻接口
-                GartenNews gartenNews = gartennewsdao.queryGartenNews(recordId);
-                if (gartenNews != null) {
-                    filePath = "/garden/" + gardenId + "/news/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
-                    imgUrls = gartenNews.getImage_urls();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-
-                    gartenNews.setImage_urls(imgUrls);
-                    //更新表中的imgUrls字段
-                    if (gartennewsdao.updateGartenNews(gartenNews)) {
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                } else {
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的新闻记录");
-                }
-                break;
-            case "publishOrUpdateClassNotification"://发布或更新班级通知
-                ClassNotification classNotification = classnotificationdao.queryClassNotification(recordId);
-                if (classNotification != null) {
-                    filePath = "/garden/" + gardenId + "/class/" + classId + "/notification/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
-                    imgUrls = classNotification.getImage_urls();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-                    classNotification.setImage_urls(imgUrls);
-                    //更新数据库表中的imgUrls字段
-                    if (classnotificationdao.updateClassNotification(classNotification)) {
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                } else {
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的班级通知");
-                }
-                break;
-            case "addHomeWork"://新增班级作业接口
-                HomeWork homeWork = homeworkdao.queryHomeWork(recordId);
-                if (homeWork != null) {
-                    filePath = "/garden/" + gardenId + "/class/" + classId + "/homework/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
-                    imgUrls = homeWork.getImage_urls();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-                    homeWork.setImage_urls(imgUrls);
-                    if (homeworkdao.updateHomeWork(homeWork)) {
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                } else {
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的班级作业");
-                }
-                break;
-            case "publishClassActivity"://发布班级活动接口
-                ClassActivity classActivity = classactivitydao.queryClassActivity(recordId);
-                if (classActivity != null) {
-                    filePath = "/garden/" + gardenId + "/class/" + classId + "/activity/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
-                    imgUrls = classActivity.getImage_urls();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-                    classActivity.setImage_urls(imgUrls);
-                    if (classactivitydao.updateClassActivity(classActivity)) {
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                } else {
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的班级活动");
-                }
-                break;
-            case "addBabyShowTime"://新增宝贝动态接口
-                BabyShowtime babyShowtime = babyshowtimedao.queryBabyShowtime(recordId);
-                if (babyShowtime != null) {
-                    switch (fileType){
-                        case 1://图片
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/showTime/img";
-                            File dir = new File(baseDir + filePath);
-                            if (!dir.exists()) {
-                                dir.mkdirs();
-                                System.out.println("创建图片目录:" + dir.getPath());
-                            }
-                            //存储原图
-                            imgPath = dir.getPath() + "/origin/" + imgName;
-                            storeImg(imgPath, ins);
-                            //存储缩略图
-                            thumbDir = dir.getPath() + "/thumb";
-                            thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                            //线程处理图片缩放和存储
-                            thumbImgThread.start();
-                            break;
-                        case 2://视频
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/showTime/video";
-                            File dir1 = new File(baseDir + filePath);
-                            if (!dir1.exists()) {
-                                dir1.mkdirs();
-                                System.out.println("创建视频目录:" + dir1.getPath());
-                            }
-                            //存储原图
-                            videoPath = dir1.getPath() + "/" + imgName;
-                            storeImg(videoPath, ins);
-                            break;
-                        default://未知的文件类型
-                            returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
-                            returnJsonObject.put("resultDesc", "未知的文件类型");
-                            return returnJsonObject.toString();
-                    }
-
-                    imgUrls = babyShowtime.getImage_urls();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-                    babyShowtime.setImage_urls(imgUrls);
-                    if(babyshowtimedao.updateBabyShowtime(babyShowtime)){
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                } else {
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的宝贝动态");
-                }
-                break;
-            case "addOrEditFootPrint"://新增或编辑宝贝足迹接口
-                BabyFootPrint babyFootPrint = babyfootprintdao.queryBabyFootPrint(recordId);
-                if(babyFootPrint!=null){
-                    switch (fileType){
-                        case 1://图片
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/footprint/img";
-                            File dir = new File(baseDir + filePath);
-                            if (!dir.exists()) {
-                                dir.mkdirs();
-                                System.out.println("创建图片目录:" + dir.getPath());
-                            }
-                            //存储原图
-                            imgPath = dir.getPath() + "/origin/" + imgName;
-                            storeImg(imgPath, ins);
-                            //存储缩略图
-                            thumbDir = dir.getPath() + "/thumb";
-                            thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                            //线程处理图片缩放和存储
-                            thumbImgThread.start();
-                            break;
-                        case 2://视频
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/footprint/video";
-                            File dir1 = new File(baseDir + filePath);
-                            if (!dir1.exists()) {
-                                dir1.mkdirs();
-                                System.out.println("创建视频目录:" + dir1.getPath());
-                            }
-                            //存储原图
-                            videoPath = dir1.getPath() + "/" + imgName;
-                            storeImg(videoPath, ins);
-                            break;
-                        default:
-                            returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
-                            returnJsonObject.put("resultDesc", "未知的文件类型");
-                            return returnJsonObject.toString();
-                    }
-                    imgUrls = babyFootPrint.getImage_urls();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-                    babyFootPrint.setImage_urls(imgUrls);
-                    if(babyfootprintdao.updateBabyFootPrint(babyFootPrint)){
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                }else {
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的宝贝足迹");
-                }
-                break;
-            case "addOrEditBabyFood"://新增或编辑宝贝饮食接口
-                FoodRecord foodRecord = foodrecorddao.queryFoodRecord(recordId);
-                if(foodRecord!=null){
-                    filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/food/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
-                    imgUrls = foodRecord.getImage_urls();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-                    foodRecord.setImage_urls(imgUrls);
-                    if(foodrecorddao.updateFoodRecord(foodRecord)){
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                }else {
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的宝贝饮食");
-                }
-                break;
-            case "addCheckinRecord"://新增宝贝考勤接口
-                CheckinRecords checkinRecords = checkinrecorddao.queryCheckinRecords(recordId);
-                if(checkinRecords!=null){
-                    filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/checkin/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
-                    imgUrls = checkinRecords.getImage_path();
-                    if (imgUrls != null) {
-                        if(imgUrls.length()==0){
-                            imgUrls = imgName;
-                        }else {
-                            imgUrls += ";"+imgName;
-                        }
-                    } else {
-                        imgUrls = imgName;
-                    }
-                    checkinRecords.setImage_path(imgUrls);
-                    if(checkinrecorddao.updateCheckinRecords(checkinRecords)){
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "更新数据库失败");
-                    }
-                }else{
-                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "没有找到对应的考勤记录");
-                }
-                break;
-            case "uploadAvatar"://上传头像接口
-                filePath = "/avatar";
+        if (interfaceType.equals("publishOrUpdateSchoolNews")) {
+            GartenNews gartenNews = gartennewsdao.queryGartenNews(recordId);
+            if (gartenNews != null) {
+                filePath = "/garden/" + gardenId + "/news/img";
                 File dir = new File(baseDir + filePath);
                 if (!dir.exists()) {
                     dir.mkdirs();
                     System.out.println("创建图片目录:" + dir.getPath());
                 }
                 //存储原图
-                imgPath = dir.getPath() +"/" + imgName;
+                imgPath = dir.getPath() + "/origin/" + imgName;
                 storeImg(imgPath, ins);
-                returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                returnJsonObject.put("resultDesc", "操作成功");
-                break;
-            default:
-                returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
-                returnJsonObject.put("resultDesc", "未知的接口类型");
-                break;
+                //存储缩略图
+                thumbDir = dir.getPath() + "/thumb";
+                thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                //线程处理图片缩放和存储
+                thumbImgThread.start();
+                imgUrls = gartenNews.getImage_urls();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+
+                gartenNews.setImage_urls(imgUrls);
+                //更新表中的imgUrls字段
+                if (gartennewsdao.updateGartenNews(gartenNews)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的新闻记录");
+            }
+
+        } else if (interfaceType.equals("publishOrUpdateClassNotification")) {
+            ClassNotification classNotification = classnotificationdao.queryClassNotification(recordId);
+            if (classNotification != null) {
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/notification/img";
+                File dir = new File(baseDir + filePath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                    System.out.println("创建图片目录:" + dir.getPath());
+                }
+                //存储原图
+                imgPath = dir.getPath() + "/origin/" + imgName;
+                storeImg(imgPath, ins);
+                //存储缩略图
+                thumbDir = dir.getPath() + "/thumb";
+                thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                //线程处理图片缩放和存储
+                thumbImgThread.start();
+                imgUrls = classNotification.getImage_urls();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+                classNotification.setImage_urls(imgUrls);
+                //更新数据库表中的imgUrls字段
+                if (classnotificationdao.updateClassNotification(classNotification)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的班级通知");
+            }
+
+        } else if (interfaceType.equals("addHomeWork")) {
+            HomeWork homeWork = homeworkdao.queryHomeWork(recordId);
+            if (homeWork != null) {
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/homework/img";
+                File dir = new File(baseDir + filePath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                    System.out.println("创建图片目录:" + dir.getPath());
+                }
+                //存储原图
+                imgPath = dir.getPath() + "/origin/" + imgName;
+                storeImg(imgPath, ins);
+                //存储缩略图
+                thumbDir = dir.getPath() + "/thumb";
+                thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                //线程处理图片缩放和存储
+                thumbImgThread.start();
+                imgUrls = homeWork.getImage_urls();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+                homeWork.setImage_urls(imgUrls);
+                if (homeworkdao.updateHomeWork(homeWork)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的班级作业");
+            }
+
+        } else if (interfaceType.equals("publishClassActivity")) {
+            ClassActivity classActivity = classactivitydao.queryClassActivity(recordId);
+            if (classActivity != null) {
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/activity/img";
+                File dir = new File(baseDir + filePath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                    System.out.println("创建图片目录:" + dir.getPath());
+                }
+                //存储原图
+                imgPath = dir.getPath() + "/origin/" + imgName;
+                storeImg(imgPath, ins);
+                //存储缩略图
+                thumbDir = dir.getPath() + "/thumb";
+                thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                //线程处理图片缩放和存储
+                thumbImgThread.start();
+                imgUrls = classActivity.getImage_urls();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+                classActivity.setImage_urls(imgUrls);
+                if (classactivitydao.updateClassActivity(classActivity)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的班级活动");
+            }
+
+        } else if (interfaceType.equals("addBabyShowTime")) {
+            BabyShowtime babyShowtime = babyshowtimedao.queryBabyShowtime(recordId);
+            if (babyShowtime != null) {
+                switch (fileType) {
+                    case 1://图片
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/showTime/img";
+                        File dir = new File(baseDir + filePath);
+                        if (!dir.exists()) {
+                            dir.mkdirs();
+                            System.out.println("创建图片目录:" + dir.getPath());
+                        }
+                        //存储原图
+                        imgPath = dir.getPath() + "/origin/" + imgName;
+                        storeImg(imgPath, ins);
+                        //存储缩略图
+                        thumbDir = dir.getPath() + "/thumb";
+                        thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                        //线程处理图片缩放和存储
+                        thumbImgThread.start();
+                        break;
+                    case 2://视频
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/showTime/video";
+                        File dir1 = new File(baseDir + filePath);
+                        if (!dir1.exists()) {
+                            dir1.mkdirs();
+                            System.out.println("创建视频目录:" + dir1.getPath());
+                        }
+                        //存储原图
+                        videoPath = dir1.getPath() + "/" + imgName;
+                        storeImg(videoPath, ins);
+                        break;
+                    default://未知的文件类型
+                        returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+                        returnJsonObject.put("resultDesc", "未知的文件类型");
+                        return returnJsonObject.toString();
+                }
+
+                imgUrls = babyShowtime.getImage_urls();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+                babyShowtime.setImage_urls(imgUrls);
+                if (babyshowtimedao.updateBabyShowtime(babyShowtime)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的宝贝动态");
+            }
+
+        } else if (interfaceType.equals("addOrEditFootPrint")) {
+            BabyFootPrint babyFootPrint = babyfootprintdao.queryBabyFootPrint(recordId);
+            if (babyFootPrint != null) {
+                switch (fileType) {
+                    case 1://图片
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/footprint/img";
+                        File dir = new File(baseDir + filePath);
+                        if (!dir.exists()) {
+                            dir.mkdirs();
+                            System.out.println("创建图片目录:" + dir.getPath());
+                        }
+                        //存储原图
+                        imgPath = dir.getPath() + "/origin/" + imgName;
+                        storeImg(imgPath, ins);
+                        //存储缩略图
+                        thumbDir = dir.getPath() + "/thumb";
+                        thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                        //线程处理图片缩放和存储
+                        thumbImgThread.start();
+                        break;
+                    case 2://视频
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/footprint/video";
+                        File dir1 = new File(baseDir + filePath);
+                        if (!dir1.exists()) {
+                            dir1.mkdirs();
+                            System.out.println("创建视频目录:" + dir1.getPath());
+                        }
+                        //存储原图
+                        videoPath = dir1.getPath() + "/" + imgName;
+                        storeImg(videoPath, ins);
+                        break;
+                    default:
+                        returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+                        returnJsonObject.put("resultDesc", "未知的文件类型");
+                        return returnJsonObject.toString();
+                }
+                imgUrls = babyFootPrint.getImage_urls();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+                babyFootPrint.setImage_urls(imgUrls);
+                if (babyfootprintdao.updateBabyFootPrint(babyFootPrint)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的宝贝足迹");
+            }
+
+        } else if (interfaceType.equals("addOrEditBabyFood")) {
+            FoodRecord foodRecord = foodrecorddao.queryFoodRecord(recordId);
+            if (foodRecord != null) {
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/food/img";
+                File dir = new File(baseDir + filePath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                    System.out.println("创建图片目录:" + dir.getPath());
+                }
+                //存储原图
+                imgPath = dir.getPath() + "/origin/" + imgName;
+                storeImg(imgPath, ins);
+                //存储缩略图
+                thumbDir = dir.getPath() + "/thumb";
+                thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                //线程处理图片缩放和存储
+                thumbImgThread.start();
+                imgUrls = foodRecord.getImage_urls();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+                foodRecord.setImage_urls(imgUrls);
+                if (foodrecorddao.updateFoodRecord(foodRecord)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的宝贝饮食");
+            }
+
+        } else if (interfaceType.equals("addCheckinRecord")) {
+            CheckinRecords checkinRecords = checkinrecorddao.queryCheckinRecords(recordId);
+            if (checkinRecords != null) {
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/checkin/img";
+                File dir = new File(baseDir + filePath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                    System.out.println("创建图片目录:" + dir.getPath());
+                }
+                //存储原图
+                imgPath = dir.getPath() + "/origin/" + imgName;
+                storeImg(imgPath, ins);
+                //存储缩略图
+                thumbDir = dir.getPath() + "/thumb";
+                thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+                //线程处理图片缩放和存储
+                thumbImgThread.start();
+                imgUrls = checkinRecords.getImage_path();
+                if (imgUrls != null) {
+                    if (imgUrls.length() == 0) {
+                        imgUrls = imgName;
+                    } else {
+                        imgUrls += ";" + imgName;
+                    }
+                } else {
+                    imgUrls = imgName;
+                }
+                checkinRecords.setImage_path(imgUrls);
+                if (checkinrecorddao.updateCheckinRecords(checkinRecords)) {
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "更新数据库失败");
+                }
+            } else {
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "没有找到对应的考勤记录");
+            }
+
+        } else if (interfaceType.equals("uploadAvatar")) {
+            filePath = "/avatar";
+            File dir = new File(baseDir + filePath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+                System.out.println("创建图片目录:" + dir.getPath());
+            }
+            //存储原图
+            imgPath = dir.getPath() + "/" + imgName;
+            storeImg(imgPath, ins);
+            returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+            returnJsonObject.put("resultDesc", "操作成功");
+
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+            returnJsonObject.put("resultDesc", "未知的接口类型");
+
         }
         return returnJsonObject.toString();
     }

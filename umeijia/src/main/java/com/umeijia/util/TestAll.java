@@ -1,21 +1,22 @@
 package com.umeijia.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by shenju on 2016/6/21.
  */
 public class TestAll {
 
     public static void main(String[] args) {
-/*        String te="11;33;450;fds";
-        String [] results=te.split(";");
-        System.out.println(results.length);
-        for (int i=0;i<results.length;i++)
-        {
-            System.out.println(results[i]);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+        try {
+            Date date = sdf.parse("2016-07-03");
+            System.out.print(date.toString());
+
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        System.out.println("end");*/
-
-     //   System.out.println(new Date().toString());
-
     }
 }

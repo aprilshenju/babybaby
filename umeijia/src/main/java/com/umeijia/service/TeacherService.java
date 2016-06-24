@@ -17,6 +17,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +60,64 @@ public class TeacherService {
     }
 
 
+    @Path("/addStudent")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addStudent(@RequestBody String userinfo, @Context HttpHeaders headers) {
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out = new JSONObject();
+        try {
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","token已过期");
+                return job_out.toString();
+            }
+            String name = job.getString("name");
+            String nick_name = job.getString("nick_name");
+            long class_id = job.getLong("class_id");
+            String avatar = job.getString("avatar");
+            String gender=job.getString("gender");
+            String date_str=job.getString("birthday");
+            int weight=job.getInt("weight");
+            int height = job.getInt("height");
+            boolean isvip=job.getBoolean("vip");
+            String vip_begin=job.getString("vip_begin");
+            String vip_end=job.getString("vip_end");
+            String entrence=job.getString("entrence");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+            Date date = sdf.parse(date_str);
+            Date date_vip_begin=sdf.parse(vip_begin);
+            Date date_vip_end=sdf.parse(vip_end);
+            Date date_entrence = sdf.parse(entrence);
+
+            Class cla = classdao.queryClass(class_id);
+            if(cla==null){
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","班级不存在");
+                return job_out.toString();
+            }
+            Student stu = new Student(name,nick_name,gender,date,height,weight,avatar,cla,isvip,date_vip_begin,date_vip_end,date_entrence);
+            if(studentdao.addStudent(stu)){
+                job_out.put("resultCode",GlobalStatus.succeed.toString());
+                job_out.put("baby_id",stu.getId()); //返回 baby_id
+                job_out.put("resultDesc","成功添加宝贝");
+                return  job_out.toString();
+            }
+            job_out.put("resultCode",GlobalStatus.error.toString());
+            job_out.put("resultDesc","添加宝贝失败");
+        } catch (JSONException e) {
+            return "error";  //json  构造异常，直接返回error
+        } catch (ParseException e) {
+            job_out.put("resultCode",GlobalStatus.error.toString());
+            job_out.put("resultDesc","生日解析失败");
+        }
+        return job_out.toString();
+    }
+
     /***
      * 添加家长
      * curl -X POST -H "Content-Type:application/json" -d {"phone":"13534456644","password":"134df","name":"ltt4aoshou","email":"12345@qq.com","class_id":"1","baby_id":"1","relation":"dad","avatar":"fdef.jpg","gender":"0"}
@@ -87,7 +147,6 @@ public class TeacherService {
             long stu_id=job.getLong("baby_id");
             String relation = job.getString("relation");
             String avatar = job.getString("avatar");
-            int gender=job.getInt("gender"); // 0 男 1 女
             String pwd_md = MD5.GetSaltMD5Code(pwd);
             Student baby = studentdao.queryStudent(stu_id);
             if(baby==null){
