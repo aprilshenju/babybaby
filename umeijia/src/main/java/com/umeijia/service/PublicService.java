@@ -1494,11 +1494,11 @@ public class PublicService {
             JSONArray ja = new JSONArray();
             for(HomeWork item : homeWorks){
                 JSONObject jo = new JSONObject();
-                jo.put("publishName",teacherdao.queryTeacher(item.getTeacher_id()));
+                jo.put("publishName",teacherdao.queryTeacher(item.getTeacher_id()).getName());
                 jo.put("title",item.getTitle());
                 jo.put("description",item.getDescription());
                 jo.put("imageUrls",item.getImage_urls());
-                jo.put("date",item.getDate());
+                jo.put("date",item.getDate().toString());
                 ja.add(jo);
             }
             jobOut.put("data",ja.toString());
@@ -1616,8 +1616,8 @@ public class PublicService {
                 jo.put("title",item.getTitle());
                 jo.put("content",item.getContent());
                 jo.put("imageUrls",item.getImage_urls());
-                jo.put("startDate",item.getStart_date());
-                jo.put("endDate",item.getEnd_date());
+                jo.put("startDate",item.getStart_date().toString());
+                jo.put("endDate",item.getEnd_date().toString());
                 jo.put("participate_num",item.getParticipate_num());
                 jo.put("contactName",item.getContact_name());
                 jo.put("contactPhoneNum",item.getContact_phone());
@@ -1675,9 +1675,12 @@ public class PublicService {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  //按这种格式来转化数据
                     java.util.Date date=new java.util.Date();
                     String dateString = sdf.format(date);
-                    String babyNames = ca.getBaby_ids().equals("")?studentdao.queryStudent(babyId).getName():(";"+studentdao.queryStudent(babyId).getName());
-                    String parentName = ca.getParent_ids().equals("")?parentsdao.queryParents(roleId).getName():(";"+parentsdao.queryParents(roleId).getName());
-                    String participateDates = ca.getParticipate_time().equals("")?dateString:(";"+dateString);
+                    String babyNames = ca.getBaby_ids().equals("")?studentdao.queryStudent(babyId).getName():(ca.getBaby_ids()+";"+studentdao.queryStudent(babyId).getName());
+                    String parentName = ca.getParent_ids().equals("")?parentsdao.queryParents(roleId).getName():(ca.getParent_ids()+";"+parentsdao.queryParents(roleId).getName());
+                    String participateDates = ca.getParticipate_time().equals("")?dateString:(ca.getParticipate_time()+";"+dateString);
+                    ca.setParent_ids(parentName);
+                    ca.setBaby_ids(babyNames);
+                    ca.setParticipate_time(participateDates);
                     classactivitydao.updateClassActivity(ca);
                     jobOut.put("resultCode", GlobalStatus.succeed.toString());
                     jobOut.put("resultDesc","操作成功");
@@ -1909,6 +1912,113 @@ public class PublicService {
                 return jobOut.toString();
             }
             jobOut.put("data",ja.toString());
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 新增日志
+     * @param logInfo
+     * @param headers
+     * @return
+     */
+    @Path("/addLog")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addLog(@RequestBody String logInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(logInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int userType = jobIn.getInt("userType");
+            int userId = jobIn.getInt("userId");
+            String opType = jobIn.getString("opType");
+            String opContent = jobIn.getString("opContent");
+            String opObject = jobIn.getString("opObject");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+
+            DailyLog dl = new DailyLog();
+            dl.setLog_date(new Date());
+            dl.setOp_content(opContent);
+            dl.setOp_object(opObject);
+            dl.setOp_type(opType);
+            dl.setUser_id(userId);
+            dl.setUser_type(userType);
+            dailylogdao.addDailyLog(dl);
+            jobOut.put("id", dl.getId());
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc","操作成功");
+        }catch(Exception e){
+            jobOut.put("resultCode",GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc","操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 查看日志
+     */
+
+    @Path("/queryLog")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryLog(@RequestBody String logInfo,@Context HttpHeaders headers){
+        JSONObject jobOut=new JSONObject();
+        try{
+            JSONObject jobIn =JSONObject.fromObject(logInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int pageNum = jobIn.getInt("pageNum");
+            int year = jobIn.getInt("year");
+            int month = jobIn.getInt("month");
+            if(!checkIdAndToken(roleType,headers)){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","token已过期");
+                return jobOut.toString();
+            }
+            if(roleType!=5){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","没有权限查看日志");
+                return jobOut.toString();
+            }
+
+            List<DailyLog> dailyLogs = dailylogdao.queryDailyLogByMonth(year,month);
+
+            if(dailyLogs==null){
+                jobOut.put("resultCode",GlobalStatus.error.toString());
+                jobOut.put("resultDesc","无记录");
+                return jobOut.toString();
+            }
+            JSONArray ja = new JSONArray();
+            for(DailyLog item : dailyLogs){
+                JSONObject jo = new JSONObject();
+                jo.put("id",item.getId());
+                jo.put("date",item.getLog_date().toString());
+                jo.put("userType",item.getUser_type());
+                jo.put("userId",item.getUser_id());
+                jo.put("opType",item.getOp_type());
+                jo.put("opContent",item.getOp_content());
+                jo.put("opObject",item.getOp_object());
+                ja.add(jo);
+            }
+            jobOut.put("data",ja.toString());
+            jobOut.put("hasNextPage",true);
+            jobOut.put("totleCount",ja.size());
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc","操作成功");
         }catch(Exception e){

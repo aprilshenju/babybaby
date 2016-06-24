@@ -39,6 +39,26 @@ public class DailyLogDao {
             return null;
         }
     }
+
+    /**
+     * 按月查日志
+     * @param
+     * @return
+     */
+    public List<DailyLog> queryDailyLogByMonth(int year,int month) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from DailyLog as log where year(log.log_date)=%d and month(log.log_date)=%d order by log.log_date desc",year,month);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+
+            return list;
+        }else {
+            return null;
+        }
+    }
     
     public boolean addDailyLog(DailyLog log) {
         boolean result=false;
