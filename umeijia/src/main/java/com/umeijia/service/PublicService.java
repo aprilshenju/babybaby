@@ -2,12 +2,14 @@ package com.umeijia.service;
 
 import com.sun.jersey.multipart.FormDataParam;
 import com.umeijia.dao.*;
+import com.umeijia.util.FileUtils;
 import com.umeijia.util.GlobalStatus;
 import com.umeijia.util.ThumbGenerateThread;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,17 @@ import java.util.*;
 @Service
 @Path("/public_service")
 public class PublicService {
+    String baseDir = "E:/file";
+    //类别路径
+    String filePath = null;
+    String imgUrls = null;
+    //原始图片存放路径
+    String imgPath = null;
+    //视频存放路径
+    String videoPath = null;
+    //小图存放路径
+    String thumbDir = null;
+    Thread thumbImgThread = null;
     @Autowired
     @Qualifier("administratordao")
     private AdministratorDao administratordao;
@@ -1446,6 +1459,11 @@ public class PublicService {
         System.out.println("收到文件上传的请求...");
         JSONObject job = JSONObject.fromObject(reqJson);
         JSONObject returnJsonObject = new JSONObject();
+        if(job==null){
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "获取json失败");
+            return returnJsonObject.toString();
+        }
         int fileType = -1;
         long recordId = -1;
 //        long roleId = -1;
@@ -1470,13 +1488,6 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "找不到参数recordId");
             return returnJsonObject.toString();
         }
-//        if (job.containsKey("roleId")) {
-//            roleId = job.getLong("roleId");
-//        } else {
-//            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-//            returnJsonObject.put("resultDesc", "找不到参数roleId");
-//            return returnJsonObject.toString();
-//        }
         if (job.containsKey("gardenId")) {
             gardenId = job.getLong("gardenId");
         } else {
@@ -1498,13 +1509,6 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "找不到参数babyId");
             return returnJsonObject.toString();
         }
-//        if (job.containsKey("roleType")) {
-//            roleType = job.getInt("roleType");
-//        } else {
-//            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-//            returnJsonObject.put("resultDesc", "找不到参数roleType");
-//            return returnJsonObject.toString();
-//        }
         if (job.containsKey("interfaceType")) {
             interfaceType =  job.getString("interfaceType");
         } else {
@@ -1519,38 +1523,13 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "找不到参数imgName");
             return returnJsonObject.toString();
         }
-
-
-        String baseDir = "E:/file";
-        //类别路径
-        String filePath = null;
-        String imgUrls = null;
-        //原始图片存放路径
-        String imgPath = null;
-        //视频存放路径
-        String videoPath = null;
-        //小图存放路径
-        String thumbDir = null;
-        Thread thumbImgThread = null;
         //根据接口类型处理文件上传
         switch (interfaceType) {
             case "publishOrUpdateSchoolNews"://发布编辑校园新闻接口
                 GartenNews gartenNews = gartennewsdao.queryGartenNews(recordId);
                 if (gartenNews != null) {
                     filePath = "/garden/" + gardenId + "/news/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
+                    handlerFileUpload(filePath,imgName,ins,true);
                     imgUrls = gartenNews.getImage_urls();
                     if (imgUrls != null) {
                         if(imgUrls.length()==0){
@@ -1580,19 +1559,7 @@ public class PublicService {
                 ClassNotification classNotification = classnotificationdao.queryClassNotification(recordId);
                 if (classNotification != null) {
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/notification/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
+                    handlerFileUpload(filePath,imgName,ins,true);
                     imgUrls = classNotification.getImage_urls();
                     if (imgUrls != null) {
                         if(imgUrls.length()==0){
@@ -1621,19 +1588,7 @@ public class PublicService {
                 HomeWork homeWork = homeworkdao.queryHomeWork(recordId);
                 if (homeWork != null) {
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/homework/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
+                    handlerFileUpload(filePath,imgName,ins,true);
                     imgUrls = homeWork.getImage_urls();
                     if (imgUrls != null) {
                         if(imgUrls.length()==0){
@@ -1661,19 +1616,7 @@ public class PublicService {
                 ClassActivity classActivity = classactivitydao.queryClassActivity(recordId);
                 if (classActivity != null) {
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/activity/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
+                    handlerFileUpload(filePath,imgName,ins,true);
                     imgUrls = classActivity.getImage_urls();
                     if (imgUrls != null) {
                         if(imgUrls.length()==0){
@@ -1703,30 +1646,11 @@ public class PublicService {
                     switch (fileType){
                         case 1://图片
                             filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/showTime/img";
-                            File dir = new File(baseDir + filePath);
-                            if (!dir.exists()) {
-                                dir.mkdirs();
-                                System.out.println("创建图片目录:" + dir.getPath());
-                            }
-                            //存储原图
-                            imgPath = dir.getPath() + "/origin/" + imgName;
-                            storeImg(imgPath, ins);
-                            //存储缩略图
-                            thumbDir = dir.getPath() + "/thumb";
-                            thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                            //线程处理图片缩放和存储
-                            thumbImgThread.start();
+                            handlerFileUpload(filePath,imgName,ins,true);
                             break;
                         case 2://视频
                             filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/showTime/video";
-                            File dir1 = new File(baseDir + filePath);
-                            if (!dir1.exists()) {
-                                dir1.mkdirs();
-                                System.out.println("创建视频目录:" + dir1.getPath());
-                            }
-                            //存储原图
-                            videoPath = dir1.getPath() + "/" + imgName;
-                            storeImg(videoPath, ins);
+                            handlerFileUpload(filePath,imgName,ins,false);
                             break;
                         default://未知的文件类型
                             returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
@@ -1763,30 +1687,11 @@ public class PublicService {
                     switch (fileType){
                         case 1://图片
                             filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/footprint/img";
-                            File dir = new File(baseDir + filePath);
-                            if (!dir.exists()) {
-                                dir.mkdirs();
-                                System.out.println("创建图片目录:" + dir.getPath());
-                            }
-                            //存储原图
-                            imgPath = dir.getPath() + "/origin/" + imgName;
-                            storeImg(imgPath, ins);
-                            //存储缩略图
-                            thumbDir = dir.getPath() + "/thumb";
-                            thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                            //线程处理图片缩放和存储
-                            thumbImgThread.start();
+                            handlerFileUpload(filePath,imgName,ins,true);
                             break;
                         case 2://视频
                             filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/footprint/video";
-                            File dir1 = new File(baseDir + filePath);
-                            if (!dir1.exists()) {
-                                dir1.mkdirs();
-                                System.out.println("创建视频目录:" + dir1.getPath());
-                            }
-                            //存储原图
-                            videoPath = dir1.getPath() + "/" + imgName;
-                            storeImg(videoPath, ins);
+                            handlerFileUpload(filePath,imgName,ins,true);
                             break;
                         default:
                             returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
@@ -1820,19 +1725,7 @@ public class PublicService {
                 FoodRecord foodRecord = foodrecorddao.queryFoodRecord(recordId);
                 if(foodRecord!=null){
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/food/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
+                    handlerFileUpload(filePath,imgName,ins,true);
                     imgUrls = foodRecord.getImage_urls();
                     if (imgUrls != null) {
                         if(imgUrls.length()==0){
@@ -1860,19 +1753,7 @@ public class PublicService {
                 CheckinRecords checkinRecords = checkinrecorddao.queryCheckinRecords(recordId);
                 if(checkinRecords!=null){
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/checkin/img";
-                    File dir = new File(baseDir + filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                        System.out.println("创建图片目录:" + dir.getPath());
-                    }
-                    //存储原图
-                    imgPath = dir.getPath() + "/origin/" + imgName;
-                    storeImg(imgPath, ins);
-                    //存储缩略图
-                    thumbDir = dir.getPath() + "/thumb";
-                    thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
-                    //线程处理图片缩放和存储
-                    thumbImgThread.start();
+                    handlerFileUpload(filePath,imgName,ins,true);
                     imgUrls = checkinRecords.getImage_path();
                     if (imgUrls != null) {
                         if(imgUrls.length()==0){
@@ -1916,7 +1797,152 @@ public class PublicService {
         }
         return returnJsonObject.toString();
     }
+    @Path("/fileDownload")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String downloadFile(@RequestBody String reqJson){
+        JSONObject job = JSONObject.fromObject(reqJson);
+        JSONObject returnJsonObject = new JSONObject();
+        if(job==null){
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "获取json失败");
+            return returnJsonObject.toString();
+        }
+        int fileType = -1;
+        long gardenId = -1;
+        long classId = -1;
+        long babyId = -1;
+        boolean isThumb = false;
+        String interfaceType = null;
+        String fileName = null;
+        String fileBase64String = null;
+        if (job.containsKey("fileType")) {
+            fileType = job.getInt("fileType");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数fileType");
+            return returnJsonObject.toString();
+        }
+        if (job.containsKey("gardenId")) {
+            gardenId = job.getLong("gardenId");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数gardenId");
+            return returnJsonObject.toString();
+        }
+        if (job.containsKey("classId")) {
+            classId = job.getLong("classId");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数classId");
+            return returnJsonObject.toString();
+        }
+        if (job.containsKey("babyId")) {
+            babyId = job.getLong("babyId");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数babyId");
+            return returnJsonObject.toString();
+        }
+        if (job.containsKey("interfaceType")) {
+            interfaceType =  job.getString("interfaceType");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数interfaceType");
+            return returnJsonObject.toString();
+        }
+        if (job.containsKey("fileName")) {
+            fileName = job.getString("fileName");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数fileName");
+            return returnJsonObject.toString();
+        }
+        if (job.containsKey("isThumb")) {
+            isThumb = job.getBoolean("isThumb");
+        } else {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到参数isThumb");
+            return returnJsonObject.toString();
+        }
 
+        switch (interfaceType) {
+            case "publishOrUpdateSchoolNews"://发布编辑校园新闻接口
+                filePath = "/garden/" + gardenId + "/news/img";
+                break;
+            case "publishOrUpdateClassNotification"://发布或更新班级通知
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/notification/img";
+                break;
+            case "addHomeWork"://新增班级作业接口
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/homework/img";
+                break;
+            case "publishClassActivity"://发布班级活动接口
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/activity/img";
+                break;
+            case "addBabyShowTime"://新增宝贝动态接口
+                switch (fileType){
+                    case 1://图片
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/showTime/img";
+                        break;
+                    case 2://视频
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/showTime/video";
+                        break;
+                    default://未知的文件类型
+                        returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+                        returnJsonObject.put("resultDesc", "未知的文件类型");
+                        return returnJsonObject.toString();
+                }
+                break;
+            case "addOrEditFootPrint"://新增或编辑宝贝足迹接口
+                switch (fileType){
+                    case 1://图片
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/footprint/img";
+                        break;
+                    case 2://视频
+                        filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/footprint/video";
+                        break;
+                    default:
+                        returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+                        returnJsonObject.put("resultDesc", "未知的文件类型");
+                        return returnJsonObject.toString();
+                }
+                break;
+            case "addOrEditBabyFood"://新增或编辑宝贝饮食接口
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/food/img";
+                break;
+            case "addCheckinRecord"://新增宝贝考勤接口
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/"+babyId+"/checkin/img";
+                break;
+            case "uploadAvatar"://上传头像接口
+                filePath = "/avatar";
+                break;
+            default:
+                returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+                returnJsonObject.put("resultDesc", "未知的接口类型");
+                break;
+        }
+        try {
+            switch (fileType){
+                case 1://图片
+                    fileBase64String = handlerFileDownload(filePath,isThumb,false,fileName);
+                    break;
+                case 2://视频
+                    fileBase64String = handlerFileDownload(filePath,isThumb,true,fileName);
+                    break;
+                default:
+                    break;
+            }
+        }catch (IOException e) {
+            e.printStackTrace();
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "下载失败");
+        }
+        returnJsonObject.put("fileBase64String",fileBase64String);
+        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+        returnJsonObject.put("resultDesc", "操作成功");
+        return returnJsonObject.toString();
+    }
     /**
      * 将流转换为图片，并存储到指定路径
      *
@@ -2278,5 +2304,50 @@ public class PublicService {
             }
         }
         return returnJsonObject.toString();
+    }
+
+    /**
+     * 处理文件上传
+     * @param filePath
+     * @param fileName
+     * @param ins
+     * @param hasThumb
+     */
+    private void handlerFileUpload(String filePath,String fileName,InputStream ins,Boolean hasThumb){
+        File dir = new File(baseDir + filePath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+            System.out.println("创建图片目录:" + dir.getPath());
+        }
+        //存储原图
+        if(!hasThumb) {
+            imgPath = dir.getPath() + "/origin/" + fileName;
+        }else {
+            imgPath = dir.getPath() + "/" + fileName;
+        }
+        storeImg(imgPath, ins);
+        if(hasThumb) {
+            //存储缩略图
+            thumbDir = dir.getPath() + "/thumb";
+            thumbImgThread = new ThumbGenerateThread(imgPath, thumbDir);
+            //线程处理图片缩放和存储
+            thumbImgThread.start();
+        }
+    }
+
+    private String handlerFileDownload(String fileDirPath,boolean isThumb,boolean isVideo,String fileName) throws IOException {
+        String fileUrl = null;
+        if(isVideo){
+            fileUrl = baseDir+fileDirPath+"/"+fileName;
+        }else{
+            if(isThumb){
+                fileUrl = baseDir+fileDirPath+"/thumb/"+fileName;
+            }else{
+                fileUrl = baseDir+fileDirPath+"/origin/"+fileName;
+            }
+        }
+        byte[] fileBytes = FileUtils.fileToByteArrayByNIOWay(fileUrl);
+        String fileBase64String = new String(Base64.encodeBase64(fileBytes));
+        return fileBase64String;
     }
 }
