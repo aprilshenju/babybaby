@@ -10,21 +10,22 @@ import com.umeijia.vo.Class;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.awt.*;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * Created by shenju on 2016/6/20.
@@ -128,7 +129,44 @@ public class PublicService {
         return "welcom to UMJ server... public service ";
     }
 
+    @Path("/wechatValid")
+    @GET
+    public void wechatValid(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
+        System.out.println("收到微信服务器的验证请求");
+        String token = "weixin";
+        String encodingAESKey ="7XJSJs7HOLyUYIwh5HRUjUrPZXRKdFAgmWlgN4KOflj";
+        String corpId = "meepomiracle";
+        // 微信加密签名
 
+        String signature = request.getParameter("signature");
+        // 时间戳
+        String timestamp = request.getParameter("timestamp");
+        // 随机数
+        String nonce = request.getParameter("nonce");
+        // 随机字符串
+        String echostr = request.getParameter("echostr");
+        String result = null;
+//        try {
+//            WXBizMsgCrypt wxcpt = new WXBizMsgCrypt(token, encodingAESKey,
+//                    corpId);
+//            result = wxcpt.VerifyURL(signature, timestamp, nonce, echostr);
+//        } catch (AesException e) {
+//            e.printStackTrace();
+//        }
+//        if (result == null) {
+//            result = token;
+//        }
+        String[] values = {token,timestamp,nonce};
+        Arrays.sort(values);
+        String value = values[0]+values[1]+values[2];
+        String sign = DigestUtils.shaHex(value);
+        if(signature.equals(sign)){
+            result = echostr;
+        }
+        PrintWriter out = response.getWriter();
+        out.print(result);
+        out.close();
+    }
     /**
      * 添加宝贝动态
      * @param showTimeInfo
