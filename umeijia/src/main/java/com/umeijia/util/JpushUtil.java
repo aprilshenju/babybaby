@@ -4,10 +4,10 @@ import cn.jpush.api.JPushClient;
 import cn.jpush.api.common.resp.APIConnectionException;
 import cn.jpush.api.common.resp.APIRequestException;
 import cn.jpush.api.push.PushResult;
-import cn.jpush.api.push.model.Message;
 import cn.jpush.api.push.model.Platform;
 import cn.jpush.api.push.model.PushPayload;
 import cn.jpush.api.push.model.audience.Audience;
+import cn.jpush.api.push.model.notification.Notification;
 
 import static cn.jpush.api.push.model.notification.PlatformNotification.ALERT;
 
@@ -16,14 +16,14 @@ import static cn.jpush.api.push.model.notification.PlatformNotification.ALERT;
  * Created by hadoop on 2016/6/27.
  */
 public class JpushUtil {
-    private static final String appKey = "057ad0a73ac0eb4633812d01";
-    private static  final String masterSecret = "a3ae8eee34cf1ff37184fb44";
+    private static final String appKey = "19a536d10fa9f7970df87eb5";
+    private static  final String masterSecret = "7e6ddf7086fff8c4f4142031";
     private static  final int MAX_RETRY_TIMES = 3;
     private static JPushClient jPushClient = new JPushClient(masterSecret,appKey,MAX_RETRY_TIMES);
 
-    public static void notificationToTargetClient(String alias,Message message){
+    public static void notificationToTargetClient(String alias,Notification notification){
         // For push, all you need do is to build PushPayload object.
-        PushPayload payload = buildPushObject_all_alias_alert(alias,message);
+        PushPayload payload = buildPushObject_all_alias_alert(alias,notification);
 
         try {
             PushResult result = jPushClient.sendPush(payload);
@@ -55,11 +55,11 @@ public class JpushUtil {
         return PushPayload.alertAll(ALERT);
     }
 
-    public static PushPayload buildPushObject_all_alias_alert(String alias,Message message) {
+    public static PushPayload buildPushObject_all_alias_alert(String alias,Notification notification) {
         return PushPayload.newBuilder()
                 .setPlatform(Platform.all())
                 .setAudience(Audience.alias(alias))
-                .setMessage(message)
+                .setNotification(notification)
                 .build();
     }
 }

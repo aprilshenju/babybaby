@@ -1,6 +1,6 @@
 package com.umeijia.service;
 
-import cn.jpush.api.push.model.Message;
+import cn.jpush.api.push.model.notification.Notification;
 import com.sun.jersey.multipart.FormDataParam;
 import com.umeijia.dao.*;
 import com.umeijia.util.FileUtils;
@@ -130,8 +130,10 @@ public class PublicService {
 //        return bfp.getDate()+bfp.getDescription();
         String alias = "138";
         String content = "hahaha jpush";
-        cn.jpush.api.push.model.Message message = Message.newBuilder().setTitle("考勤推送").setContentType(content).build();
-        JpushUtil.notificationToTargetClient(alias,message);
+        Notification notification = Notification.newBuilder()
+                .setAlert(content)
+                .build();
+        JpushUtil.notificationToTargetClient(alias,notification);
         return "welcom to UMJ server... public service ";
     }
 
