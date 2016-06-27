@@ -1,9 +1,11 @@
 package com.umeijia.service;
 
+import cn.jpush.api.push.model.Message;
 import com.sun.jersey.multipart.FormDataParam;
 import com.umeijia.dao.*;
 import com.umeijia.util.FileUtils;
 import com.umeijia.util.GlobalStatus;
+import com.umeijia.util.JpushUtil;
 import com.umeijia.util.ThumbGenerateThread;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
@@ -126,6 +128,10 @@ public class PublicService {
     public String test2(){
 //        BabyFootPrint bfp = babyfootprintdao.queryBabyFootPrint(1);
 //        return bfp.getDate()+bfp.getDescription();
+        String alias = "138";
+        String content = "hahaha jpush";
+        cn.jpush.api.push.model.Message message = Message.newBuilder().setTitle("考勤推送").setContentType(content).build();
+        JpushUtil.notificationToTargetClient(alias,message);
         return "welcom to UMJ server... public service ";
     }
 
