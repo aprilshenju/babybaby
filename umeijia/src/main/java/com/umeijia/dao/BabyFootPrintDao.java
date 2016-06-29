@@ -61,7 +61,7 @@ public class BabyFootPrintDao {
     /**
      * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）。
      * **/
-    public Pager queryBabyFootPrintByClass(long baby_id, Pager pager) {
+    public Pager queryBabyFootPrintByPage(long baby_id, Pager pager) {
         if (pager == null) {
             pager = new Pager();
         }

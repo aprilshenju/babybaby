@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Created by shenju on 2016/6/14.
- * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效�
+ * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效�
  * 应当是直接修改字段，用update操作
  *
  *
@@ -42,11 +42,11 @@ public class DailyLogDao {
     }
 
     /**
-     * 日志查询，暂时未做筛选，后期应追加筛选条�比如时间筛�
+     * 日志查询，暂时未做筛选，后期应追加筛选条�比如时间筛�
      *
-     * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）�
+     * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）�
      * **/
-    public Pager queryDailyLogPageByClass( Pager pager) {
+    public Pager queryDailyLogPage( Pager pager) {
         if (pager == null) {
             pager = new Pager();
         }
@@ -70,7 +70,7 @@ public class DailyLogDao {
     }
 
     /**
-     * 按月查日�
+     * 按月查日�
      * @param
      * @return
      */
