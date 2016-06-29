@@ -1,6 +1,7 @@
 package com.umeijia.dao;
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.GartenNews;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -37,7 +38,7 @@ public class GartenNewsDao {
     }
 
     /**
-     *    // 按 agent获取
+     *    // 按 学校获取
      * **/
     public List<GartenNews> queryGartenNewss(long school_id) {
         Session session = DBManager.getSession();
@@ -51,6 +52,33 @@ public class GartenNewsDao {
         }else {
             return null;
         }
+    }
+
+
+    /**
+     * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）。
+     * **/
+    public Pager queryGartenNewsPageBySchool(long school_id, Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from GartenNews gn where gn.kindergarten.id=%d",school_id);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<GartenNews> list=(List<GartenNews>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     public boolean addGartenNews(GartenNews gnews) {

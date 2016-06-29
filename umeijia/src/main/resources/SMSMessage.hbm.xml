@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--  	
+	    private String phoneNum;
+    private long id;
+    private String verifyCode;
+    private Date validTimeDeadLine;
+    private String unUsedOne;
+    private String unUsedTwo;
+	-->
+
+	<class name="com.umeijia.vo.SMSMessage" table="t_smsmessage">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="phoneNum" column="phoneNum"></property>
+		<property name="verifyCode" column="verifyCode"></property>
+		<property name="validTimeDeadLine" column="validTimeDeadLine" ></property>
+		<property name="unUsedOne" column="unUsedOne" ></property>
+        <property name="unUsedTwo" column="unUsedTwo" ></property>
+        <property name="lastRequestTime" column="lastRequestTime" ></property>
+        <property name="lastInputVerifyCodeTime" column="lastInputVerifyCodeTime" ></property>
+
+                   
+	</class>
+	
+	
+	
+</hibernate-mapping>

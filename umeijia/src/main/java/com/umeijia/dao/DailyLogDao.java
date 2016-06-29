@@ -2,6 +2,7 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.DailyLog;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /**
  * Created by shenju on 2016/6/14.
- * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效。
+ * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效�
  * 应当是直接修改字段，用update操作
  *
  *
@@ -41,7 +42,35 @@ public class DailyLogDao {
     }
 
     /**
-     * 按月查日志
+     * 日志查询，暂时未做筛选，后期应追加筛选条�比如时间筛�
+     *
+     * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）�
+     * **/
+    public Pager queryDailyLogPage( Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql="from DailyLog";
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<DailyLog> list=(List<DailyLog>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
+    }
+
+    /**
+     * 按月查日�
      * @param
      * @return
      */

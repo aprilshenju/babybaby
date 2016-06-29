@@ -1,8 +1,9 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
-import com.umeijia.vo.HomeWork;
-import com.umeijia.vo.Pager;
+import com.umeijia.util.MD5;
+import com.umeijia.vo.Agent;
+import com.umeijia.vo.SMSMessage;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -10,87 +11,59 @@ import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by shenju on 2016/6/14.
- * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效。
- * 应当是直接修改字段，用update操作
- *
- *
  */
 @Scope("prototype")
-@Repository("homeworkdao")
-public class HomeWorkDao {
-    public HomeWorkDao(){
+@Repository("smsmessagedao")
+public class SMSMessageDao {
+    public SMSMessageDao(){
 
     }
 
-    public HomeWork queryHomeWork(long id) {
+    public SMSMessage queryMessage(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from HomeWork as work where work.id=%d",id);
+        String sql = String.format("from SMSMessage as u where u.id=%d", id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
         if(list.size()>0){
-            HomeWork work = (HomeWork) list.get(0);
-            return work;
+            SMSMessage sMSMessage = (SMSMessage) list.get(0);
+            return sMSMessage;
         }else {
             return null;
         }
     }
-    
-    /**
-     * 后续改为分页处理  
-     * **/
-    public List<HomeWork> queryHomeWorks(long class_id) {
+
+    public SMSMessage querySMSMessageByPhone(String phoneNumber) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from HomeWork as work where work.class_id=%d order by work.date desc",class_id);
+        String sql = String.format("from SMSMessage as u where u.phoneNum=\'%s\'", phoneNumber);
         Query query = session.createQuery(sql);
-        List <HomeWork> list = query.list();
+        List list = query.list();
         session.close();
         if(list.size()>0){
-            return list;
+            SMSMessage sMSMessage = (SMSMessage) list.get(0);
+            return sMSMessage;
         }else {
             return null;
         }
     }
 
-    /**
-     * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）。
-     * **/
-    public Pager queryHomeWorkPageByClass(long class_id, Pager pager) {
-        if (pager == null) {
-            pager = new Pager();
-        }
-        Integer pageNumber = pager.getPageNumber();
-        Integer pageSize = pager.getPageSize();
-        String hql=String.format("from HomeWork bs where bs.class_id=%d",class_id);
-        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
-        Session session=DBManager.getSession();
-        Query query=session.createQuery(countHql);
-        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
-        query=session.createQuery(hql);
 
-        query.setFirstResult(pageSize*(pageNumber-1));
-        query.setMaxResults(pageSize);
-        List<HomeWork> list=(List<HomeWork>)query.list();
-        Pager newPage=new Pager();
-        newPage.setPageSize(pageSize);
-        newPage.setTotalCount(totalRecord);
-        newPage.setList(list);
-        return newPage;
-    }
+
     
-    public boolean addHomeWork(HomeWork work) {
+    public boolean addSMSMessage(SMSMessage sMSMessage) {
         boolean result=false;
         Session session = DBManager.getSession();
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            session.save(work);
+            session.save(sMSMessage);
             session.flush();
             session.getTransaction().commit();
             result=true;
@@ -105,13 +78,14 @@ public class HomeWorkDao {
     }
 
 
-    public boolean updateHomeWork(HomeWork work) {
+
+    public boolean updateAgent(SMSMessage sMSMessage) {
         boolean result=false;
         Session session = DBManager.getSession();
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            session.update(work);
+            session.update(sMSMessage);
             session.flush();
             session.getTransaction().commit();
             result=true;
@@ -125,16 +99,15 @@ public class HomeWorkDao {
         }
     }
 
-
-    public boolean deleteHomeWork(long id) {
+    public boolean deleteSMSMessage(String phoneNumber) {
         boolean result=false;
-        HomeWork homework = queryHomeWork(id);
-        if(homework!=null){
+        SMSMessage sMSMessage = querySMSMessageByPhone(phoneNumber);
+        if(sMSMessage!=null){
             Session session = DBManager.getSession();
             try {
                 session.setFlushMode(FlushMode.AUTO);
                 session.beginTransaction();
-                session.delete(homework);
+                session.delete(sMSMessage);
                 session.flush();
                 session.getTransaction().commit();
                 result=true;

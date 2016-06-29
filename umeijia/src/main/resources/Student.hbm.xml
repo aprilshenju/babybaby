@@ -28,7 +28,6 @@ private long id;
 		<property name="name" column="name"></property>	
 		<property name="nick_name" column="nick_name"></property>	
 		<property name="gender" column="gender"></property>
-		<property name="age" column="age" ></property>
 
 		<property name="birthday" column="birthday" ></property>
 		<property name="height" column="height" ></property>

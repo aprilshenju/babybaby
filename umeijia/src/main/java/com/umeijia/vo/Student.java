@@ -7,8 +7,7 @@ public class Student {
 	private long id;
 	private String name;
 	private String nick_name;
-	private int gender;
-	private int age;
+	private String gender;
 	private Class cla;
 	private Set<Parents> parents;
 	private Date entrance_date;
@@ -23,14 +22,13 @@ public class Student {
 	public Student(){
 
 	}
-	public  Student(String name,String nick,int gender,int age,Date birthday,int height,int weight,String avatar,Class cla,boolean isvip,Date start,Date end,Date enter_date){
+	public  Student(String name,String nick,String gender,Date birthday,int height,int weight,String avatar,Class cla,boolean isvip,Date start,Date end,Date enter_date){
 		vip=isvip;
 		this.vip_start=start;
 		this.vip_end=end;
 		this.name=name;
 		this.nick_name=nick;
 		this.gender=gender;
-		this.age=age;
 		this.birthday= birthday;
 		this.height=height;
 		this.weight=weight;
@@ -58,17 +56,11 @@ public class Student {
 	public void setNick_name(String nick_name) {
 		this.nick_name = nick_name;
 	}
-	public int getGender() {
+	public String getGender() {
 		return gender;
 	}
-	public void setGender(int gender) {
+	public void setGender(String gender) {
 		this.gender = gender;
-	}
-	public int getAge() {
-		return age;
-	}
-	public void setAge(int age) {
-		this.age = age;
 	}
 	public Date getEntrance_date() {
 		return entrance_date;
