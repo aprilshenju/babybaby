@@ -137,44 +137,6 @@ public class PublicService {
         return "welcom to UMJ server... public service ";
     }
 
-    @Path("/wechatValid")
-    @GET
-    public void wechatValid(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
-        System.out.println("收到微信服务器的验证请求");
-        String token = "weixin";
-        String encodingAESKey ="7XJSJs7HOLyUYIwh5HRUjUrPZXRKdFAgmWlgN4KOflj";
-        String corpId = "meepomiracle";
-        // 微信加密签名
-
-        String signature = request.getParameter("signature");
-        // 时间戳
-        String timestamp = request.getParameter("timestamp");
-        // 随机数
-        String nonce = request.getParameter("nonce");
-        // 随机字符串
-        String echostr = request.getParameter("echostr");
-        String result = null;
-//        try {
-//            WXBizMsgCrypt wxcpt = new WXBizMsgCrypt(token, encodingAESKey,
-//                    corpId);
-//            result = wxcpt.VerifyURL(signature, timestamp, nonce, echostr);
-//        } catch (AesException e) {
-//            e.printStackTrace();
-//        }
-//        if (result == null) {
-//            result = token;
-//        }
-        String[] values = {token,timestamp,nonce};
-        Arrays.sort(values);
-        String value = values[0]+values[1]+values[2];
-        String sign = DigestUtils.shaHex(value);
-        if(signature.equals(sign)){
-            result = echostr;
-        }
-        PrintWriter out = response.getWriter();
-        out.print(result);
-        out.close();
-    }
     /**
      * 添加宝贝动态
      * @param showTimeInfo
