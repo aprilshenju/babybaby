@@ -32,7 +32,7 @@ import java.util.*;
 @Service
 @Path("/public_service")
 public class PublicService {
-    String baseDir = "E:/file";
+    String baseDir = "/UMJ_IMG_SERVER";
     //类别路径
     String filePath = null;
     String imgUrls = null;
@@ -3531,7 +3531,7 @@ public class PublicService {
                 fileUrl = baseDir + fileDirPath + "/origin/" + fileName;
             }
         }
-        byte[] fileBytes = FileUtils.fileToByteArrayByNIOWay(fileUrl);
+        byte[] fileBytes = FileUtils.fileToByteArrayByTraditionalWay(fileUrl);
 //        String fileBase64String = new String(Base64.encodeBase64(fileBytes));
         return fileBytes;
     }
