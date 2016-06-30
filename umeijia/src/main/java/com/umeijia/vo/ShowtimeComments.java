@@ -46,6 +46,9 @@ public class ShowtimeComments {
 	private BabyShowtime showtime;
 	private int user_type; // 1为老师，2为园长，3为家长，4为赞助，5为运营/管理
 
+	public ShowtimeComments() {
+	}
+
 	public BabyShowtime getShowtime() {
 		return showtime;
 	}
