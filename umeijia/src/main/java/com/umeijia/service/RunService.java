@@ -29,6 +29,11 @@ public class RunService {
     @Autowired
     @Qualifier("agentdao")
     private AgentDao agentdao;
+
+    @Autowired
+    @Qualifier("basicinfodao")
+    private  BasicInfoDao basicinfodao;
+
     @Autowired
     @Qualifier("parentsdao")
     private ParentsDao parentsdao;
@@ -54,6 +59,21 @@ public class RunService {
     @Qualifier("babyshowtimedao")
     private BabyShowtimeDao babyshowtimedao;
 
+    @Autowired
+    @Qualifier("showtimecommentsdao")
+    private  ShowtimeCommentsDao showtimecommentsdao;
+
+    @Autowired
+    @Qualifier("homeworkdao")
+    private  HomeWorkDao homeworkdao;
+
+    @Autowired
+    @Qualifier("classnotificationdao")
+    private  ClassNotificationDao classnotificationdao;
+
+    @Autowired
+    @Qualifier("classactivitydao")
+    private ClassActivityDao classactivitydao;
 
     @Path("/hello")
     @GET
@@ -92,9 +112,29 @@ public class RunService {
                 "在舞蹈《聪明的宝贝》中，孩子们将“聪明”的状态演绎得活灵活现，让人觉得他们就是一群最聪明的宝贝；而舞蹈《枪战CS》，则将大家带入了“枪林弹雨”的情景；还有《维族姑娘》，孩子们惊艳的表演，令大家误以为表演者真是一群来自维族的小朋友。\n" +
                 "舞蹈表演亮点接踵而来，令观众目不暇接。还沉浸在精彩的舞蹈中无法自拔，惊艳的T台模特秀又来了。别看小朋友们年纪小小的，走上T台个个像模像样，举手投足间尽现超模姿态，台下有观众甚至发出“未来他们中一定会诞生国际名模”的言论。",
                 "xd35.jpg",te,garten);
+        GartenNews news2 = new GartenNews("广西龙胜幼儿园学生拍毕业照秀童真","幼儿园学生拍创意毕业照","6月26日，在广西桂林市龙胜各族自治县民族中心体育场，小朋友们在拍摄毕业照。当天，龙胜第二幼儿园的小朋友们在老师和家长的陪伴下，拍摄各种趣味横生的毕业照。毕业季临近，该县各幼儿园通过拍摄创意毕业照、文艺表演、亲子游园活动等方式，记录小朋友们快乐的成长足迹。",
+                "xd35.jpg",te,garten);
         gartennewsdao.addGartenNews(news);
+        gartennewsdao.addGartenNews(news2);
+
         BabyShowtime showtiem = new BabyShowtime("为了庆祝儿童节的到来,老师们组织了歌舞表演","2.jpg;3.jpg",cla.getId(),stu1.getId(),te2.getId(),parent.getId(),1);
         babyshowtimedao.addBabyShowtime(showtiem);
+        ShowtimeComments comment = new ShowtimeComments(true,showtiem,1,1,0,0,d,"跳得真好看");
+        showtimecommentsdao.addShowtimeComments(comment);
+
+
+        BasicInfo basicInfo = new BasicInfo("软件园","v1.0","v1.0","铅笔科技","02888888","3333333","33332@qq.com","我们致力于移动app开发");
+        basicinfodao.addBasicInfo(basicInfo);
+
+        HomeWork hw = new HomeWork(1,"画一个鸡蛋","今天给孩子们布置了画一个鸡蛋的绘画作业,宝宝们都要好好表现哦。","2.jpg",d,te.getId());
+        homeworkdao.addHomeWork(hw);
+
+        ClassNotification notification = new ClassNotification("期中家长会","为了更好地了解宝宝的相关信息，这个月20号幼儿园组织家长会","3.jpg;2.jpg;",d,te2.getId(),cla.getId(),te2.getName());
+        classnotificationdao.addClassNotification(notification);
+
+        Date d2 = new Date(d.getTime()+3600000000l);
+        ClassActivity activity = new ClassActivity("开学季春游","为了迎接春天的到来,我们班组织了一次春游","2.jpg;1.jpg;",d,d2,te.getId(),1,"1","1",d.toString(),cla.getId(),te.getName(),te.getPhone_num());
+        classactivitydao.addClassActivity(activity);
 
         return "welcom to UMJ server... run service ";
     }

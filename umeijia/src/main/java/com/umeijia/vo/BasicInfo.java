@@ -35,6 +35,21 @@ public class BasicInfo {
         return email;
     }
 
+    public BasicInfo(String addr, String teacher_version_no, String parent_version_no, String company_name, String contact, String qq, String email, String introduction) {
+        this.addr = addr;
+        this.teacher_version_no = teacher_version_no;
+        this.parent_version_no = parent_version_no;
+        this.company_name = company_name;
+        this.contact = contact;
+        this.qq = qq;
+        this.email = email;
+        this.introduction = introduction;
+    }
+
+    public  BasicInfo(){
+
+    }
+
     public String getIntroduction() {
         return introduction;
     }

@@ -44,7 +44,7 @@ public class ShowtimeComments {
 	}
 	private long id;
 	private BabyShowtime showtime;
-	private int user_type; // 老师还是家长
+	private int user_type; // 1为老师，2为园长，3为家长，4为赞助，5为运营/管理
 
 	public BabyShowtime getShowtime() {
 		return showtime;
@@ -75,6 +75,17 @@ public class ShowtimeComments {
 
 	public void setSay_good(boolean say_good) {
 		this.say_good = say_good;
+	}
+
+	public ShowtimeComments(boolean say_good, BabyShowtime showtime, int user_type, long user_id, int response_user_type, long response_user_id, Date date, String comment_content) {
+		this.say_good = say_good;
+		this.showtime = showtime;
+		this.user_type = user_type;
+		this.user_id = user_id;
+		this.response_user_type = response_user_type;
+		this.response_user_id = response_user_id;
+		this.date = date;
+		this.comment_content = comment_content;
 	}
 
 	private  boolean say_good; // 是否点赞

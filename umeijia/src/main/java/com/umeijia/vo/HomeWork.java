@@ -3,6 +3,22 @@ package com.umeijia.vo;
 import java.util.Date;
 
 public class HomeWork {
+
+	public HomeWork(long class_id, String title, String description, String image_urls, Date date, long teacher_id) {
+		this.class_id = class_id;
+		this.title = title;
+		this.description = description;
+		this.image_urls = image_urls;
+		this.date = date;
+		this.teacher_id = teacher_id;
+	}
+
+	public HomeWork(){
+
+	}
+
+
+
 	private long id;
 	public long getId() {
 		return id;
