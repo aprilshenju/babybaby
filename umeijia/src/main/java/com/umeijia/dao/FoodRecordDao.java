@@ -45,10 +45,10 @@ public class FoodRecordDao {
      * @param classId
      * @return
      */
-    public FoodRecord queryFoodRecordByClassId(long classId) {
+    public FoodRecord queryFoodRecordByClassId(long classId,int year,int month,int day) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from FoodRecord as food where food.cla.id=%d",classId);
+        String sql = String.format("from FoodRecord as food where food.class_id=%d and year(food.date)=%d and month(food.date)=%d and day(food.date)=%d",classId,year,month,day);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

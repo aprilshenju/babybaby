@@ -88,6 +88,10 @@ public class ShowtimeComments {
 		this.comment_content = comment_content;
 	}
 
+    public ShowtimeComments(){
+
+    }
+
 	private  boolean say_good; // 是否点赞
 
 }

@@ -282,7 +282,7 @@ public class PublicService {
                     jo.put("avatar", parents.getAvatar_path());
                 }
                 jo.put("description", item.getDescription());
-                jo.put("date", item.getDate().toString());
+                jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                 jo.put("type", item.getShow_type());
                 jo.put("urls", item.getImage_urls());
                 JSONArray commentsArray = new JSONArray();
@@ -628,7 +628,7 @@ public class PublicService {
                 JSONObject jo = new JSONObject();
                 jo.put("id", item.getId());
                 jo.put("description", item.getDescription());
-                jo.put("date", item.getDate().toString());
+                jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                 jo.put("type", item.getShow_type());
                 jo.put("urls", item.getImage_urls());
                 ja.add(jo);
@@ -688,7 +688,7 @@ public class PublicService {
                 JSONObject jo = new JSONObject();
                 jo.put("id", item.getId());
                 jo.put("description", item.getDescription());
-                jo.put("date", item.getDate().toString());
+                jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                 jo.put("type", item.getShow_type());
                 jo.put("urls", item.getImage_urls());
                 ja.add(jo);
@@ -846,7 +846,7 @@ public class PublicService {
                 jo.put("id", item.getId());
                 jo.put("roleType", item.getUser_type());
                 jo.put("roleId", item.getUser_id());
-                jo.put("date", item.getDate().toString());
+                jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                 jo.put("content", item.getContent());
                 jo.put("response", item.getResponse());
                 jo.put("readOrNot", item.getRead_or_not());
@@ -1108,7 +1108,7 @@ public class PublicService {
                 jo.put("imageUrls", item.getImage_urls());
                 jo.put("teacherId", item.getTeacher_id());
                 jo.put("teacherName", teacherdao.queryTeacher(item.getTeacher_id()).getName());
-                jo.put("date", item.getDate().toString());
+                jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                 List<Long> allStudents = studentdao.queryStudentByClass(classId); //得到全班所有同学的id，然后去除已读的id
                 if (!item.getSubscribers().equals("")) {
                     String[] readIds = item.getSubscribers().split(";");
@@ -1306,7 +1306,7 @@ public class PublicService {
                     JSONObject jo = new JSONObject();
                     jo.put("studentId", item.getStu_id());
                     jo.put("studentName", studentdao.queryStudent(item.getStu_id()).getName());
-                    jo.put("date", item.getDate().toString());
+                    jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                     jo.put("temperature", item.getTemperature());
                     jo.put("images", item.getImage_path());
                     jo.put("period", item.getPeriod());
@@ -1321,7 +1321,7 @@ public class PublicService {
                     JSONObject jo = new JSONObject();
                     jo.put("studentId", item.getStu_id());
                     jo.put("studentName", studentdao.queryStudent(item.getStu_id()).getName());
-                    jo.put("date", item.getDate().toString());
+                    jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                     jo.put("temperature", item.getTemperature());
                     jo.put("images", item.getImage_path());
                     jo.put("period", item.getPeriod());
@@ -1358,14 +1358,14 @@ public class PublicService {
      * @param headers
      * @return
      */
-    @Path("/updateBabyFood")
+    @Path("/addBabyFood")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String updateBabyFood(@RequestBody String foodInfo, @Context HttpHeaders headers) {
+    public String addBabyFood(@RequestBody String foodInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(foodInfo,"roleType","roleId","classId","schoolId","week","imageUrls","name");
+            String checkInput = judgeValidationOfInputJson(foodInfo,"roleType","roleId","classId","content");
             if(!checkInput.equals("")){
                 return checkInput;
             }
@@ -1373,10 +1373,7 @@ public class PublicService {
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
             int classId = jobIn.getInt("classId");
-            int schoolId = jobIn.getInt("schoolId");
-            int week = jobIn.getInt("week");
-            String imageUrls = jobIn.getString("imageUrls");
-            String content = jobIn.getString("name");
+            String content = jobIn.getString("content");
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
@@ -1384,52 +1381,54 @@ public class PublicService {
             }
             if (roleType != 1 && roleType != 2) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "没有权限更改饮食");
+                jobOut.put("resultDesc", "没有权限添加饮食");
                 return jobOut.toString();
             }
-            if (week >= 6 || week <= 0) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "传入的week不合法");
-                return jobOut.toString();
-            }
-            FoodRecord fr = foodrecorddao.queryFoodRecordByClassId(classId);
-            if (fr.getSchool_id() == schoolId) {
-                if (!fr.getRecords().isEmpty()) {  //食物内容的处理
-                    String days[] = fr.getRecords().split(";");
-                    if (days.length != 5) {
-                        jobOut.put("resultCode", GlobalStatus.error.toString());
-                        jobOut.put("resultDesc", "数据库记录天数出错（不为5天），请管理人员维护");
-                        return jobOut.toString();
-                    } else {
-                        for (int i = 0; i < days.length; i++) {
-                            if (i > week - 1) {  //把后面星期x的内容置为“ ”
-                                days[i] = " ";
-                            } else if (i == week - 1) {
-                                days[i] = content;
-                            }
-                        }
-                        fr.setRecords(days[0] + ";" + days[1] + ";" + days[2] + ";" + days[3] + ";" + days[4]);
-                    }
-                }
-                if (!fr.getImage_urls().isEmpty()) {  //图片的处理
-                    String days[] = fr.getImage_urls().split(";");
-                    if (days.length != 5) {
-                        jobOut.put("resultCode", GlobalStatus.error.toString());
-                        jobOut.put("resultDesc", "数据库记录天数出错（不为5天），请管理人员维护");
-                        return jobOut.toString();
-                    } else {
-                        for (int i = 0; i < days.length; i++) {
-                            if (i > week - 1) {  //把后面星期x的内容置为“ ”
-                                days[i] = " ";
-                            } else if (i == week - 1) {
-                                days[i] = imageUrls;
-                            }
-                        }
-                        fr.setImage_urls(days[0] + ";" + days[1] + ";" + days[2] + ";" + days[3] + ";" + days[4]);
-                    }
-                }
-                foodrecorddao.updateFoodRecord(fr);
-            }
+
+
+//            if (fr.getClass_id() == classId) {
+//                if (!fr.getRecords().isEmpty()) {  //食物内容的处理
+//                    String days[] = fr.getRecords().split(";");
+//                    if (days.length != 5) {
+//                        jobOut.put("resultCode", GlobalStatus.error.toString());
+//                        jobOut.put("resultDesc", "数据库记录天数出错（不为5天），请管理人员维护");
+//                        return jobOut.toString();
+//                    } else {
+//                        for (int i = 0; i < days.length; i++) {
+//                            if (i > week - 1) {  //把后面星期x的内容置为“ ”
+//                                days[i] = " ";
+//                            } else if (i == week - 1) {
+//                                days[i] = content;
+//                            }
+//                        }
+//                        fr.setRecords(days[0] + ";" + days[1] + ";" + days[2] + ";" + days[3] + ";" + days[4]);
+//                    }
+//                }
+//                if (!fr.getImage_urls().isEmpty()) {  //图片的处理
+//                    String days[] = fr.getImage_urls().split(";");
+//                    if (days.length != 5) {
+//                        jobOut.put("resultCode", GlobalStatus.error.toString());
+//                        jobOut.put("resultDesc", "数据库记录天数出错（不为5天），请管理人员维护");
+//                        return jobOut.toString();
+//                    } else {
+//                        for (int i = 0; i < days.length; i++) {
+//                            if (i > week - 1) {  //把后面星期x的内容置为“ ”
+//                                days[i] = " ";
+//                            } else if (i == week - 1) {
+//                                days[i] = imageUrls;
+//                            }
+//                        }
+//                        fr.setImage_urls(days[0] + ";" + days[1] + ";" + days[2] + ";" + days[3] + ";" + days[4]);
+//                    }
+//                }
+//            }
+            FoodRecord fr = new FoodRecord();
+            fr.setDate(new Date());
+            fr.setRecords(content);
+            fr.setClass_id(classId);
+            fr.setSchool_id(0);
+            fr.setImage_urls("");
+            foodrecorddao.addFoodRecord(fr);
             jobOut.put("id", fr.getId());
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
@@ -1452,7 +1451,7 @@ public class PublicService {
     public String queryBabyFood(@RequestBody String foodInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(foodInfo,"roleType","roleId","classId");
+            String checkInput = judgeValidationOfInputJson(foodInfo,"roleType","roleId","classId","year","month","day");
             if(!checkInput.equals("")){
                 return checkInput;
             }
@@ -1460,6 +1459,9 @@ public class PublicService {
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
             int classId = jobIn.getInt("classId");
+            int year = jobIn.getInt("year");
+            int month = jobIn.getInt("month");
+            int day = jobIn.getInt("day");
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
@@ -1470,25 +1472,27 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看饮食");
                 return jobOut.toString();
             }
-            FoodRecord fr = foodrecorddao.queryFoodRecordByClassId(classId);
-            JSONArray ja = new JSONArray();
+            FoodRecord fr = foodrecorddao.queryFoodRecordByClassId(classId,year,month,day);
+//            JSONArray ja = new JSONArray();
             if (fr.getRecords() != null && !fr.getRecords().isEmpty()) {
-                String foods[] = fr.getRecords().split(";");
-                String images[] = fr.getImage_urls().split(";");
-                if (foods.length == 5 && images.length == 5) {
-                    for (int i = 0; i < foods.length; i++) {
-                        JSONObject jo = new JSONObject();
-                        jo.put("name", foods[i]);
-                        jo.put("imageUrls", images[i]);
-                        jo.put("week", (i + 1));
-                        ja.add(jo);
-                    }
-                } else {
-                    jobOut.put("resultCode", GlobalStatus.error.toString());
-                    jobOut.put("resultDesc", "数据库记录天数出错（不为5天），请管理人员维护");
-                    return jobOut.toString();
-                }
-                jobOut.put("data", ja.toString());
+//                String foods[] = fr.getRecords().split(";");
+//                String images[] = fr.getImage_urls().split(";");
+//                if (foods.length == 5 && images.length == 5) {
+//                    for (int i = 0; i < foods.length; i++) {
+//                        JSONObject jo = new JSONObject();
+//                        jo.put("name", foods[i]);
+//                        jo.put("imageUrls", images[i]);
+//                        jo.put("week", (i + 1));
+//                        ja.add(jo);
+//                    }
+//                } else {
+//                    jobOut.put("resultCode", GlobalStatus.error.toString());
+//                    jobOut.put("resultDesc", "数据库记录天数出错（不为5天），请管理人员维护");
+//                    return jobOut.toString();
+//                }
+//                jobOut.put("data", ja.toString());
+                jobOut.put("imageUrls",fr.getImage_urls());
+                jobOut.put("content",fr.getRecords());
                 jobOut.put("resultCode", GlobalStatus.succeed.toString());
                 jobOut.put("resultDesc", "操作成功");
             } else {
@@ -1693,7 +1697,7 @@ public class PublicService {
                 jo.put("title", item.getTitle());
                 jo.put("description", item.getDescription());
                 jo.put("imageUrls", item.getImage_urls());
-                jo.put("date", item.getDate().toString());
+                jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
@@ -1825,8 +1829,8 @@ public class PublicService {
                 jo.put("title", item.getTitle());
                 jo.put("content", item.getContent());
                 jo.put("imageUrls", item.getImage_urls());
-                jo.put("startDate", item.getStart_date().toString());
-                jo.put("endDate", item.getEnd_date().toString());
+                jo.put("startDate", item.getStart_date().toString().contains(".")?item.getStart_date().toString().split("\\.")[0]:item.getStart_date().toString());
+                jo.put("endDate", item.getEnd_date().toString().contains(".")?item.getEnd_date().toString().split("\\.")[0]:item.getEnd_date().toString());
                 jo.put("participate_num", item.getParticipate_num());
                 jo.put("contactName", item.getContact_name());
                 jo.put("contactPhoneNum", item.getContact_phone());
@@ -2246,7 +2250,7 @@ public class PublicService {
             for (DailyLog item : dailyLogs) {
                 JSONObject jo = new JSONObject();
                 jo.put("id", item.getId());
-                jo.put("date", item.getLog_date().toString());
+                jo.put("date", item.getLog_date().toString().contains(".")?item.getLog_date().toString().split("\\.")[0]:item.getLog_date().toString());
                 jo.put("userType", item.getUser_type());
                 jo.put("userName", getNameFromRoleTypeAndRoleId(item.getUser_type(), item.getUser_id()));
                 jo.put("opType", item.getOp_type());
@@ -2290,7 +2294,7 @@ public class PublicService {
 //            private long teacher_id;
 //            private long parents_id;
 //            private int send_direction; // 1-家长发给老师的，2-老师发给家长的
-            String checkInput = judgeValidationOfInputJson(messageInfo,"roleType","roleId","content","content_type","teacher_id","parents_id","send_direction");
+            String checkInput = judgeValidationOfInputJson(messageInfo,"roleType","roleId","content","content_type","otherPhoneNum");
             if(!checkInput.equals("")){
                 return checkInput;
             }
@@ -2298,9 +2302,7 @@ public class PublicService {
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
             int content_type = jobIn.getInt("content_type");
-            int teacher_id = jobIn.getInt("teacher_id");
-            int parents_id = jobIn.getInt("parents_id");
-            int send_direction = jobIn.getInt("send_direction");
+            String otherPhoneNum = jobIn.getString("otherPhoneNum");
             String content = jobIn.getString("content");
 
             if (!checkIdAndToken(roleType, headers)) {
@@ -2313,10 +2315,20 @@ public class PublicService {
             msg.setContent_type(content_type);
             msg.setDate(new Date());
             msg.setImage_url("");
-            msg.setParents_id(parents_id);
             msg.setRead_or_not(false);
-            msg.setSend_direction(send_direction);
-            msg.setTeacher_id(teacher_id);
+            if(roleType==1||roleType==2){
+                msg.setTeacher_id(roleId);
+                msg.setParents_id(parentsdao.queryParents(otherPhoneNum).getId());
+                msg.setSend_direction(2);
+            }else if(roleType==3){
+                msg.setTeacher_id(teacherdao.queryTeacher(otherPhoneNum).getId());
+                msg.setParents_id(roleId);
+                msg.setSend_direction(1);
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "roleType不合法");
+                return jobOut.toString();
+            }
             messagedao.addMessage(msg);
             jobOut.put("id", msg.getId());
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
@@ -2340,24 +2352,31 @@ public class PublicService {
     public String queryMessage(@RequestBody String messageInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(messageInfo,"roleType","roleId","teacherId","parents_id","send_direction");
+            String checkInput = judgeValidationOfInputJson(messageInfo,"roleType","roleId");
             if(!checkInput.equals("")){
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(messageInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            int teacherId = jobIn.getInt("teacherId");
-            int parents_id = jobIn.getInt("parents_id");
-            int send_direction = jobIn.getInt("send_direction");
-
 
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
                 return jobOut.toString();
             }
-            List<Message> msgs = messagedao.queryUnreadMessages(teacherId,parents_id,send_direction);
+            String otherPhoneNum = "";
+            List<Message> msgs = new ArrayList<Message>();
+            if(roleType==1||roleType==2){
+                msgs = messagedao.queryUnreadMessagesByTeacherId(roleId);
+            }else if(roleType==3){
+                msgs = messagedao.queryUnreadMessagesByParentsId(roleId);
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "roleType传入有误");
+                return jobOut.toString();
+            }
+
             if (msgs == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -2369,12 +2388,15 @@ public class PublicService {
                 jo.put("id", item.getId());
                 jo.put("content", item.getContent());
                 jo.put("content_type", item.getContent_type());
-                jo.put("date", item.getDate());
+                jo.put("date", item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
                 jo.put("imageUrls", item.getImage_url());
-//                jo.put("parentId", item.getParents_id());
-//                jo.put("teacherId", item.getTeacher_id());
+                if(item.getSend_direction()==1){
+                    otherPhoneNum = parentsdao.queryParents(item.getParents_id()).getPhone_num();
+                }else if(item.getSend_direction()==2){
+                    otherPhoneNum = teacherdao.queryTeacher(item.getTeacher_id()).getPhone_num();
+                }
+                jo.put("otherPhoneNum",otherPhoneNum);
                 jo.put("readOrNot", item.isRead_or_not());
-//                jo.put("send_direction", item.getSend_direction());
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
@@ -2407,6 +2429,64 @@ public class PublicService {
             Message msg = messagedao.queryMessage(id);
             msg.setRead_or_not(true);
             messagedao.updateMessage(msg);
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 根据id或phoneNum获取头像
+     * @param avatarInfo
+     * @param headers
+     * @return
+     */
+    @Path("/queryAvatarByIdOrPhone")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryAvatarByIdOrPhone(@RequestBody String avatarInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson("roleType","roleId","phoneNum","type");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(avatarInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            String phoneNum = jobIn.getString("phoneNum");
+            int type = jobIn.getInt("type");
+
+            switch(roleType){
+                case 1:
+                case 2:
+                    if(type==1){  //按id查
+                        jobOut.put("avatar",teacherdao.queryTeacher(roleId).getAvatar_path());
+                    }else if (type==2){ //按phoneNum查
+                        jobOut.put("avatar",teacherdao.queryTeacher(phoneNum).getAvatar_path());
+                    }
+                    break;
+                case 3:
+                    if(type==1){  //按id查
+                        jobOut.put("avatar",parentsdao.queryParents(roleId).getAvatar_path());
+                    }else if (type==2){ //按phoneNum查
+                        jobOut.put("avatar",parentsdao.queryParents(phoneNum).getAvatar_path());
+                    }
+                    break;
+                case 4:
+                    if(type==1){  //按id查
+                        jobOut.put("avatar",agentdao.queryAgent(roleId).getAvarta());
+                    }else if (type==2){ //按phoneNum查
+                        jobOut.put("avatar",agentdao.queryAgent(phoneNum).getAvarta());
+                    }
+                    break;
+            }
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -2470,8 +2550,8 @@ public class PublicService {
                 item.put("description", news.getDescription());
                 item.put("imageUrls", news.getImage_urls());
                 item.put("teacherName", news.getTeacher().getName());
-                item.put("publishDate", news.getPublishDate().toString());
-                item.put("modifyDate", news.getModifyDate().toString());
+                item.put("publishDate", news.getPublishDate().toString().contains(".")?news.getPublishDate().toString().split("\\.")[0]:news.getPublishDate().toString());
+                item.put("modifyDate", news.getModifyDate().toString().contains(".")?news.getModifyDate().toString().split("\\.")[0]:news.getModifyDate().toString());
                 data.add(item);
             }
             returnJsonObject.put("data", data);
