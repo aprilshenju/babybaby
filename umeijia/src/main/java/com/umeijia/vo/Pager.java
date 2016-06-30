@@ -25,7 +25,7 @@ public class Pager {
 	}
 
 	public static final Integer MAX_PAGE_SIZE = 21;// 每页最大记录数限制
-
+    public static int normalPageSize = 20; //正常每页显示的条数
 	private Integer pageNumber = 1;// 当前页码
 	private Integer pageSize = 20;// 每页记录数
 	private Integer totalCount = 0;// 总记录数

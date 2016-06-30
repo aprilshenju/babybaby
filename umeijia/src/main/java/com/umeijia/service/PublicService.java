@@ -137,48 +137,8 @@ public class PublicService {
         return "welcom to UMJ server... public service ";
     }
 
-    @Path("/wechatValid")
-    @GET
-    public void wechatValid(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
-        System.out.println("收到微信服务器的验证请求");
-        String token = "weixin";
-        String encodingAESKey = "7XJSJs7HOLyUYIwh5HRUjUrPZXRKdFAgmWlgN4KOflj";
-        String corpId = "meepomiracle";
-        // 微信加密签名
-
-        String signature = request.getParameter("signature");
-        // 时间戳
-        String timestamp = request.getParameter("timestamp");
-        // 随机数
-        String nonce = request.getParameter("nonce");
-        // 随机字符串
-        String echostr = request.getParameter("echostr");
-        String result = null;
-//        try {
-//            WXBizMsgCrypt wxcpt = new WXBizMsgCrypt(token, encodingAESKey,
-//                    corpId);
-//            result = wxcpt.VerifyURL(signature, timestamp, nonce, echostr);
-//        } catch (AesException e) {
-//            e.printStackTrace();
-//        }
-//        if (result == null) {
-//            result = token;
-//        }
-        String[] values = {token, timestamp, nonce};
-        Arrays.sort(values);
-        String value = values[0] + values[1] + values[2];
-        String sign = DigestUtils.shaHex(value);
-        if (signature.equals(sign)) {
-            result = echostr;
-        }
-        PrintWriter out = response.getWriter();
-        out.print(result);
-        out.close();
-    }
-
     /**
      * 添加宝贝动态
-     *
      * @param showTimeInfo
      * @param headers
      * @return
@@ -261,7 +221,7 @@ public class PublicService {
     public String queryBabyShowTime(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "classId", "pageNum");
+            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "classId", "pageNum","querySelf");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -279,18 +239,28 @@ public class PublicService {
              * 分页
              */
             int pageNum = jobIn.getInt("pageNum");
+            Pager pager = new Pager();
+            pager.setPageSize(Pager.normalPageSize);
+            pager.setPageNumber(pageNum);
+            int querySelf = jobIn.getInt("querySelf");
             List<BabyShowtime> result = new ArrayList<BabyShowtime>();
-            switch (roleType) {
-                case 1: //老师查询
-                    result = babyshowtimedao.queryBabyShowtimesByTeacher(roleId);
-                    break;
-                case 2:
-                    result = babyshowtimedao.queryBabyShowtimesByClass(classId);
-                    break;
-                case 3:  //家长查询
-                    result = babyshowtimedao.queryBabyShowtimesByParents(roleId);
-                    break;
+            if(querySelf==1){  //是否是查自己的
+                switch (roleType) {
+                    case 1: //老师和园长查询
+                    case 2:
+                        pager = babyshowtimedao.queryBabyShowtimesByTeacher(roleId, pager);
+                        result = pager.getList();
+                        break;
+                    case 3:  //家长查询
+                        pager = babyshowtimedao.queryBabyShowtimesByParents(roleId, pager);
+                        result = pager.getList();
+                        break;
+                }
+            }else{  //不是查自己的，就直接按班级查
+                pager = babyshowtimedao.queryBabyShowtimesPageByClass(classId,pager);
+                result = pager.getList();
             }
+
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -339,8 +309,9 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("hasNextPage", true); //是否有下一页
-            jobOut.put("totalCount", ja.size());  //总共返回多少条记录
+            jobOut.put("pageCount",pager.getPageCount());
+            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("totalCount", pager.getTotalCount());  //总共返回多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -642,8 +613,11 @@ public class PublicService {
                 return jobOut.toString();
             }
             int pageNum = jobIn.getInt("pageNum");  //分页
-            List<BabyFootPrint> result =
-                    babyfootprintdao.queryBabyFootprints(babyId);
+            Pager pager = new Pager();
+            pager.setPageSize(Pager.normalPageSize);
+            pager.setPageNumber(pageNum);
+            pager =   babyfootprintdao.queryBabyFootPrintByPage(babyId,pager);
+            List<BabyFootPrint> result = pager.getList();
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -660,8 +634,9 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("hasNextPage", true); //是否有下一页
-            jobOut.put("totalCount", ja.size());  //总共返回多少条记录
+            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -1111,12 +1086,16 @@ public class PublicService {
             int roleId = jobIn.getInt("roleId");
             int classId = jobIn.getInt("classId");
             int pageNum = jobIn.getInt("pageNum");
+            Pager pager = new Pager();
+            pager.setPageSize(Pager.normalPageSize);
+            pager.setPageNumber(pageNum);
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
                 return jobOut.toString();
             }
-            List<ClassNotification> result = classnotificationdao.queryClassNotifications(classId);
+            pager = classnotificationdao.queryClassNotificationPageByClass(classId,pager);
+            List<ClassNotification> result = pager.getList();
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -1150,6 +1129,9 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
+            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -1686,6 +1668,9 @@ public class PublicService {
             int roleId = jobIn.getInt("roleId");
             int classId = jobIn.getInt("classId");
             int pageNum = jobIn.getInt("pageNum");
+            Pager pager = new Pager();
+            pager.setPageSize(Pager.normalPageSize);
+            pager.setPageNumber(pageNum);
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
@@ -1696,7 +1681,8 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看作业");
                 return jobOut.toString();
             }
-            List<HomeWork> homeWorks = homeworkdao.queryHomeWorks(classId);
+            pager = homeworkdao.queryHomeWorkPageByClass(classId,pager);
+            List<HomeWork> homeWorks = pager.getList();
             if (homeWorks == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -1713,8 +1699,9 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
-            jobOut.put("hasNextPage", true);
-            jobOut.put("totleCount", ja.size());
+            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -1813,6 +1800,9 @@ public class PublicService {
             int roleId = jobIn.getInt("roleId");
             int classId = jobIn.getInt("classId");
             int pageNum = jobIn.getInt("pageNum");
+            Pager pager = new Pager();
+            pager.setPageSize(Pager.normalPageSize);
+            pager.setPageNumber(pageNum);
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
@@ -1823,7 +1813,8 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看班级活动");
                 return jobOut.toString();
             }
-            List<ClassActivity> classActivities = classactivitydao.queryOneClassActivitysList(classId);
+            pager = classactivitydao.queryClassActivityPageByClass(classId,pager);
+            List<ClassActivity> classActivities = pager.getList();
             if (classActivities == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -1847,8 +1838,9 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
-            jobOut.put("hasNextPage", true);
-            jobOut.put("totleCount", ja.size());
+            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -2310,7 +2302,11 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "找不到参数pageNum");
             return returnJsonObject.toString();
         }
-        List<GartenNews> newsList = gartennewsdao.queryGartenNewss(schoolId);
+        Pager pager = new Pager();
+        pager.setPageSize(Pager.normalPageSize);
+        pager.setPageNumber(pageNum);
+        pager = gartennewsdao.queryGartenNewsPageBySchool(schoolId,pager);
+        List<GartenNews> newsList = pager.getList();
         if (newsList != null) {
             JSONArray data = new JSONArray();
             Iterator iterator = newsList.iterator();
@@ -2328,9 +2324,9 @@ public class PublicService {
                 data.add(item);
             }
             returnJsonObject.put("data", data);
-            //测试，待加入分页功能
-            returnJsonObject.put("totalCount", newsList.size());
-            returnJsonObject.put("hasNextPage", false);
+            returnJsonObject.put("pageCount",pager.getPageCount()); //总共有多少页
+            returnJsonObject.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            returnJsonObject.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
             returnJsonObject.put("resultDesc", "操作成功");
         } else {

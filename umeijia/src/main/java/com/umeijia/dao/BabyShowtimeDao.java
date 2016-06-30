@@ -78,35 +78,53 @@ public class BabyShowtimeDao {
     /**
      * 后续改为分页处理
      * **/
-    public List<BabyShowtime> queryBabyShowtimesByParents(long parent_id) {
-        Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("from BabyShowtime as ba where ba.parent_id=%d and ba.valid=1 order by ba.date desc",parent_id);
-        Query query = session.createQuery(sql);
-        List <BabyShowtime> list = query.list();
-        session.close();
-        if(list.size()>0){
-            return list;
-        }else {
-            return null;
+    public Pager queryBabyShowtimesByParents(long parent_id,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
         }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from BabyShowtime as ba where ba.parent_id=%d and ba.valid=1 order by ba.date desc",parent_id);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<BabyShowtime> list=(List<BabyShowtime>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     /**
      * 后续改为分页处理
      * **/
-    public List<BabyShowtime> queryBabyShowtimesByTeacher(long teacher_id) {
-        Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("from BabyShowtime as ba where ba.teacher_id=%d and ba.valid=1 order by ba.date desc",teacher_id);
-        Query query = session.createQuery(sql);
-        List <BabyShowtime> list = query.list();
-        session.close();
-        if(list.size()>0){
-            return list;
-        }else {
-            return null;
+    public Pager queryBabyShowtimesByTeacher(long teacher_id,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
         }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from BabyShowtime as ba where ba.teacher_id=%d and ba.valid=1 order by ba.date desc",teacher_id);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<BabyShowtime> list=(List<BabyShowtime>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     /**
