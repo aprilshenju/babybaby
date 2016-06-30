@@ -74,6 +74,7 @@ public class TeacherDao {
         return  teachers;
     }
 
+
     public Teacher queryTeacherByEmail(String email) {
         Session session = DBManager.getSession();
         session.clear();
