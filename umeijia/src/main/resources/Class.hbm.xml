@@ -40,10 +40,10 @@ private long id;
                 <one-to-many class="com.umeijia.vo.Camera"/>   
          </set>
 
-        <set name="foodRecords" cascade="all" inverse="true" lazy="false">
+        <!--<set name="foodRecords" cascade="all" inverse="true" lazy="false">
             <key column="class_id"></key>
             <one-to-many class="com.umeijia.vo.FoodRecord"/>
-        </set>
+        </set>-->
         <set name="teachers" cascade="save-update"  lazy="false"  inverse="false" table="t_teacher_class">
                 <key column="class_id"></key>
                 <many-to-many column="teacher_id" class="com.umeijia.vo.Teacher"/>

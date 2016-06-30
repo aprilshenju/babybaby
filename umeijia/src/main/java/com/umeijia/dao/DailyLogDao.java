@@ -46,13 +46,13 @@ public class DailyLogDao {
      *
      * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）�
      * **/
-    public Pager queryDailyLogPage( Pager pager) {
+    public Pager queryDailyLogPage( int year,int month,Pager pager) {
         if (pager == null) {
             pager = new Pager();
         }
         Integer pageNumber = pager.getPageNumber();
         Integer pageSize = pager.getPageSize();
-        String hql="from DailyLog";
+        String hql=String.format("from DailyLog as log where year(log.log_date)=%d and month(log.log_date)=%d order by log.log_date desc",year,month);
         String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
         Session session=DBManager.getSession();
         Query query=session.createQuery(countHql);

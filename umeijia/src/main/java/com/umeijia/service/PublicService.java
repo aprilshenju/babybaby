@@ -856,7 +856,7 @@ public class PublicService {
     public String queryFeedBack(@RequestBody String feedbackInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(feedbackInfo, "roleType", "roleId", "pageNum");
+            String checkInput = judgeValidationOfInputJson(feedbackInfo, "roleType", "roleId");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -873,7 +873,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看反馈");
                 return jobOut.toString();
             }
-            int pageNum = jobIn.getInt("pageNum");
+
             List<FeedBack> result = feedbackdao.getFeedBackList();
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
@@ -893,8 +893,6 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("hasNextPage", true); //是否有下一页
-            jobOut.put("totalCount", ja.size());  //总共返回多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -2027,14 +2025,14 @@ public class PublicService {
     public String queryBabyKnowledge(@RequestBody String babyKnowledgeInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(babyKnowledgeInfo,"roleType","roleId","pageNum");
+            String checkInput = judgeValidationOfInputJson(babyKnowledgeInfo,"roleType","roleId");
             if(!checkInput.equals("")){
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(babyKnowledgeInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            int pageNum = jobIn.getInt("pageNum");
+
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
@@ -2061,8 +2059,6 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
-            jobOut.put("hasNextPage", true);
-            jobOut.put("totleCount", ja.size());
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -2264,6 +2260,10 @@ public class PublicService {
             int pageNum = jobIn.getInt("pageNum");
             int year = jobIn.getInt("year");
             int month = jobIn.getInt("month");
+            Pager pager = new Pager();
+            pager.setPageSize(Pager.normalPageSize);
+            pager.setPageNumber(pageNum);
+
             if (!checkIdAndToken(roleType, headers)) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "token已过期");
@@ -2274,8 +2274,8 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看日志");
                 return jobOut.toString();
             }
-
-            List<DailyLog> dailyLogs = dailylogdao.queryDailyLogByMonth(year, month);
+            pager = dailylogdao.queryDailyLogPage(year,month,pager);
+            List<DailyLog> dailyLogs = pager.getList();
 
             if (dailyLogs == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
@@ -2295,8 +2295,9 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
-            jobOut.put("hasNextPage", true);
-            jobOut.put("totleCount", ja.size());
+            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -2306,6 +2307,156 @@ public class PublicService {
         }
         return jobOut.toString();
     }
+
+
+
+    /**
+     * 新增留言
+     *
+     * @param messageInfo
+     * @param headers
+     * @return
+     */
+    @Path("/addMessage")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addMessage(@RequestBody String messageInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+//            private String content;
+//            private String image_url;
+//            private int content_type; // 图片还是文字  1-文字，2-图片
+//            private long teacher_id;
+//            private long parents_id;
+//            private int send_direction; // 1-家长发给老师的，2-老师发给家长的
+            String checkInput = judgeValidationOfInputJson(messageInfo,"roleType","roleId","content","content_type","teacher_id","parents_id","send_direction");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(messageInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int content_type = jobIn.getInt("content_type");
+            int teacher_id = jobIn.getInt("teacher_id");
+            int parents_id = jobIn.getInt("parents_id");
+            int send_direction = jobIn.getInt("send_direction");
+            String content = jobIn.getString("content");
+
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            Message msg = new Message();
+            msg.setContent(content);
+            msg.setContent_type(content_type);
+            msg.setDate(new Date());
+            msg.setImage_url("");
+            msg.setParents_id(parents_id);
+            msg.setRead_or_not(false);
+            msg.setSend_direction(send_direction);
+            msg.setTeacher_id(teacher_id);
+            messagedao.addMessage(msg);
+            jobOut.put("id", msg.getId());
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 查看留言
+     */
+
+    @Path("/queryMessage")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryMessage(@RequestBody String messageInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(messageInfo,"roleType","roleId","teacherId","parents_id","send_direction");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(messageInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int teacherId = jobIn.getInt("teacherId");
+            int parents_id = jobIn.getInt("parents_id");
+            int send_direction = jobIn.getInt("send_direction");
+
+
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            List<Message> msgs = messagedao.queryUnreadMessages(teacherId,parents_id,send_direction);
+            if (msgs == null) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "无记录");
+                return jobOut.toString();
+            }
+            JSONArray ja = new JSONArray();
+            for (Message item : msgs) {
+                JSONObject jo = new JSONObject();
+                jo.put("id", item.getId());
+                jo.put("content", item.getContent());
+                jo.put("content_type", item.getContent_type());
+                jo.put("date", item.getDate());
+                jo.put("imageUrls", item.getImage_url());
+//                jo.put("parentId", item.getParents_id());
+//                jo.put("teacherId", item.getTeacher_id());
+                jo.put("readOrNot", item.isRead_or_not());
+//                jo.put("send_direction", item.getSend_direction());
+                ja.add(jo);
+            }
+            jobOut.put("data", ja.toString());
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 更新消息读取状态
+     */
+    @Path("/updateStateOfMessage")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String updateStateOfMessage(@RequestBody String messageInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(messageInfo,"id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(messageInfo);
+            int id = jobIn.getInt("id");
+            Message msg = messagedao.queryMessage(id);
+            msg.setRead_or_not(true);
+            messagedao.updateMessage(msg);
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
 
     /**
      * 查询校园新闻
