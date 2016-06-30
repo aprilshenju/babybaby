@@ -509,6 +509,58 @@ public class PublicService {
         return jobOut.toString();
     }
 
+
+    /**
+     * 对宝贝动态取消点赞
+     *
+     * @param showTimeInfo
+     * @param headers
+     * @return
+     */
+    @Path("/abortLike")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String abortLike(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(showTimeInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            int id = jobIn.getInt("id");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            ShowtimeComments stc = showtimecommentsdao.queryOneShowtimeComments(id);
+            if(stc.getUser_type()==roleType&&stc.getUser_id()==roleId){
+                stc.setSay_good(false);
+                if(stc.getComment_content().equals("")){  //如果取消点赞，也没有评论内容，直接删除
+                    showtimecommentsdao.deleteShowtimeComments(stc.getId());
+                }else{
+                    showtimecommentsdao.updateShowtimeComments(stc);
+                }
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "不能取消点赞");
+                return jobOut.toString();
+            }
+
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
     /**
      * 添加或更新宝贝成长足迹
      *
@@ -2477,7 +2529,7 @@ public class PublicService {
     public String queryAvatarByIdOrPhone(@RequestBody String avatarInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson("roleType","roleId","phoneNum","type");
+            String checkInput = judgeValidationOfInputJson(avatarInfo,"roleType","roleId","phoneNum","type");
             if(!checkInput.equals("")){
                 return checkInput;
             }
