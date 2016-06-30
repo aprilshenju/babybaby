@@ -2,6 +2,7 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.BasicInfo;
+import com.umeijia.vo.Camera;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -33,6 +34,26 @@ public class BasicInfoDao {
             return info;
         }else {
             return null;
+        }
+    }
+
+    public boolean addBasicInfo(BasicInfo info) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            session.save(info);
+            session.flush();
+            session.getTransaction().commit();
+            result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
         }
     }
 

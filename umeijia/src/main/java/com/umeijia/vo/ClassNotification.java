@@ -12,6 +12,20 @@ public class ClassNotification {
 	public String getTitle() {
 		return title;
 	}
+
+	public ClassNotification(String title, String description, String image_urls, Date date, long teacher_id, long class_id, String subscribers) {
+		this.title = title;
+		this.description = description;
+		this.image_urls = image_urls;
+		this.date = date;
+		this.teacher_id = teacher_id;
+		this.class_id = class_id;
+		this.subscribers = subscribers;
+	}
+
+	public ClassNotification() {
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
