@@ -10,9 +10,30 @@ public class ClassActivity {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+	public ClassActivity() {
+	}
+
 	public String getTitle() {
 		return title;
 	}
+
+	public ClassActivity(String title, String content, String image_urls, Date start_date, Date end_date, long teacher_id, int participate_num, String baby_ids, String parent_ids, String participate_time, long class_id, String contact_name, String contact_phone) {
+		this.title = title;
+		this.content = content;
+		this.image_urls = image_urls;
+		this.start_date = start_date;
+		this.end_date = end_date;
+		this.teacher_id = teacher_id;
+		this.participate_num = participate_num;
+		this.baby_ids = baby_ids;
+		this.parent_ids = parent_ids;
+		this.participate_time = participate_time;
+		this.class_id = class_id;
+		this.contact_name = contact_name;
+		this.contact_phone = contact_phone;
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}

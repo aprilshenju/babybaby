@@ -444,7 +444,10 @@ public class TeacherService {
     }
 
 
+
     /***
+     * 当一个班添加一个家长或一个老师时，更新 幼儿园的老师通信录和班级家长通信录 
+     *
      *更新一个班级的 家长通信录
      * **/
      class UpdateParentContractsThread extends Thread {

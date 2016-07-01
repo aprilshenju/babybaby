@@ -3,11 +3,14 @@ package com.umeijia.service;
 import com.umeijia.dao.ClassDao;
 import com.umeijia.dao.ParentsDao;
 import com.umeijia.dao.StudentDao;
+import com.umeijia.dao.TeacherDao;
 import com.umeijia.util.GlobalStatus;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.Class;
 import com.umeijia.vo.Parents;
 import com.umeijia.vo.Student;
+import com.umeijia.vo.Teacher;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,8 @@ import javax.ws.rs.core.MediaType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 
 @Service
 @Path("/parents_service")
@@ -35,6 +40,10 @@ public class ParentsService {
     @Autowired
     @Qualifier("classdao")
     private  ClassDao classdao;
+
+    @Autowired
+    @Qualifier("teacherdao")
+    private TeacherDao teacherdao;
 
     @Path("/hello")
     @GET
@@ -74,16 +83,19 @@ public class ParentsService {
                 {
 
                     Student stu = p.getStudent();
+
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","登陆成功");
                     job_out.put("tkn",p.getToken());
                     job_out.put("tkn_exptime",p.getExpire().toString());
                     job_out.put("p_id",p.getId());
+                    job_out.put("schoolId",p.getGarten_id());
                     job_out.put("phone",p.getPhone_num());
                     job_out.put("email",p.getEmail());
                     job_out.put("name",p.getName());
                     job_out.put("baby_id",stu.getId());
                     job_out.put("class_id",p.getClass_id());
+                    job_out.put("class_name",p.getClass().getName());
                     job_out.put("relation",p.getRelationship());
                     job_out.put("is_vip",stu.isVip());
                     job_out.put("vip_start",stu.getVip_start().toString());
@@ -212,7 +224,7 @@ public class ParentsService {
                 job_out.put("resultDesc","无效家长id");
                 return job_out.toString();
             }
-            Student stu = p.getStudent(); //获取 当前家长的宝贝
+            Student stu = p.getStudent(); //获取 当前家长的宝�
             if(stu==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","当前家长还没宝贝");
@@ -234,6 +246,62 @@ public class ParentsService {
         return job_out.toString();
     }
 
+    @Path("/getClassTeacherContacts")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getClassTeacherContacts(@RequestBody String userinfo, @Context HttpHeaders headers){
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out=new JSONObject();
+        try {
+            // 用户 登陆token 验证
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","token已过期");
+                return job_out.toString();
+            }
+
+            Parents p = parentsdao.queryParents(tid);
+            if(p==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效家长id");
+                return job_out.toString();
+            }
+            Class cla = classdao.queryClass(p.getClass_id());// 获取家长对应的班级
+            if(cla==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","当前家长没有对应的班级");
+                return job_out.toString();
+            }
+            Set<Teacher> teachers = cla.getTeachers();
+            if(teachers==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","当前班级没有老师");
+                return job_out.toString();
+            }
+
+            JSONArray ja = new JSONArray();
+            Iterator<Teacher> it = teachers.iterator();
+            while (it.hasNext()){
+                Teacher t = (Teacher) it.next();
+                JSONObject jo=new JSONObject();
+                jo.put("name",t.getName());
+                jo.put("phoneNum",t.getPhone_num());
+                jo.put("avatar", t.getAvatar_path());
+                jo.put("className",cla.getName());
+                ja.add(jo);
+            }
+            job_out.put("resultCode", GlobalStatus.succeed.toString());
+            job_out.put("resultDesc","成功获取班级老师通信录");
+            job_out.put("data",ja.toString());
+
+        }catch (JSONException e){
+            return "error";  //json  构造异常，直接返回error
+        }
+        return job_out.toString();
+    }
 
 
     @Path("/correctBabyInfo")
@@ -277,7 +345,7 @@ public class ParentsService {
                 return  job_out.toString();
             }
 
-            //设置宝贝信息为新设置的值
+            //设置宝贝信息为新设置的�
             stu.setName(name);
             stu.setNick_name(nick_name);
             stu.setAvatar_path(avatar);

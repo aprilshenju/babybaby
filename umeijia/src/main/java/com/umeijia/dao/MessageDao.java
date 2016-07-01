@@ -43,10 +43,28 @@ public class MessageDao {
     /**
      * teacher_id 和 parents_id共同标识一个会话
      * **/
-    public List<Message> queryUnreadMessages(long teacher_id,long parents_id,int dir) {
+    public List<Message> queryUnreadMessagesByTeacherId(long teacher_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Message as message where message.teacher_id=%d and message.parents_id=%d and message.send_direction=%d and message.read_or_not=0 order by message.date desc",teacher_id,parents_id,dir);
+        String sql = String.format("from Message as message where message.teacher_id=%d  and message.send_direction=%d and message.read_or_not=0 order by message.date desc",teacher_id,1);
+        Query query = session.createQuery(sql);
+        List <Message> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    /**
+     * teacher_id 和 parents_id共同标识一个会话
+     * **/
+    public List<Message> queryUnreadMessagesByParentsId(long parents_id) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Message as message where message.parents_id=%d  and message.send_direction=%d and message.read_or_not=0 order by message.date desc",parents_id,2);
         Query query = session.createQuery(sql);
         List <Message> list = query.list();
         session.close();
