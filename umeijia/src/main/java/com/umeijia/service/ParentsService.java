@@ -83,11 +83,13 @@ public class ParentsService {
                 {
 
                     Student stu = p.getStudent();
+
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","登陆成功");
                     job_out.put("tkn",p.getToken());
                     job_out.put("tkn_exptime",p.getExpire().toString());
                     job_out.put("p_id",p.getId());
+                    job_out.put("schoolId",p.getGarten_id());
                     job_out.put("phone",p.getPhone_num());
                     job_out.put("email",p.getEmail());
                     job_out.put("name",p.getName());
@@ -222,7 +224,7 @@ public class ParentsService {
                 job_out.put("resultDesc","无效家长id");
                 return job_out.toString();
             }
-            Student stu = p.getStudent(); //获取 当前家长的宝贝
+            Student stu = p.getStudent(); //获取 当前家长的宝�
             if(stu==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","当前家长还没宝贝");
@@ -267,13 +269,13 @@ public class ParentsService {
                 job_out.put("resultDesc","无效家长id");
                 return job_out.toString();
             }
-            Class cla =classdao.queryClass(p.getClass_id());
+            Class cla = classdao.queryClass(p.getClass_id());// 获取家长对应的班级
             if(cla==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","当前家长没有对应的班级");
                 return job_out.toString();
             }
-            Set<Teacher>teachers = cla.getTeachers();
+            Set<Teacher> teachers = cla.getTeachers();
             if(teachers==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","当前班级没有老师");
@@ -343,7 +345,7 @@ public class ParentsService {
                 return  job_out.toString();
             }
 
-            //设置宝贝信息为新设置的值
+            //设置宝贝信息为新设置的�
             stu.setName(name);
             stu.setNick_name(nick_name);
             stu.setAvatar_path(avatar);

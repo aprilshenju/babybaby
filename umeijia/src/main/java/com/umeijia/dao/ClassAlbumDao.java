@@ -2,6 +2,7 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.ClassAlbum;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -41,19 +42,46 @@ public class ClassAlbumDao {
         }
     }
 
-    public List queryClassAlbumList(long class_id) {
+
+    public ClassAlbum queryClassAlbumByDate(int year,int month,int day) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassAlbum as ca where ca.class_id=%d order by ca.date desc",class_id);
+        String sql = String.format("from ClassAlbum as ca where year(ca.date)=%d and month(ca.date)=%d and day(ca.date)=%d",year,month,day);
         Query query = session.createQuery(sql);
         List <ClassAlbum> list = query.list();
         session.close();
         if(list.size()>0){
-            return list;
+            ClassAlbum ca = (ClassAlbum) list.get(0);
+            return ca;
         }else {
             return null;
         }
     }
+
+    public Pager queryClassAlbumListByPage(long class_id,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from ClassAlbum as ca where ca.class_id=%d order by ca.date desc",class_id);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<ClassAlbum> list=(List<ClassAlbum>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
+    }
+
+
+
     
     public boolean addClassAlbum(ClassAlbum album) {
         boolean result=false;

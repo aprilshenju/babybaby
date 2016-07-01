@@ -13,15 +13,15 @@ public class Class {
 	private Set<Camera> cameras;
 	private Set<Teacher> teachers;
 
-    public Set<FoodRecord> getFoodRecords() {
-        return foodRecords;
-    }
+//    public Set<FoodRecord> getFoodRecords() {
+//        return foodRecords;
+//    }
+//
+//    public void setFoodRecords(Set<FoodRecord> foodRecords) {
+//        this.foodRecords = foodRecords;
+//    }
 
-    public void setFoodRecords(Set<FoodRecord> foodRecords) {
-        this.foodRecords = foodRecords;
-    }
-
-    public Set<FoodRecord> foodRecords;
+//    public Set<FoodRecord> foodRecords;
 	public long getId() {
 		return id;
 	}
