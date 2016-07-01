@@ -140,6 +140,121 @@ public class RunService {
     }
 
 
+
+    /***
+     *
+     *运营人员天添加 幼儿园 和 园长
+     * **/
+    @Path("/addGartenAndLeader")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addGartenAndLeader(@RequestBody String userinfo, @Context HttpHeaders headers) {
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out = new JSONObject();
+        try{
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!agentdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","token已过期");
+                return job_out.toString();
+            }
+            Agent agent = new Agent(tid);
+
+            String garten_name= job.getString("garten_name");
+            String addr= job.getString("addr"); //幼儿园地址
+            String contact=job.getString("garten_contact"); //幼儿园联系方式
+            String descrip=job.getString("garten_description"); // 幼儿园介绍
+            String teacher_presence_imgs=job.getString("teacher_presence_imgs");// 教师风采图片列表
+            String garten_instrument_imgs=job.getString("garten_instrument_imgs");// 教学设施列表
+            String garten_presence_imgs=job.getString("garten_presence_imgs");//幼儿园图片展示列表*/
+            String phone = job.getString("leader_phone");
+            String email = job.getString("leader_email");
+            String pwd = job.getString("leader_password");
+            pwd=MD5.GetSaltMD5Code(pwd);
+            String name = job.getString("leader_name");
+            String avatar = job.getString("leader_avatar");
+            String wishes = job.getString("leader_wishes"); //园长寄语，老师不传
+            String leader_descrip=job.getString("leader_description"); //老师介绍
+
+            Date date = new Date();
+            Kindergarten garten = new Kindergarten(garten_name,addr,contact,descrip,teacher_presence_imgs,garten_instrument_imgs,garten_presence_imgs,agent);
+            garten.setLeader_wishes(wishes);
+            if(kindergartendao.addKindergarten(garten)){
+                // 成功添加幼儿园
+                Teacher leader=new Teacher(name,avatar,pwd,garten,phone,leader_descrip,email,true,wishes); //园长
+                if(teacherdao.addTeacher(leader)){
+                    garten.setLeader_wishes(wishes); //更新幼儿园 寄语
+                    garten.setLeader_id(leader.getId()); //更新幼儿园 园长
+                    String leader_contact=name+"-"+phone+"-"+avatar+"-"+"园长";
+                    garten.setTeacher_contacts(leader_contact);
+                    if( kindergartendao.updateKindergarten(garten))
+                    {
+                        job_out.put("resultCode",GlobalStatus.succeed.toString());
+                        job_out.put("resultDesc","成功添加幼儿园和园长");
+                        return job_out.toString();
+                    }
+                }
+
+            }
+            job_out.put("resultCode",GlobalStatus.error.toString());
+            job_out.put("resultDesc","新建幼儿园失败");
+            return job_out.toString();
+
+        } catch (JSONException e) {
+            return "error";  //json  构造异常，直接返回error
+        }
+    }
+
+
+
+    /***
+     *
+     *运营人员天添加 幼儿园
+     * **/
+    @Path("/addGarten")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addGarten(@RequestBody String userinfo, @Context HttpHeaders headers) {
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out = new JSONObject();
+        try{
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!agentdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","token已过期");
+                return job_out.toString();
+            }
+            Agent agent = new Agent(tid);
+
+            String name= job.getString("name");
+            String addr= job.getString("addr"); //幼儿园地址
+            String contact=job.getString("contact"); //幼儿园联系方式
+            String descrip=job.getString("description"); // 幼儿园介绍
+            String teacher_presence_imgs=job.getString("teacher_presence_imgs");// 教师风采图片列表
+            String garten_instrument_imgs=job.getString("garten_instrument_imgs");// 教学设施列表
+            String garten_presence_imgs=job.getString("garten_presence_imgs");//幼儿园图片展示列表*/
+
+            Date date = new Date();
+            Kindergarten garten = new Kindergarten(name,addr,contact,descrip,teacher_presence_imgs,garten_instrument_imgs,garten_presence_imgs,agent);
+
+            if(kindergartendao.addKindergarten(garten)){
+                job_out.put("resultCode",GlobalStatus.succeed.toString());
+                job_out.put("resultDesc","成功添加幼儿园");
+                return  job_out.toString();
+            }
+            job_out.put("resultCode",GlobalStatus.error.toString());
+            job_out.put("resultDesc","添加幼儿园失败");
+            return job_out.toString();
+
+        } catch (JSONException e) {
+            return "error";  //json  构造异常，直接返回error
+        }
+    }
+
     /***
      * 代理商添加园长
      * curl -X POST -H "Content-Type:application/json" -d {"phone":"13534456644","password":"134df","name":"ltt4aoshou","email":"12345@qq.com","class_id":"1","baby_id":"1","relation":"dad","avatar":"fdef.jpg","gender":"0"}
@@ -301,51 +416,6 @@ public class RunService {
         return job_out.toString();
     }
 
-    /***
-     *
-     *运营人员天添加 幼儿园
-     * **/
-    @Path("/addGarten")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public String addGarten(@RequestBody String userinfo, @Context HttpHeaders headers) {
-        JSONObject job = JSONObject.fromObject(userinfo);
-        JSONObject job_out = new JSONObject();
-        try{
-            String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!agentdao.verifyToken(tid,tkn)){ // token验证
-                job_out.put("resultCode", GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过期");
-                return job_out.toString();
-            }
-            Agent agent = new Agent(tid);
-
-            String name= job.getString("name");
-            String addr= job.getString("addr"); //幼儿园地址
-            String contact=job.getString("contact"); //幼儿园联系方式
-            String descrip=job.getString("description"); // 幼儿园介绍
-            String teacher_presence_imgs=job.getString("teacher_presence_imgs");// 教师风采图片列表
-            String garten_instrument_imgs=job.getString("garten_instrument_imgs");// 教学设施列表
-            String garten_presence_imgs=job.getString("garten_presence_imgs");//幼儿园图片展示列表*/
-
-            Date date = new Date();
-            Kindergarten garten = new Kindergarten(name,addr,contact,descrip,teacher_presence_imgs,garten_instrument_imgs,garten_presence_imgs,agent);
-
-            if(kindergartendao.addKindergarten(garten)){
-                job_out.put("resultCode",GlobalStatus.succeed.toString());
-                job_out.put("resultDesc","成功添加幼儿园");
-                return  job_out.toString();
-            }
-            job_out.put("resultCode",GlobalStatus.error.toString());
-            job_out.put("resultDesc","添加幼儿园失败");
-            return job_out.toString();
-
-        } catch (JSONException e) {
-            return "error";  //json  构造异常，直接返回error
-        }
-    }
 
     /***
      * 管理员运营人员添加代理商

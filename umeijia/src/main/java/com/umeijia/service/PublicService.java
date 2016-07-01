@@ -401,7 +401,7 @@ public class PublicService {
                 result = administratordao.verifyToken(id, tkn);
                 break;
         }
-        return true;
+        return result;
     }
 
     /**
@@ -2536,6 +2536,11 @@ public class PublicService {
             JSONObject jobIn = JSONObject.fromObject(avatarInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
             String phoneNum = jobIn.getString("phoneNum");
             int type = jobIn.getInt("type");
 
@@ -2563,6 +2568,130 @@ public class PublicService {
                     }
                     break;
             }
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 上传班级相册
+     * @param classAlumInfo
+     * @param headers
+     * @return
+     */
+    @Path("/addClassAlum")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addClassAlum(@RequestBody String classAlumInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(classAlumInfo,"roleType","roleId","classId");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(classAlumInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int classId = jobIn.getInt("classId");
+            if(roleType!=1&&roleType!=2){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "没有权限添加相册");
+                return jobOut.toString();
+            }
+            Calendar cal=Calendar.getInstance();//使用日历类
+            int year=cal.get(Calendar.YEAR);//得到年
+            int month=cal.get(Calendar.MONTH)+1;//得到月，因为从0开始的，所以要加1
+            int day=cal.get(Calendar.DAY_OF_MONTH);//得到天
+            ClassAlbum ca = classalbumdao.queryClassAlbumByDate(year,month,day);
+            if(ca==null){ //没有当天的相册记录则直接添加
+                ca = new ClassAlbum();
+                ca.setDate(new Date());
+                ca.setClass_id(classId);
+                ca.setImage_names("");
+                classalbumdao.addClassAlbum(ca);
+            }else{  //有的话也不用更新
+
+            }
+            jobOut.put("id",ca.getId());
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 查询班级相册
+     * @param classAlumInfo
+     * @param headers
+     * @return
+     */
+    @Path("/queryClassAlum")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String queryClassAlum(@RequestBody String classAlumInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(classAlumInfo,"roleType","roleId","classId","pageNum");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(classAlumInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int classId = jobIn.getInt("classId");
+            int pageNum = jobIn.getInt("pageNum");
+            if(roleType!=1&&roleType!=2&&roleType!=3){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "没有权限查看相册");
+                return jobOut.toString();
+            }
+            Pager pager = new Pager();
+            pager.setPageSize(Pager.normalPageSize);
+            pager.setPageNumber(pageNum);
+            pager = classalbumdao.queryClassAlbumListByPage(classId,pager);
+            List<ClassAlbum> classAlbums = pager.getList();
+            JSONArray ja = new JSONArray();
+            if(classAlbums!=null&&classAlbums.size()!=0){
+                for(ClassAlbum item : classAlbums){
+                    JSONObject jo = new JSONObject();
+                    jo.put("id",item.getId());
+                    jo.put("date",item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
+                    jo.put("className",classdao.queryClass(item.getClass_id()).getName());
+                    jo.put("imageUrls",item.getImage_names());
+                    ja.add(jo);
+                }
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "无记录");
+                return jobOut.toString();
+            }
+            jobOut.put("data",ja.toString());
+            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {

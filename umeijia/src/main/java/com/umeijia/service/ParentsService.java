@@ -79,11 +79,13 @@ public class ParentsService {
                 {
 
                     Student stu = p.getStudent();
+
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","登陆成功");
                     job_out.put("tkn",p.getToken());
                     job_out.put("tkn_exptime",p.getExpire().toString());
                     job_out.put("p_id",p.getId());
+                    job_out.put("schoolId",p.getGarten_id());
                     job_out.put("phone",p.getPhone_num());
                     job_out.put("email",p.getEmail());
                     job_out.put("name",p.getName());
