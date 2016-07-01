@@ -267,7 +267,7 @@ public class ParentsService {
                 job_out.put("resultDesc","无效家长id");
                 return job_out.toString();
             }
-            Class cla = p.getClass();// 获取家长对应的班级
+            Class cla =classdao.queryClass(p.getClass_id());
             if(cla==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","当前家长没有对应的班级");
