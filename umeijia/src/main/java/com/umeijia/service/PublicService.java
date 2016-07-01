@@ -12,14 +12,11 @@ import com.umeijia.vo.Class;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -36,7 +33,7 @@ import java.util.*;
 @Service
 @Path("/public_service")
 public class PublicService {
-    String baseDir = "E:/file";
+    String baseDir = "/UMJ_IMG_SERVER";
     //类别路径
     String filePath = null;
     String imgUrls = null;
@@ -133,12 +130,13 @@ public class PublicService {
         Notification notification = Notification.newBuilder()
                 .setAlert(content)
                 .build();
-        JpushUtil.notificationToTargetClient(alias,notification);
+        JpushUtil.notificationToTargetClient(alias, notification);
         return "welcom to UMJ server... public service ";
     }
 
     /**
      * 添加宝贝动态
+     *
      * @param showTimeInfo
      * @param headers
      * @return
@@ -150,7 +148,8 @@ public class PublicService {
     public String addBabyShowTime(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "showTimeType", "description", "classId", "babyId", "isShareToFootPrint");
+            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "showTimeType",
+                    "description", "classId", "babyId", "isShareToFootPrint");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -221,7 +220,8 @@ public class PublicService {
     public String queryBabyShowTime(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "classId", "pageNum","querySelf");
+            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "classId", "pageNum",
+                    "querySelf");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -244,7 +244,7 @@ public class PublicService {
             pager.setPageNumber(pageNum);
             int querySelf = jobIn.getInt("querySelf");
             List<BabyShowtime> result = new ArrayList<BabyShowtime>();
-            if(querySelf==1){  //是否是查自己的
+            if (querySelf == 1) {  //是否是查自己的
                 switch (roleType) {
                     case 1: //老师和园长查询
                     case 2:
@@ -256,8 +256,8 @@ public class PublicService {
                         result = pager.getList();
                         break;
                 }
-            }else{  //不是查自己的，就直接按班级查
-                pager = babyshowtimedao.queryBabyShowtimesPageByClass(classId,pager);
+            } else {  //不是查自己的，就直接按班级查
+                pager = babyshowtimedao.queryBabyShowtimesPageByClass(classId, pager);
                 result = pager.getList();
             }
 
@@ -295,11 +295,13 @@ public class PublicService {
                         JSONObject job = new JSONObject();
                         job.put("userRoleType", commentsItem.getUser_type());
                         job.put("userId", commentsItem.getUser_id());
-                        job.put("userName", getNameFromRoleTypeAndRoleId(commentsItem.getUser_type(), commentsItem.getUser_id()));
+                        job.put("userName", getNameFromRoleTypeAndRoleId(commentsItem.getUser_type(), commentsItem
+                                .getUser_id()));
                         job.put("isLike", commentsItem.isSay_good());
                         job.put("responseUserType", commentsItem.getResponse_user_type());
                         job.put("responseUserId", commentsItem.getResponse_user_id());
-                        job.put("responseUserName", getNameFromRoleTypeAndRoleId(commentsItem.getResponse_user_type(), commentsItem.getResponse_user_id()));
+                        job.put("responseUserName", getNameFromRoleTypeAndRoleId(commentsItem.getResponse_user_type()
+                                , commentsItem.getResponse_user_id()));
                         job.put("content", commentsItem.getComment_content());
                         commentsArray.add(job);
                     }
@@ -309,8 +311,8 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("pageCount",pager.getPageCount());
-            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("pageCount", pager.getPageCount());
+            jobOut.put("hasNextPage", pager.getPageCount() > pageNum ? true : false); //是否有下一页
             jobOut.put("totalCount", pager.getTotalCount());  //总共返回多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
@@ -336,10 +338,10 @@ public class PublicService {
                 break;
             }
         }
-        if(jobOut.toString().equals("{}")){
+        if (jobOut.toString().equals("{}")) {
             return "";
-        }else
-        return jobOut.toString();
+        } else
+            return jobOut.toString();
     }
 
 
@@ -470,7 +472,8 @@ public class PublicService {
     public String likeOrComment(@RequestBody String showTimeInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "id", "content", "responseUserId", "responseUserType", "type");
+            String checkInput = judgeValidationOfInputJson(showTimeInfo, "roleType", "roleId", "id", "content",
+                    "responseUserId", "responseUserType", "type");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -521,7 +524,8 @@ public class PublicService {
     public String addOrEditFootPrint(@RequestBody String footPrintInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(footPrintInfo, "roleType", "roleId", "id", "footPrintType", "description", "babyId", "type", "isShareToBabyShowTime", "classId");
+            String checkInput = judgeValidationOfInputJson(footPrintInfo, "roleType", "roleId", "id",
+                    "footPrintType", "description", "babyId", "type", "isShareToBabyShowTime", "classId");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -616,7 +620,7 @@ public class PublicService {
             Pager pager = new Pager();
             pager.setPageSize(Pager.normalPageSize);
             pager.setPageNumber(pageNum);
-            pager =   babyfootprintdao.queryBabyFootPrintByPage(babyId,pager);
+            pager = babyfootprintdao.queryBabyFootPrintByPage(babyId, pager);
             List<BabyFootPrint> result = pager.getList();
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
@@ -634,8 +638,8 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString()); //返回的数据
-            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
-            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("pageCount", pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount() > pageNum ? true : false); //是否有下一页
             jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
@@ -661,7 +665,8 @@ public class PublicService {
     public String queryFootPrintByMonth(@RequestBody String footPrintInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(footPrintInfo, "roleType", "roleId", "babyId", "year", "month");
+            String checkInput = judgeValidationOfInputJson(footPrintInfo, "roleType", "roleId", "babyId", "year",
+                    "month");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -879,7 +884,9 @@ public class PublicService {
     public String addOrUpdateAboutUs(@RequestBody String aboutUsInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(aboutUsInfo, "roleType", "roleId", "id", "companyAddress", "companyName", "phoneNum", "email", "description", "qq", "currentVersion_teacher", "currentVersion_parent");
+            String checkInput = judgeValidationOfInputJson(aboutUsInfo, "roleType", "roleId", "id", "companyAddress",
+                    "companyName", "phoneNum", "email", "description", "qq", "currentVersion_teacher",
+                    "currentVersion_parent");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -982,10 +989,12 @@ public class PublicService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String publishOrUpdateClassNotification(@RequestBody String classNotificationInfo, @Context HttpHeaders headers) {
+    public String publishOrUpdateClassNotification(@RequestBody String classNotificationInfo, @Context HttpHeaders
+            headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(classNotificationInfo, "roleType", "roleId", "id", "type", "description", "classId", "title");
+            String checkInput = judgeValidationOfInputJson(classNotificationInfo, "roleType", "roleId", "id", "type",
+                    "description", "classId", "title");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -1037,7 +1046,8 @@ public class PublicService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String updateReadStudentInClassNotification(@RequestBody String classNotificationInfo, @Context HttpHeaders headers) {
+    public String updateReadStudentInClassNotification(@RequestBody String classNotificationInfo, @Context
+            HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
             String checkInput = judgeValidationOfInputJson(classNotificationInfo, "studentId", "id");
@@ -1077,7 +1087,8 @@ public class PublicService {
     public String queryClassNotification(@RequestBody String classNotificationInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(classNotificationInfo, "roleType", "roleId", "classId", "pageNum");
+            String checkInput = judgeValidationOfInputJson(classNotificationInfo, "roleType", "roleId", "classId",
+                    "pageNum");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -1094,7 +1105,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "token已过期");
                 return jobOut.toString();
             }
-            pager = classnotificationdao.queryClassNotificationPageByClass(classId,pager);
+            pager = classnotificationdao.queryClassNotificationPageByClass(classId, pager);
             List<ClassNotification> result = pager.getList();
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
@@ -1129,8 +1140,8 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
-            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
-            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("pageCount", pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount() > pageNum ? true : false); //是否有下一页
             jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
@@ -1180,7 +1191,8 @@ public class PublicService {
                 String[] ids = unReadIds.split(";");
                 for (int i = 0; i < ids.length; i++) {
                     JSONObject jo = new JSONObject();
-                    jo.put("className", classdao.queryClass(classnotificationdao.queryClassNotification(id).getClass_id()).getName());
+                    jo.put("className", classdao.queryClass(classnotificationdao.queryClassNotification(id)
+                            .getClass_id()).getName());
                     jo.put("babyName", studentdao.queryStudent(Integer.parseInt(ids[i])).getName());
                     /**
                      * 还需要家长的各种信息
@@ -1221,7 +1233,8 @@ public class PublicService {
     public String addCheckinRecord(@RequestBody String checkinInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(checkinInfo, "roleType", "roleId", "cardId", "classId", "period", "state", "temperature");
+            String checkInput = judgeValidationOfInputJson(checkinInfo, "roleType", "roleId", "cardId", "classId",
+                    "period", "state", "temperature");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -1273,7 +1286,8 @@ public class PublicService {
     public String queryCheckinRecord(@RequestBody String checkinInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(checkinInfo, "roleType", "roleId", "classId", "babyId", "year", "month", "day");
+            String checkInput = judgeValidationOfInputJson(checkinInfo, "roleType", "roleId", "classId", "babyId",
+                    "year", "month", "day");
             if (!checkInput.equals("")) {
                 return checkInput;
             }
@@ -1367,8 +1381,9 @@ public class PublicService {
     public String updateBabyFood(@RequestBody String foodInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(foodInfo,"roleType","roleId","classId","schoolId","week","imageUrls","name");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(foodInfo, "roleType", "roleId", "classId", "schoolId",
+                    "week", "imageUrls", "name");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(foodInfo);
@@ -1429,6 +1444,8 @@ public class PublicService {
                         }
                         fr.setImage_urls(days[0] + ";" + days[1] + ";" + days[2] + ";" + days[3] + ";" + days[4]);
                     }
+                    //更新前先删除所有图片
+                    fr.setImage_urls(null);
                 }
                 foodrecorddao.updateFoodRecord(fr);
             }
@@ -1454,8 +1471,8 @@ public class PublicService {
     public String queryBabyFood(@RequestBody String foodInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(foodInfo,"roleType","roleId","classId");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(foodInfo, "roleType", "roleId", "classId");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(foodInfo);
@@ -1521,8 +1538,9 @@ public class PublicService {
     public String editCourseSchedule(@RequestBody String courseScheduleInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(courseScheduleInfo,"roleType","roleId","classId","courseScheduleContent");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(courseScheduleInfo, "roleType", "roleId", "classId",
+                    "courseScheduleContent");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(courseScheduleInfo);
@@ -1565,8 +1583,8 @@ public class PublicService {
     public String queryCourseSchedule(@RequestBody String courseScheduleInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(courseScheduleInfo,"roleType","roleId","classId");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(courseScheduleInfo, "roleType", "roleId", "classId");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(courseScheduleInfo);
@@ -1609,8 +1627,9 @@ public class PublicService {
     public String addHomeWork(@RequestBody String homeworkInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(homeworkInfo,"roleType","roleId","classId","title","description");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(homeworkInfo, "roleType", "roleId", "classId", "title",
+                    "description");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(homeworkInfo);
@@ -1659,8 +1678,8 @@ public class PublicService {
     public String queryHomeWork(@RequestBody String homeworkInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(homeworkInfo,"roleType","roleId","classId","pageNum");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(homeworkInfo, "roleType", "roleId", "classId", "pageNum");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(homeworkInfo);
@@ -1681,7 +1700,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看作业");
                 return jobOut.toString();
             }
-            pager = homeworkdao.queryHomeWorkPageByClass(classId,pager);
+            pager = homeworkdao.queryHomeWorkPageByClass(classId, pager);
             List<HomeWork> homeWorks = pager.getList();
             if (homeWorks == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
@@ -1699,8 +1718,8 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
-            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
-            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("pageCount", pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount() > pageNum ? true : false); //是否有下一页
             jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
@@ -1727,8 +1746,9 @@ public class PublicService {
     public String publishClassActivity(@RequestBody String classActivityInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(classActivityInfo,"roleType","roleId","classId","title","content","startDate","endDate","participate_num","contactName","contactPhoneNum");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(classActivityInfo, "roleType", "roleId", "classId",
+                    "title", "content", "startDate", "endDate", "participate_num", "contactName", "contactPhoneNum");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(classActivityInfo);
@@ -1791,8 +1811,9 @@ public class PublicService {
     public String queryClassActivity(@RequestBody String classActivityInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(classActivityInfo,"roleType","roleId","classId","pageNum");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(classActivityInfo, "roleType", "roleId", "classId",
+                    "pageNum");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(classActivityInfo);
@@ -1813,7 +1834,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看班级活动");
                 return jobOut.toString();
             }
-            pager = classactivitydao.queryClassActivityPageByClass(classId,pager);
+            pager = classactivitydao.queryClassActivityPageByClass(classId, pager);
             List<ClassActivity> classActivities = pager.getList();
             if (classActivities == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
@@ -1838,8 +1859,8 @@ public class PublicService {
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());
-            jobOut.put("pageCount",pager.getPageCount()); //总共有多少页
-            jobOut.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            jobOut.put("pageCount", pager.getPageCount()); //总共有多少页
+            jobOut.put("hasNextPage", pager.getPageCount() > pageNum ? true : false); //是否有下一页
             jobOut.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
@@ -1862,8 +1883,8 @@ public class PublicService {
     public String participateClassActivity(@RequestBody String classActivityInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(classActivityInfo,"roleType","roleId","babyId","id");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(classActivityInfo, "roleType", "roleId", "babyId", "id");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(classActivityInfo);
@@ -1882,7 +1903,8 @@ public class PublicService {
                 return jobOut.toString();
             }
             ClassActivity ca = classactivitydao.queryClassActivity(id);
-            if (new Date().getTime() < ca.getEnd_date().getTime() && new Date().getTime() > ca.getStart_date().getTime()) { //活动期间内可以报名
+            if (new Date().getTime() < ca.getEnd_date().getTime() && new Date().getTime() > ca.getStart_date()
+                    .getTime()) { //活动期间内可以报名
                 if (ca.getBaby_ids().split(";").length > ca.getParticipate_num()) {
                     jobOut.put("resultCode", GlobalStatus.error.toString());
                     jobOut.put("resultDesc", "人数已满，不能报名");
@@ -1891,9 +1913,12 @@ public class PublicService {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  //按这种格式来转化数据
                     java.util.Date date = new java.util.Date();
                     String dateString = sdf.format(date);
-                    String babyNames = ca.getBaby_ids().equals("") ? studentdao.queryStudent(babyId).getName() : (ca.getBaby_ids() + ";" + studentdao.queryStudent(babyId).getName());
-                    String parentName = ca.getParent_ids().equals("") ? parentsdao.queryParents(roleId).getName() : (ca.getParent_ids() + ";" + parentsdao.queryParents(roleId).getName());
-                    String participateDates = ca.getParticipate_time().equals("") ? dateString : (ca.getParticipate_time() + ";" + dateString);
+                    String babyNames = ca.getBaby_ids().equals("") ? studentdao.queryStudent(babyId).getName() : (ca
+                            .getBaby_ids() + ";" + studentdao.queryStudent(babyId).getName());
+                    String parentName = ca.getParent_ids().equals("") ? parentsdao.queryParents(roleId).getName() :
+                            (ca.getParent_ids() + ";" + parentsdao.queryParents(roleId).getName());
+                    String participateDates = ca.getParticipate_time().equals("") ? dateString : (ca
+                            .getParticipate_time() + ";" + dateString);
                     ca.setParent_ids(parentName);
                     ca.setBaby_ids(babyNames);
                     ca.setParticipate_time(participateDates);
@@ -1929,8 +1954,9 @@ public class PublicService {
     public String addOrUpdateBabyKnowledge(@RequestBody String babyKnowledgeInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(babyKnowledgeInfo,"roleType","roleId","type","id","question","answer","linkUrl");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(babyKnowledgeInfo, "roleType", "roleId", "type", "id",
+                    "question", "answer", "linkUrl");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(babyKnowledgeInfo);
@@ -1987,8 +2013,8 @@ public class PublicService {
     public String queryBabyKnowledge(@RequestBody String babyKnowledgeInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(babyKnowledgeInfo,"roleType","roleId","pageNum");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(babyKnowledgeInfo, "roleType", "roleId", "pageNum");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(babyKnowledgeInfo);
@@ -2045,8 +2071,9 @@ public class PublicService {
     public String queryContacts(@RequestBody String contactInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(contactInfo,"roleType","roleId","classId","schoolId","contactType");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(contactInfo, "roleType", "roleId", "classId", "schoolId",
+                    "contactType");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(contactInfo);
@@ -2166,8 +2193,9 @@ public class PublicService {
     public String addLog(@RequestBody String logInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(logInfo,"roleType","roleId","userType","userId","opType","opContent","opObject");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(logInfo, "roleType", "roleId", "userType", "userId",
+                    "opType", "opContent", "opObject");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(logInfo);
@@ -2214,8 +2242,8 @@ public class PublicService {
     public String queryLog(@RequestBody String logInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(logInfo,"roleType","roleId","pageNum","year","month");
-            if(!checkInput.equals("")){
+            String checkInput = judgeValidationOfInputJson(logInfo, "roleType", "roleId", "pageNum", "year", "month");
+            if (!checkInput.equals("")) {
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(logInfo);
@@ -2282,30 +2310,22 @@ public class PublicService {
         JSONObject returnJsonObject = new JSONObject();
         long schoolId;
         int pageNum;
-        if (reqJson == null) {
+        JSONObject jsonObject = JSONObject.fromObject(reqJson);
+        if (jsonObject == null) {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "请求参数异常");
             return returnJsonObject.toString();
         }
-        JSONObject jsonObject = JSONObject.fromObject(reqJson);
-        if (jsonObject.containsKey("schoolId")) {
-            schoolId = jsonObject.getLong("schoolId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数schoolId");
-            return returnJsonObject.toString();
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "schoolId", "pageNum");
+        if (!checkReqJson.equals("")) {
+            return checkReqJson;
         }
-        if (jsonObject.containsKey("pageNum")) {
-            pageNum = jsonObject.getInt("pageNum");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数pageNum");
-            return returnJsonObject.toString();
-        }
+        schoolId = jsonObject.getLong("schoolId");
+        pageNum = jsonObject.getInt("pageNum");
         Pager pager = new Pager();
         pager.setPageSize(Pager.normalPageSize);
         pager.setPageNumber(pageNum);
-        pager = gartennewsdao.queryGartenNewsPageBySchool(schoolId,pager);
+        pager = gartennewsdao.queryGartenNewsPageBySchool(schoolId, pager);
         List<GartenNews> newsList = pager.getList();
         if (newsList != null) {
             JSONArray data = new JSONArray();
@@ -2324,8 +2344,8 @@ public class PublicService {
                 data.add(item);
             }
             returnJsonObject.put("data", data);
-            returnJsonObject.put("pageCount",pager.getPageCount()); //总共有多少页
-            returnJsonObject.put("hasNextPage", pager.getPageCount()>pageNum?true:false); //是否有下一页
+            returnJsonObject.put("pageCount", pager.getPageCount()); //总共有多少页
+            returnJsonObject.put("hasNextPage", pager.getPageCount() > pageNum ? true : false); //是否有下一页
             returnJsonObject.put("totalCount", pager.getTotalCount());  //总共有多少条记录
             returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
             returnJsonObject.put("resultDesc", "操作成功");
@@ -2355,6 +2375,12 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "请求参数异常");
             return returnJsonObject.toString();
         }
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "type", "roleType", "roleId",
+                "ipUrl", "videoUrl", "description", "manufactory", "classId", "gartenId", "cameraType", "state",
+                "thumbPath", "activePeriod", "isPublic");
+        if (!checkReqJson.equals("")) {
+            return checkReqJson;
+        }
         int type;
         long id;
         int roleType;
@@ -2372,104 +2398,20 @@ public class PublicService {
         Boolean isPublic;
         Date addDate;
         Date modifyDate;
-        if (jsonObject.containsKey("type")) {
-            type = jsonObject.getInt("type");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数type");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("roleType")) {
-            roleType = jsonObject.getInt("roleType");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数roleType");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("roleId")) {
-            roleId = jsonObject.getLong("roleId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数roleId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("ipUrl")) {
-            ipUrl = jsonObject.getString("ipUrl");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数ipUrl");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("videoUrl")) {
-            videoUrl = jsonObject.getString("videoUrl");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数videoUrl");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("description")) {
-            description = jsonObject.getString("description");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数description");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("manufactory")) {
-            manufactory = jsonObject.getString("manufactory");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数manufactory");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("classId")) {
-            classId = jsonObject.getLong("classId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数classId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("gartenId")) {
-            gartenId = jsonObject.getLong("gartenId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数gartenId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("cameraType")) {
-            cameraType = jsonObject.getString("cameraType");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数cameraType");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("state")) {
-            state = jsonObject.getString("state");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数state");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("thumbPath")) {
-            thumbPath = jsonObject.getString("thumbPath");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数thumbPath");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("activePeriod")) {
-            activePeriod = jsonObject.getString("activePeriod");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数activePeriod");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("isPublic")) {
-            isPublic = jsonObject.getBoolean("isPublic");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数isPublic");
-            return returnJsonObject.toString();
-        }
+        type = jsonObject.getInt("type");
+        roleType = jsonObject.getInt("roleType");
+        roleId = jsonObject.getLong("roleId");
+        ipUrl = jsonObject.getString("ipUrl");
+        videoUrl = jsonObject.getString("videoUrl");
+        description = jsonObject.getString("description");
+        manufactory = jsonObject.getString("manufactory");
+        classId = jsonObject.getLong("classId");
+        gartenId = jsonObject.getLong("gartenId");
+        cameraType = jsonObject.getString("cameraType");
+        state = jsonObject.getString("state");
+        thumbPath = jsonObject.getString("thumbPath");
+        activePeriod = jsonObject.getString("activePeriod");
+        isPublic = jsonObject.getBoolean("isPublic");
         switch (type) {
             case 1://添加
                 Class clz = new Class();
@@ -2493,7 +2435,7 @@ public class PublicService {
                     id = jsonObject.getLong("id");
                 } else {
                     returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsonObject.put("resultDesc", "找不到参数id");
+                    returnJsonObject.put("resultDesc", "未传入id");
                     return returnJsonObject.toString();
                 }
                 Class clz1 = new Class();
@@ -2540,6 +2482,12 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "获取json失败");
             return returnJsonObject.toString();
         }
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "fileType", "recordId", "gardenId", "classId",
+                "babyId", "interfaceType", "fileName");
+        if (!checkReqJson.equals("")) {
+            return checkReqJson;
+        }
+
         int fileType = -1;
         long recordId = -1;
 //        long roleId = -1;
@@ -2548,73 +2496,31 @@ public class PublicService {
         long babyId = -1;
 //        int roleType= -1;
         String interfaceType;
-        String imgName;
+        String fileName;
 
-        if (job.containsKey("fileType")) {
-            fileType = job.getInt("fileType");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数fileType");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("recordId")) {
-            recordId = job.getLong("recordId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数recordId");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("gardenId")) {
-            gardenId = job.getLong("gardenId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数gardenId");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("classId")) {
-            classId = job.getLong("classId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数classId");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("babyId")) {
-            babyId = job.getLong("babyId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数babyId");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("interfaceType")) {
-            interfaceType = job.getString("interfaceType");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数interfaceType");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("imgName")) {
-            imgName = job.getString("imgName");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数imgName");
-            return returnJsonObject.toString();
-        }
+        fileType = job.getInt("fileType");
+        recordId = job.getLong("recordId");
+        gardenId = job.getLong("gardenId");
+        classId = job.getLong("classId");
+        babyId = job.getLong("babyId");
+        interfaceType = job.getString("interfaceType");
+        fileName = job.getString("fileName");
         //根据接口类型处理文件上传
         switch (interfaceType) {
             case "publishOrUpdateSchoolNews"://发布编辑校园新闻接口
                 GartenNews gartenNews = gartennewsdao.queryGartenNews(recordId);
                 if (gartenNews != null) {
                     filePath = "/garden/" + gardenId + "/news/img";
-                    handlerFileUpload(filePath, imgName, ins, true);
+                    handlerFileUpload(filePath, fileName, ins, true);
                     imgUrls = gartenNews.getImage_urls();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
 
                     gartenNews.setImage_urls(imgUrls);
@@ -2635,16 +2541,16 @@ public class PublicService {
                 ClassNotification classNotification = classnotificationdao.queryClassNotification(recordId);
                 if (classNotification != null) {
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/notification/img";
-                    handlerFileUpload(filePath, imgName, ins, true);
+                    handlerFileUpload(filePath, fileName, ins, true);
                     imgUrls = classNotification.getImage_urls();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
                     classNotification.setImage_urls(imgUrls);
                     //更新数据库表中的imgUrls字段
@@ -2664,16 +2570,16 @@ public class PublicService {
                 HomeWork homeWork = homeworkdao.queryHomeWork(recordId);
                 if (homeWork != null) {
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/homework/img";
-                    handlerFileUpload(filePath, imgName, ins, true);
+                    handlerFileUpload(filePath, fileName, ins, true);
                     imgUrls = homeWork.getImage_urls();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
                     homeWork.setImage_urls(imgUrls);
                     if (homeworkdao.updateHomeWork(homeWork)) {
@@ -2692,16 +2598,16 @@ public class PublicService {
                 ClassActivity classActivity = classactivitydao.queryClassActivity(recordId);
                 if (classActivity != null) {
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/activity/img";
-                    handlerFileUpload(filePath, imgName, ins, true);
+                    handlerFileUpload(filePath, fileName, ins, true);
                     imgUrls = classActivity.getImage_urls();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
                     classActivity.setImage_urls(imgUrls);
                     if (classactivitydao.updateClassActivity(classActivity)) {
@@ -2721,12 +2627,14 @@ public class PublicService {
                 if (babyShowtime != null) {
                     switch (fileType) {
                         case 1://图片
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/showTime/img";
-                            handlerFileUpload(filePath, imgName, ins, true);
+                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId +
+                                    "/showTime/img";
+                            handlerFileUpload(filePath, fileName, ins, true);
                             break;
                         case 2://视频
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/showTime/video";
-                            handlerFileUpload(filePath, imgName, ins, false);
+                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId +
+                                    "/showTime/video";
+                            handlerFileUpload(filePath, fileName, ins, false);
                             break;
                         default://未知的文件类型
                             returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
@@ -2737,12 +2645,12 @@ public class PublicService {
                     imgUrls = babyShowtime.getImage_urls();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
                     babyShowtime.setImage_urls(imgUrls);
                     if (babyshowtimedao.updateBabyShowtime(babyShowtime)) {
@@ -2762,12 +2670,14 @@ public class PublicService {
                 if (babyFootPrint != null) {
                     switch (fileType) {
                         case 1://图片
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/footprint/img";
-                            handlerFileUpload(filePath, imgName, ins, true);
+                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId +
+                                    "/footprint/img";
+                            handlerFileUpload(filePath, fileName, ins, true);
                             break;
                         case 2://视频
-                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/footprint/video";
-                            handlerFileUpload(filePath, imgName, ins, true);
+                            filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId +
+                                    "/footprint/video";
+                            handlerFileUpload(filePath, fileName, ins, true);
                             break;
                         default:
                             returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
@@ -2777,12 +2687,12 @@ public class PublicService {
                     imgUrls = babyFootPrint.getImage_urls();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
                     babyFootPrint.setImage_urls(imgUrls);
                     if (babyfootprintdao.updateBabyFootPrint(babyFootPrint)) {
@@ -2800,17 +2710,17 @@ public class PublicService {
             case "addOrEditBabyFood"://新增或编辑宝贝饮食接口
                 FoodRecord foodRecord = foodrecorddao.queryFoodRecord(recordId);
                 if (foodRecord != null) {
-                    filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/food/img";
-                    handlerFileUpload(filePath, imgName, ins, true);
+                    filePath = "/garden/" + gardenId + "/class/" + classId + "/food/img";
+                    handlerFileUpload(filePath, fileName, ins, true);
                     imgUrls = foodRecord.getImage_urls();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
                     foodRecord.setImage_urls(imgUrls);
                     if (foodrecorddao.updateFoodRecord(foodRecord)) {
@@ -2829,16 +2739,16 @@ public class PublicService {
                 CheckinRecords checkinRecords = checkinrecorddao.queryCheckinRecords(recordId);
                 if (checkinRecords != null) {
                     filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/checkin/img";
-                    handlerFileUpload(filePath, imgName, ins, true);
+                    handlerFileUpload(filePath, fileName, ins, true);
                     imgUrls = checkinRecords.getImage_path();
                     if (imgUrls != null) {
                         if (imgUrls.length() == 0) {
-                            imgUrls = imgName;
+                            imgUrls = fileName;
                         } else {
-                            imgUrls += ";" + imgName;
+                            imgUrls += ";" + fileName;
                         }
                     } else {
-                        imgUrls = imgName;
+                        imgUrls = fileName;
                     }
                     checkinRecords.setImage_path(imgUrls);
                     if (checkinrecorddao.updateCheckinRecords(checkinRecords)) {
@@ -2861,10 +2771,94 @@ public class PublicService {
                     System.out.println("创建图片目录:" + dir.getPath());
                 }
                 //存储原图
-                imgPath = dir.getPath() + "/" + imgName;
+                imgPath = dir.getPath() + "/" + fileName;
                 storeImg(imgPath, ins);
                 returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
                 returnJsonObject.put("resultDesc", "操作成功");
+                break;
+            case "addTeacherPresence"://上传教师风采图片
+                Kindergarten kindergarten = kindergartendao.queryKindergarten(recordId);
+                if (kindergarten != null) {
+                    filePath = "/garden/" + gardenId + "/teacher_presence/img";
+                    handlerFileUpload(filePath, fileName, ins, true);
+                    imgUrls = kindergarten.getTeacher_presence_imgs();
+                    if (imgUrls != null) {
+                        if (imgUrls.length() == 0) {
+                            imgUrls = fileName;
+                        } else {
+                            imgUrls += ";" + fileName;
+                        }
+                    } else {
+                        imgUrls = fileName;
+                    }
+                    kindergarten.setTeacher_presence_imgs(imgUrls);
+                    if (kindergartendao.updateKindergarten(kindergarten)) {
+                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                        returnJsonObject.put("resultDesc", "操作成功");
+                    } else {
+                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                        returnJsonObject.put("resultDesc", "更新数据库失败");
+                    }
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "没有找到对应的幼儿园");
+                }
+                break;
+            case "addFacilities"://上传幼儿园设施图片
+                Kindergarten kindergarten1 = kindergartendao.queryKindergarten(recordId);
+                if (kindergarten1 != null) {
+                    filePath = "/garden/" + gardenId + "/facilities/img";
+                    handlerFileUpload(filePath, fileName, ins, true);
+                    imgUrls = kindergarten1.getGarten_instrument_imgs();
+                    if (imgUrls != null) {
+                        if (imgUrls.length() == 0) {
+                            imgUrls = fileName;
+                        } else {
+                            imgUrls += ";" + fileName;
+                        }
+                    } else {
+                        imgUrls = fileName;
+                    }
+                    kindergarten1.setGarten_instrument_imgs(imgUrls);
+                    if (kindergartendao.updateKindergarten(kindergarten1)) {
+                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                        returnJsonObject.put("resultDesc", "操作成功");
+                    } else {
+                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                        returnJsonObject.put("resultDesc", "更新数据库失败");
+                    }
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "没有找到对应的幼儿园");
+                }
+                break;
+            case "addGardenPresence"://上传幼儿园设施图片
+                Kindergarten kindergarten2 = kindergartendao.queryKindergarten(recordId);
+                if (kindergarten2 != null) {
+                    filePath = "/garden/" + gardenId + "/garden_presence/img";
+                    handlerFileUpload(filePath, fileName, ins, true);
+                    imgUrls = kindergarten2.getGarten_presence_imgs();
+                    if (imgUrls != null) {
+                        if (imgUrls.length() == 0) {
+                            imgUrls = fileName;
+                        } else {
+                            imgUrls += ";" + fileName;
+                        }
+                    } else {
+                        imgUrls = fileName;
+                    }
+                    kindergarten2.setGarten_presence_imgs(imgUrls);
+                    if (kindergartendao.updateKindergarten(kindergarten2)) {
+                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                        returnJsonObject.put("resultDesc", "操作成功");
+                    } else {
+                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                        returnJsonObject.put("resultDesc", "更新数据库失败");
+                    }
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "没有找到对应的幼儿园");
+                }
                 break;
             default:
                 returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
@@ -2886,6 +2880,11 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "获取json失败");
             return returnJsonObject.toString();
         }
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "fileType", "gardenId", "classId",
+                "babyId", "interfaceType", "fileName", "isThumb");
+        if (!checkReqJson.equals("")) {
+            return checkReqJson;
+        }
         int fileType = -1;
         long gardenId = -1;
         long classId = -1;
@@ -2894,56 +2893,13 @@ public class PublicService {
         String interfaceType = null;
         String fileName = null;
         String fileBase64String = null;
-        if (job.containsKey("fileType")) {
-            fileType = job.getInt("fileType");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数fileType");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("gardenId")) {
-            gardenId = job.getLong("gardenId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数gardenId");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("classId")) {
-            classId = job.getLong("classId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数classId");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("babyId")) {
-            babyId = job.getLong("babyId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数babyId");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("interfaceType")) {
-            interfaceType = job.getString("interfaceType");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数interfaceType");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("fileName")) {
-            fileName = job.getString("fileName");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数fileName");
-            return returnJsonObject.toString();
-        }
-        if (job.containsKey("isThumb")) {
-            isThumb = job.getBoolean("isThumb");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数isThumb");
-            return returnJsonObject.toString();
-        }
-
+        fileType = job.getInt("fileType");
+        gardenId = job.getLong("gardenId");
+        classId = job.getLong("classId");
+        babyId = job.getLong("babyId");
+        interfaceType = job.getString("interfaceType");
+        fileName = job.getString("fileName");
+        isThumb = job.getBoolean("isThumb");
         switch (interfaceType) {
             case "publishOrUpdateSchoolNews"://发布编辑校园新闻接口
                 filePath = "/garden/" + gardenId + "/news/img";
@@ -2986,7 +2942,7 @@ public class PublicService {
                 }
                 break;
             case "addOrEditBabyFood"://新增或编辑宝贝饮食接口
-                filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/food/img";
+                filePath = "/garden/" + gardenId + "/class/" + classId + "/food/img";
                 break;
             case "addCheckinRecord"://新增宝贝考勤接口
                 filePath = "/garden/" + gardenId + "/class/" + classId + "/baby/" + babyId + "/checkin/img";
@@ -2997,7 +2953,7 @@ public class PublicService {
             default:
                 returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
                 returnJsonObject.put("resultDesc", "未知的接口类型");
-                break;
+                return returnJsonObject.toString();
         }
         try {
             switch (fileType) {
@@ -3010,10 +2966,15 @@ public class PublicService {
                 default:
                     break;
             }
+        } catch (FileNotFoundException e) {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "找不到文件");
+            return returnJsonObject.toString();
         } catch (IOException e) {
             e.printStackTrace();
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "下载失败");
+            return returnJsonObject.toString();
         }
         returnJsonObject.put("fileBase64String", fileBase64String);
         returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
@@ -3068,7 +3029,18 @@ public class PublicService {
     public String publishOrUpdateSchoolNews(@RequestBody String reqJson) {
         System.out.println("接收到发布或更新校园新闻的请求");
         JSONObject job = JSONObject.fromObject(reqJson);
-        JSONObject returnJsoObject = new JSONObject();
+        JSONObject returnJsonObject = new JSONObject();
+
+        if (job == null) {
+            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+            returnJsonObject.put("resultDesc", "请求参数异常");
+            return returnJsonObject.toString();
+        }
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "type", "teacher_id", "title",
+                "summary", "description");
+        if (!checkReqJson.equals("")) {
+            return checkReqJson;
+        }
 
         int optType = job.getInt("type");
         long teacherId = job.getLong("teacher_id");
@@ -3108,12 +3080,12 @@ public class PublicService {
                 gartenNews.setModifyDate(publisDate);
                 if (gartennewsdao.addGartenNews(gartenNews)) {
                     long newsId = gartenNews.getId();
-                    returnJsoObject.put("id", newsId);
-                    returnJsoObject.put("resultCode", GlobalStatus.succeed.toString());
-                    returnJsoObject.put("resultDesc", "操作成功");
+                    returnJsonObject.put("id", newsId);
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
                 } else {
-                    returnJsoObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsoObject.put("resultDesc", "操作失败");
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "操作失败");
                 }
                 break;
             case 2: //更新
@@ -3129,21 +3101,21 @@ public class PublicService {
                 long newsId = job.getLong("id");
                 gartenNews.setId(newsId);
                 if (gartennewsdao.updateGartenNews(gartenNews)) {
-                    returnJsoObject.put("id", newsId);
-                    returnJsoObject.put("resultCode", GlobalStatus.succeed.toString());
-                    returnJsoObject.put("resultDesc", "操作成功");
+                    returnJsonObject.put("id", newsId);
+                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                    returnJsonObject.put("resultDesc", "操作成功");
                 } else {
-                    returnJsoObject.put("resultCode", GlobalStatus.error.toString());
-                    returnJsoObject.put("resultDesc", "操作失败");
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "操作失败");
                 }
                 break;
             default:
-                returnJsoObject.put("resultCode", GlobalStatus.error.toString());
-                returnJsoObject.put("resultDesc", "type类型错误，应为1或2");
+                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                returnJsonObject.put("resultDesc", "type类型错误，应为1或2");
                 break;
         }
 
-        return returnJsoObject.toString();
+        return returnJsonObject.toString();
     }
 
     /**
@@ -3164,31 +3136,15 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "请求参数异常");
             return returnJsonObject.toString();
         }
-
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "gardenId", "classId", "pageNum");
+        if (!checkReqJson.equals("")) {
+            return checkReqJson;
+        }
         long gardenId, classId;
         int pageNum;
-        if (jsonObject.containsKey("gardenId")) {
-            gardenId = jsonObject.getLong("gardenId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数gardenId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("classId")) {
-            classId = jsonObject.getLong("classId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数classId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("pageNum")) {
-            pageNum = jsonObject.getInt("pageNum");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数pageNum");
-            return returnJsonObject.toString();
-        }
-
+        gardenId = jsonObject.getLong("gardenId");
+        classId = jsonObject.getLong("classId");
+        pageNum = jsonObject.getInt("pageNum");
         List<Camera> privateCameraList = cameradao.queryPrivateCamerasList(classId);
         List<Camera> publicCameraList = cameradao.queryPublicCamerasList(gardenId);
         if (privateCameraList == null && publicCameraList == null) {
@@ -3259,47 +3215,22 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "请求参数异常");
             return returnJsonObject.toString();
         }
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "roleType", "roleId", "cameraId", "classId",
+                "isPublic");
+        if (!checkReqJson.equals("")) {
+            return checkReqJson;
+        }
         int roleType;
         long roleId;
         long cameraId;
         long classId;
         boolean isPublic;
 
-        if (jsonObject.containsKey("roleType")) {
-            roleType = jsonObject.getInt("roleType");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数roleType");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("roleId")) {
-            roleId = jsonObject.getLong("roleId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数roleId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("cameraId")) {
-            cameraId = jsonObject.getLong("cameraId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数cameraId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("classId")) {
-            classId = jsonObject.getLong("classId");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数classId");
-            return returnJsonObject.toString();
-        }
-        if (jsonObject.containsKey("isPublic")) {
-            isPublic = jsonObject.getBoolean("isPublic");
-        } else {
-            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-            returnJsonObject.put("resultDesc", "找不到参数isPublic");
-            return returnJsonObject.toString();
-        }
+        roleType = jsonObject.getInt("roleType");
+        roleId = jsonObject.getLong("roleId");
+        cameraId = jsonObject.getLong("cameraId");
+        classId = jsonObject.getLong("classId");
+        isPublic = jsonObject.getBoolean("isPublic");
 
         Camera camera = cameradao.queryCamera(cameraId);
         if (camera == null) {
@@ -3399,11 +3330,12 @@ public class PublicService {
             System.out.println("创建图片目录:" + dir.getPath());
         }
         //存储原图
-        if (!hasThumb) {
+        if (hasThumb) {
             imgPath = dir.getPath() + "/origin/" + fileName;
         } else {
             imgPath = dir.getPath() + "/" + fileName;
         }
+        System.out.println("圖片url:" + imgPath);
         storeImg(imgPath, ins);
         if (hasThumb) {
             //存储缩略图
@@ -3414,18 +3346,22 @@ public class PublicService {
         }
     }
 
-    private String handlerFileDownload(String fileDirPath, boolean isThumb, boolean isVideo, String fileName) throws IOException {
+    private String handlerFileDownload(String fileDirPath, boolean isThumb, boolean isVideo, String fileName) throws
+            IOException {
         String fileUrl = null;
         if (isVideo) {
             fileUrl = baseDir + fileDirPath + "/" + fileName;
         } else {
             if (isThumb) {
-                fileUrl = baseDir + fileDirPath + "/thumb/" + fileName;
+                fileUrl = baseDir + fileDirPath + "/thumb/" + fileName.substring(0, fileName.lastIndexOf(".jpg")) +
+                        "_thumb.jpg";
+                ;
             } else {
                 fileUrl = baseDir + fileDirPath + "/origin/" + fileName;
             }
         }
-        byte[] fileBytes = FileUtils.fileToByteArrayByNIOWay(fileUrl);
+//        byte[] fileBytes = FileUtils.fileToByteArrayByNIOWay(fileUrl);
+        byte[] fileBytes = FileUtils.fileToByteArrayByTraditionalWay(fileUrl);
         String fileBase64String = new String(Base64.encodeBase64(fileBytes));
         return fileBase64String;
     }

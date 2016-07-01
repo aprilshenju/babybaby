@@ -36,11 +36,23 @@ public enum InterfaceTypeEnum{
      */
     addOrEditFootPrint,
     /**
-     * 上传/编辑宝贝饮食接口
+     * 更新宝贝饮食接口
      */
     addOrEditBabyFood,
     /**
      * 上传头像接口
      */
-    uploadAvatar;
+    uploadAvatar,
+    /**
+     * 上传教师风采图片
+     */
+    addTeacherPresence,
+    /**
+     * 上传幼儿园设施图片
+     */
+    addFacilities,
+    /**
+     * 上传幼儿园全景图片
+     */
+    addGardenPresence;
 }

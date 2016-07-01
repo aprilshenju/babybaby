@@ -2,9 +2,9 @@ package com.umeijia.service;
 
 import com.umeijia.wechat.TextMessage;
 import com.umeijia.wechat.WechatUtil;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.dom4j.DocumentException;
 import org.springframework.stereotype.Service;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +17,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
+
+//import org.springframework.util.DigestUtils;
 
 /**
  * Created by hadoop on 2016/6/29.
