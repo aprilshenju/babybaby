@@ -54,5 +54,10 @@ public enum InterfaceTypeEnum{
     /**
      * 上传幼儿园全景图片
      */
-    addGardenPresence;
+    addGardenPresence,
+    /**
+     * 上传班级相册
+     */
+    addClassAlum;
+
 }

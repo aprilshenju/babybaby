@@ -16,6 +16,15 @@ public class Parents {
 	private String pwd_md;
 	private String name;
 	private String relationship;
+	private String wechat_open_id;
+
+	public String getWechat_open_id() {
+		return wechat_open_id;
+	}
+
+	public void setWechat_open_id(String wechat_open_id) {
+		this.wechat_open_id = wechat_open_id;
+	}
 
 	public void setGarten_id(long garten_id) {
 		this.garten_id = garten_id;

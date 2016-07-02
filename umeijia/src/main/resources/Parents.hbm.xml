@@ -46,7 +46,7 @@
 
 		<property name="expire" column="expire"></property>
 		<property name="token" column="token"></property>
-                    
+         <property name="wechat_open_id" column="wechat_open_id" unique="true"></property>
 	</class>
 	
 	

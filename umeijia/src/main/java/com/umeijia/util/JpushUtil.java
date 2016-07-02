@@ -20,7 +20,8 @@ public class JpushUtil {
     private static  final String masterSecret = "7e6ddf7086fff8c4f4142031";
     private static  final int MAX_RETRY_TIMES = 3;
     private static JPushClient jPushClient = new JPushClient(masterSecret,appKey,MAX_RETRY_TIMES);
-
+    String user="youmeijia";
+    String pwd="ymj123456";
     public static void notificationToTargetClient(String alias,Notification notification){
         // For push, all you need do is to build PushPayload object.
         PushPayload payload = buildPushObject_all_alias_alert(alias,notification);

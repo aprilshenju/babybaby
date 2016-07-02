@@ -1,10 +1,15 @@
 package com.umeijia.service;
 
 import com.sun.jersey.api.view.Viewable;
+import com.umeijia.dao.ParentsDao;
+import com.umeijia.util.MD5;
+import com.umeijia.vo.Parents;
 import com.umeijia.wechat.TextMessage;
 import com.umeijia.wechat.WechatUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.dom4j.DocumentException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +33,10 @@ import java.util.Map;
 @Service
 @Path("/wechat_service")
 public class WechatService {
+    @Autowired
+    @Qualifier("parentsdao")
+    private ParentsDao parentsdao;
+
     private final String serverIp = "http://xiaoxiaomi.imwork.net/umeijiaServer/";
     private final String bindUrl = serverIp + "rest/wechat_service/login";
 
@@ -157,17 +166,34 @@ public class WechatService {
             ("openId") String openId, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         System.out.println("收到绑定的post请求");
         if (request != null) {
+            try {
+                request.setCharacterEncoding("UTF-8");
+                response.setCharacterEncoding("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             System.out.println("account = " + account);
             System.out.println("passwd = " + passwd);
             System.out.println("openId = " + openId);
+            String passwd_md5= MD5.GetSaltMD5Code(passwd);
+            Parents parents = null;
+            if(account!=null){
+                if(WechatUtil.isPhone(account)){
+                    parents = parentsdao.loginCheckByPhone(account,passwd_md5);
+                }else if(WechatUtil.isEmail(account)){
+                    parents=parentsdao.loginCheckByEmail(account,passwd_md5);
+                }
+                if(parents!=null){
+                    if(openId!=null){
+                        parents.setWechat_open_id(openId);
+                        if(parentsdao.updateParents(parents)){
+                            return new Viewable("/succeed.jsp");
+                        }
+                    }
+                }
+            }
         }
-        try {
-            request.setCharacterEncoding("UTF-8");
-            response.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return new Viewable("/succeed.jsp");
+        return new Viewable("/error.jsp");
     }
 
 //    /**
