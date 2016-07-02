@@ -236,7 +236,6 @@ public class SMSMessageService {
             String verifyCode = job.getString("verifyCode");
             String newPassWord = job.getString("newPassword");
             int roleType = job.getInt("roleType");
-            int roleId = job.getInt("roleId");
             SMSMessage sMSMessage = smsmessagedao.querySMSMessageByPhone(phoneNum);
             if (sMSMessage == null) {
                 job_out.put("resultCode", GlobalStatus.error.toString());
@@ -260,22 +259,22 @@ public class SMSMessageService {
                     switch (roleType) {
                         case 1:
                         case 2:
-                            Teacher teacher = teacherdao.queryTeacher(roleId);
+                            Teacher teacher = teacherdao.queryTeacher(phoneNum);
                             teacher.setPwd_md(MD5.GetSaltMD5Code(newPassWord));
                             teacherdao.updateTeacher(teacher);
                             break;
                         case 3:
-                            Parents parents = parentsdao.queryParents(roleId);
+                            Parents parents = parentsdao.queryParents(phoneNum);
                             parents.setPwd_md(MD5.GetSaltMD5Code(newPassWord));
                             parentsdao.updateParents(parents);
                             break;
                         case 4:
-                            Agent agent = agentdao.queryAgent(roleId);
+                            Agent agent = agentdao.queryAgent(phoneNum);
                             agent.setPwd_md(MD5.GetSaltMD5Code(newPassWord));
                             agentdao.updateAgent(agent);
                             break;
                         case 5:
-                            Administrator administrator = administratordao.queryAdministrator(roleId);
+                            Administrator administrator = administratordao.queryAdministrator(phoneNum);
                             administrator.setPwd_md(MD5.GetSaltMD5Code(newPassWord));
                             administratordao.updateAdministrator(administrator);
                             break;
@@ -300,7 +299,7 @@ public class SMSMessageService {
      *
      * @return
      */
-    public String GenerateRandomNumber() {
+    public static String GenerateRandomNumber() {
         String result = "";
         for (int i = 0; i < 6; i++) {
             Random rd = new Random();

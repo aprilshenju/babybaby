@@ -41,6 +41,8 @@ public class BabyFootPrintDao {
         }
     }
 
+
+
    /**
      * 后续改为分页处理
      * **/
@@ -98,6 +100,29 @@ public class BabyFootPrintDao {
         session.close();
         if(list.size()>0){
             return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    /**
+     * 限制家长一天只能发布一条足迹用
+     * @param parentId
+     * @param year
+     * @param month
+     * @param day
+     * @return
+     */
+    public BabyFootPrint queryBabyFootprintsByParentAndDay(long parentId,int year,int month,int day) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from BabyFootPrint as ba where ba.parent_id=%d and year(ba.date)=%d and month(ba.date)=%d and day(ba.date)=%d and ba.valid=1 order by ba.date desc",parentId,year,month,day);
+        Query query = session.createQuery(sql);
+        List <BabyFootPrint> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list.get(0);
         }else {
             return null;
         }
