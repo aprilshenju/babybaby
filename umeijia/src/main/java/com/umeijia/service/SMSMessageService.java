@@ -41,6 +41,9 @@ public class SMSMessageService {
     private static String URI_SEND_SMS = "https://sms.yunpian.com/v2/sms/single_send.json";
     private static String URI_TPL_SEND_SMS = "https://sms.yunpian.com/v2/sms/tpl_single_send.json";
     private static String ENCODING = "UTF-8";
+    public static List<Map<String,Object>> cmds;
+    public static boolean sendSmsThreadStartFlag = false;
+    public static boolean sendSmsThreadStopFlag = false;
     @Autowired
     @Qualifier("smsmessagedao")
     private SMSMessageDao smsmessagedao;
@@ -63,6 +66,15 @@ public class SMSMessageService {
     @Produces(MediaType.TEXT_PLAIN)
     public String test2() {
         return "welcom to UMJ smsMessage service....";
+    }
+
+
+    public  SMSMessageService(){
+        cmds = new ArrayList<Map<String,Object>>();
+        if(sendSmsThreadStartFlag==false){
+            sendSmsThread.start();
+        }
+
     }
 
 
@@ -92,7 +104,12 @@ public class SMSMessageService {
                 sMSMessage.setUnUsedOne("");
                 sMSMessage.setUnUsedTwo("");
                 sMSMessage.setValidTimeDeadLine(new Date(new Date().getTime() + 1200000)); //2分钟有效期
-                callThirdPartySmsInterface(phoneNum, verifyCode);  //调用三方给用户发送短信
+                //调用三方给用户发送短信
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum", phoneNum);
+                map.put("verifyCode", verifyCode);
+                map.put("type", 1);
+                cmds.add(map);
                 smsmessagedao.addSMSMessage(sMSMessage);
             } else { //有记录直接更新
                 if (new Date().getTime() < (sMSMessage.getLastRequestTime().getTime() + 5000)) { //防止不断请求,5秒内不能重复请求
@@ -107,7 +124,13 @@ public class SMSMessageService {
                 sMSMessage.setUnUsedOne("");
                 sMSMessage.setUnUsedTwo("");
                 sMSMessage.setValidTimeDeadLine(new Date(new Date().getTime() + 1200000)); //2分钟有效期
-                callThirdPartySmsInterface(phoneNum, verifyCode);//调用三方给用户发送短信
+
+                //调用三方给用户发送短信
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phoneNum);
+                map.put("verifyCode",verifyCode);
+                map.put("type",1);
+                cmds.add(map);
                 smsmessagedao.updateAgent(sMSMessage);
             }
             job_out.put("resultCode", GlobalStatus.succeed.toString());
@@ -127,12 +150,17 @@ public class SMSMessageService {
      * *
      */
 
-    public int callThirdPartySmsInterface(String phoneNum, String verifyCode) {
+    public int callThirdPartySmsInterface(String phoneNum, String verifyCode,int type) {
         try {
 
             String apikey = "cd7101046f359ea766471e1851646067";
             String mobile = phoneNum;
-            String text = "【幼美加】您的验证码是 " + verifyCode;
+            String text = "";
+            if(type==1){
+                text = "【幼美加】您的验证码是 " + verifyCode;
+            }else if (type==2){
+                text = "【幼美加】您的初始密码是 " + verifyCode;
+            }
             System.out.println(sendSms(apikey, text, mobile));
 //            System.out.println(tpl_value);
 //            System.out.println(tplSendSms(apikey, tpl_id, tpl_value, mobile));
@@ -292,6 +320,28 @@ public class SMSMessageService {
         }
         return job_out.toString();
     }
+
+
+    Thread sendSmsThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            while(!sendSmsThreadStopFlag){
+                if(cmds!=null&&cmds.size()>1){
+                    Map<String,Object> map = cmds.get(0);
+                    String phoneNum = map.get("phoneNum").toString();
+                    String verifyCode = map.get("verifyCode").toString();
+                    int type = (Integer)map.get("type");
+                    callThirdPartySmsInterface(phoneNum,verifyCode,type);
+                }
+                try {
+                    Thread.sleep(5000);  //每xx秒轮训一次
+                    cmds.remove(0);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
 
 
     /**

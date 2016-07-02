@@ -20,7 +20,7 @@ public class FileUtils {
     public static byte[] fileToByteArrayByTraditionalWay(String filename) throws IOException {
         File f = new File(filename);
         if (!f.exists()) {
-            throw new FileNotFoundException(filename);
+            throw new FileNotFoundException("找不到该图片");
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream((int) f.length());
         BufferedInputStream in = null;
@@ -33,15 +33,8 @@ public class FileUtils {
                 bos.write(buffer, 0, len);
             }
             return bos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
         } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            in.close();
             bos.close();
         }
     }
