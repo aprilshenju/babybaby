@@ -444,8 +444,11 @@ public class RunService {
                 String email=job.getString("email");
                 String company=job.getString("company");
                 float price = (float) job.getDouble("price");
+                String avatar=job.getString("avatar");
+
                 Date date = new Date();
-                Agent agent=new Agent(phone,email,pwd,name,date,company,price);
+                Agent agent=new Agent(email,new Date(),name,pwd,phone,avatar,null,company,price);
+
                 if(agentdao.addAgent(agent)){
                     job_out.put("resultCode",GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功添加代理商");
