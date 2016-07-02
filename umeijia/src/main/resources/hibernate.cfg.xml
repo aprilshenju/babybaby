@@ -64,6 +64,7 @@
 		<mapping resource="FeedBack.hmb.xml"/>
 		<mapping resource="BasicInfo.hbm.xml"/>
         <mapping resource="SMSMessage.hbm.xml"/>
+        <mapping resource="SystemNotification.hbm.xml"/>
 
 	</session-factory>
 </hibernate-configuration>

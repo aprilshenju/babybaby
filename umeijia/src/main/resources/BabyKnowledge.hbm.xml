@@ -15,8 +15,9 @@
 		<id name="id" column="id">
 			<generator class="native"></generator>
 		</id>
-		<property name="question" column="question"></property>	
-		<property name="answer" column="answer" length="1500"></property>
+		<property name="question" column="question"></property>
+        <property name="valid" column="valid"></property>
+        <property name="answer" column="answer" length="1500"></property>
 		<property name="url" column="url" ></property>		        
 	</class>
 	

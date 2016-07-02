@@ -1,7 +1,9 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
-import com.umeijia.vo.BabyKnowledge;
+import com.umeijia.util.MD5;
+import com.umeijia.vo.Administrator;
+import com.umeijia.vo.SystemNotification;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -9,43 +11,40 @@ import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by shenju on 2016/6/14.
- * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效。
- * 应当是直接修改字段，用update操作
- *
- *
  */
 @Scope("prototype")
-@Repository("babyknowledgedao")
-public class BabyKnowledgeDao {
-    public BabyKnowledgeDao(){
+@Repository("systemnotificationdao")
+public class SystemNotificationDao {
+    public SystemNotificationDao(){
 
     }
-
-    public BabyKnowledge queryBabyKnowledge(long id) {
+    public SystemNotification querySystemNotification(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyKnowledge as knowledge where knowledge.id=%d and valid=1",id);
+        String sql = String.format("from SystemNotification as u where u.id=%d and valid=1", id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
         if(list.size()>0){
-            BabyKnowledge knowledge = (BabyKnowledge) list.get(0);
-            return knowledge;
+            SystemNotification admin = (SystemNotification) list.get(0);
+            return admin;
         }else {
             return null;
         }
     }
 
-    public List getBabyKnowledgeList() {
+
+    public List<SystemNotification> querySystemNotifications() {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyKnowledge where valid=1");
+        String sql = String.format("from SystemNotification where valid=1");
         Query query = session.createQuery(sql);
-        List <BabyKnowledge> list = query.list();
+        List list = query.list();
         session.close();
         if(list.size()>0){
             return list;
@@ -53,14 +52,14 @@ public class BabyKnowledgeDao {
             return null;
         }
     }
-    
-    public boolean addBabyKnowledge(BabyKnowledge knowledge) {
+
+    public boolean addSystemNotification(SystemNotification systemNotification) {
         boolean result=false;
         Session session = DBManager.getSession();
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            session.save(knowledge);
+            session.save(systemNotification);
             session.flush();
             session.getTransaction().commit();
             result=true;
@@ -74,33 +73,13 @@ public class BabyKnowledgeDao {
         }
     }
 
-    public boolean updateBabyKnowledge(BabyKnowledge knowledge) {
+    public boolean invalidSystemNotification(long g_id) {
         boolean result=false;
         Session session = DBManager.getSession();
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            session.update(knowledge);
-            session.flush();
-            session.getTransaction().commit();
-            result=true;
-        } catch (HibernateException e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-            result=false;
-        } finally{
-            session.close();
-            return result;
-        }
-    }
-
-    public boolean invaliBabyKnowledge(long g_id) {
-        boolean result=false;
-        Session session = DBManager.getSession();
-        try {
-            session.setFlushMode(FlushMode.AUTO);
-            session.beginTransaction();
-            String hql=String.format("update BabyKnowledge bs set bs.valid=0 where bs.id=%d",g_id);
+            String hql=String.format("update SystemNotification bs set bs.valid=0 where bs.id=%d",g_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -118,27 +97,25 @@ public class BabyKnowledgeDao {
     }
 
 
-    public boolean deleteBabyKnowledge(long id) {
+    public boolean updateSystemNotification(SystemNotification systemNotification) {
         boolean result=false;
-        BabyKnowledge bk = queryBabyKnowledge(id);
-        if(bk!=null){
-            Session session = DBManager.getSession();
-            try {
-                session.setFlushMode(FlushMode.AUTO);
-                session.beginTransaction();
-                session.delete(bk);
-                session.flush();
-                session.getTransaction().commit();
-                result=true;
-            } catch (HibernateException e) {
-                e.printStackTrace();
-                session.getTransaction().rollback();
-                result=false;
-            } finally{
-                session.close();
-                return result;
-            }
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            session.update(systemNotification);
+            session.flush();
+            session.getTransaction().commit();
+            result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
         }
-        return false;
     }
+
+
 }
