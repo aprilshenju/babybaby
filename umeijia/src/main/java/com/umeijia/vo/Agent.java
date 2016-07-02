@@ -102,7 +102,19 @@ public class Agent {
 	private Date expire; // 过期时间
 	private String token; //登陆token
 
+	private  boolean valid;
+
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
 	public  Agent(){
+
 
 	}
 
@@ -120,5 +132,6 @@ public class Agent {
 		this.gartens = gartens;
 		this.company_name = company_name;
 		this.price_rate = price_rate;
+		valid=true; //新创建的账号默认有效
 	}
 }

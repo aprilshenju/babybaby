@@ -18,11 +18,20 @@ public class Student {
 	private  boolean vip; //登陆就得反查
 	private  Date vip_start;
 	private Date vip_end; //会员开始结束时间
-
+	private  boolean valid;
 	public Student(){
 
 	}
-	public  Student(String name,String nick,String gender,Date birthday,int height,int weight,String avatar,Class cla,boolean isvip,Date start,Date end,Date enter_date){
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	public  Student(String name, String nick, String gender, Date birthday, int height, int weight, String avatar, Class cla, boolean isvip, Date start, Date end, Date enter_date){
 		vip=isvip;
 		this.vip_start=start;
 		this.vip_end=end;
@@ -32,9 +41,11 @@ public class Student {
 		this.birthday= birthday;
 		this.height=height;
 		this.weight=weight;
+
 		this.avatar_path=avatar;
 		this.cla=cla;
 		this.entrance_date=enter_date;
+		valid=true; //新创建的账号默认有效
 	}
 
 

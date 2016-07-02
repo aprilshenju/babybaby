@@ -29,6 +29,7 @@
 		<property name="token" column="token"></property>
 		<property name="avarta" column="avarta"></property>
 
+		<property name="valid" column="valid"></property>
 
          <set name="gartens" cascade="all" inverse="true" lazy="false">
                 <key column="agent_id"></key>   

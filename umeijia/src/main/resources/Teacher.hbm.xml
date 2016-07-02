@@ -36,7 +36,7 @@
 
 		<property name="expire" column="expire"></property>
 		<property name="token" column="token"></property>
-
+		<property name="valid" column="valid"></property>
 		
             <set name="classes" cascade="all"  lazy="false"  inverse="true" table="t_teacher_class">     <!-- class主控？？？ -->
                 <key column="teacher_id"></key>

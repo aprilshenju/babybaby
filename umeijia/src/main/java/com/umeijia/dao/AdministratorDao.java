@@ -25,7 +25,7 @@ public class AdministratorDao {
     public Administrator queryAdministrator(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Administrator as u where u.id=%d", id);
+        String sql = String.format("from Administrator as u where u.id=%d and u.valid=1", id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -40,7 +40,7 @@ public class AdministratorDao {
     public Administrator queryAdministrator(String phoneNumber) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Administrator as u where u.phone_num=\'%s\'", phoneNumber);
+        String sql = String.format("from Administrator as u where u.phone_num=\'%s\' and u.valid=1", phoneNumber);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -55,7 +55,7 @@ public class AdministratorDao {
     public Administrator queryAdministratorByEmail(String email) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Administrator as u where u.email=\'%s\'", email);
+        String sql = String.format("from Administrator as u where u.email=\'%s\' and u.valid=1", email);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -71,7 +71,7 @@ public class AdministratorDao {
     public boolean verifyToken(long id,String tkn){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("select u.expire from Administrator as u where u.id=%d and u.token=\'%s\'",id,tkn);
+        String sql = String.format("select u.expire from Administrator as u where u.id=%d and u.token=\'%s\' and u.valid=1",id,tkn);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -90,7 +90,7 @@ public class AdministratorDao {
     public Administrator loginCheckByPhone(String phoneNumber, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Administrator as u where u.phone_num=\'%s\'", phoneNumber);
+        String sql = String.format("from Administrator as u where u.phone_num=\'%s\' and u.valid=1", phoneNumber);
         Query query = session.createQuery(sql);
         List list = query.list();
         if(list.size()>0) {
@@ -101,7 +101,7 @@ public class AdministratorDao {
                     session.beginTransaction();
                     administrator.setToken(MD5.GetSaltMD5Code(administrator.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
                     Date now=new Date();
-                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     administrator.setExpire(dead);
                     session.update(administrator);
                     session.flush();
@@ -125,7 +125,7 @@ public class AdministratorDao {
     public Administrator loginCheckByEmail(String email, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Administrator as u where u.email=\'%s\'", email);
+        String sql = String.format("from Administrator as u where u.email=\'%s\' and u.valid=1", email);
         Query query = session.createQuery(sql);
         List list = query.list();
         if(list.size()>0) {
@@ -136,7 +136,7 @@ public class AdministratorDao {
                     session.beginTransaction();
                     administrator.setToken(MD5.GetSaltMD5Code(administrator.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
                     Date now=new Date();
-                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     administrator.setExpire(dead);
                     session.update(administrator);
                     session.flush();
@@ -180,7 +180,7 @@ public class AdministratorDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Administrator admin set admin.pwd_md=\'%s\' where admin.phone_num=\'%s\'",passwd,phoneNumber);
+            String hql=String.format("update Administrator admin set admin.pwd_md=\'%s\' where admin.phone_num=\'%s\' and admin.valud=1",passwd,phoneNumber);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -196,6 +196,33 @@ public class AdministratorDao {
             return result;
         }
     }
+
+    /**
+     * 将该角色设为无效
+     * **/
+    public boolean invalidAdministrator(long id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update Administrator u set u.valid=%d where u.id=%d",0,id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
 
     public boolean updateAdministrator(Administrator admin) {
         boolean result=false;

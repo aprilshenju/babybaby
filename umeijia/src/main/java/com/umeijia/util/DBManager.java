@@ -9,6 +9,8 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 public class DBManager {
 /*	@Autowired
 	@Qualifier("sessionFactory")*/
+	public  static  long EXPIRE_SECONDS=720000000; // 200小时，后续改动
+
 	private static SessionFactory factory;
 	static{
 		//读取配置文件hibernate.cfg.xml

@@ -38,6 +38,7 @@ private long id;
 		<property name="vip" column="vip"></property>
 		<property name="vip_start" column="vip_start"></property>
 		<property name="vip_end" column="vip_end"></property>
+		<property name="valid" column="valid"></property>
 
 <!-- 		<property name="class_id" column="class_id"></property>  -->  
          
