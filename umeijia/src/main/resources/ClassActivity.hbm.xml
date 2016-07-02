@@ -25,6 +25,7 @@
 		</id>
 		<property name="title" column="title"></property>	
 		<property name="content" column="content"></property>
+        <property name="valid" column="valid"></property>
 		<property name="image_urls" column="image_urls"></property>
 		<property name="start_date" column="start_date" ></property>
 		<property name="end_date" column="end_date"></property>	

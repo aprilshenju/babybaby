@@ -22,6 +22,7 @@
 		<property name="records" column="records" length="1000"></property>
 		<!--<many-to-one name="cla" class="com.umeijia.vo.Class" column="class_id" cascade="delete"></many-to-one>-->
 		<property name="school_id" column="school_id" ></property>
+        <property name="valid" column="valid" ></property>
         <property name="class_id" column="class_id" ></property>
         <property name="image_urls" column="image_urls"></property>
         <property name="date" column="date"></property>

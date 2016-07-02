@@ -29,7 +29,7 @@ public class ClassActivityDao {
     public ClassActivity queryClassActivity(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassActivity as ca where ca.id=%d",id);
+        String sql = String.format("from ClassActivity as ca where ca.id=%d and valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -50,7 +50,7 @@ public class ClassActivityDao {
         }
         Integer pageNumber = pager.getPageNumber();
         Integer pageSize = pager.getPageSize();
-        String hql=String.format("from ClassActivity bs where bs.class_id=%d",class_id);
+        String hql=String.format("from ClassActivity bs where bs.class_id=%d and valid=1",class_id);
         String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
         Session session=DBManager.getSession();
         Query query=session.createQuery(countHql);
@@ -71,7 +71,7 @@ public class ClassActivityDao {
     public List queryOneClassActivitysList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassActivity as ca where ca.class_id=%d order by ca.start_date desc",class_id);
+        String sql = String.format("from ClassActivity as ca where ca.class_id=%d and valid=1 order by ca.start_date desc",class_id);
         Query query = session.createQuery(sql);
         List <ClassActivity> list = query.list();
         session.close();
@@ -121,6 +121,30 @@ public class ClassActivityDao {
             return result;
         }
     }
+
+    public boolean invalidClassActivity(long g_id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update ClassActivity bs set bs.valid=0 where bs.id=%d",g_id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
 
 
     public boolean deleteClassActivity(long id) {

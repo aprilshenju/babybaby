@@ -62,6 +62,16 @@ public class FoodRecord {
     private long class_id;
 	private String image_urls;
 
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    private boolean valid;
+
 
 
 //	public void setCla(Class cla) {

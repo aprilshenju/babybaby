@@ -19,6 +19,16 @@ public class Camera {
 	private Date create_date; //摄像头创�日期
 	private Date modified_date; //修改日期
 
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    private boolean valid;
+
 	public  Camera(){
 
 	}

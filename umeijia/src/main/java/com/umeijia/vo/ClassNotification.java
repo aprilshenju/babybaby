@@ -73,6 +73,16 @@ public class ClassNotification {
 	private long teacher_id;
 	private long class_id;
 
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    private boolean valid;
+
 	private String subscribers; // 分号分割,已查看通知的宝贝集合
 	
 	

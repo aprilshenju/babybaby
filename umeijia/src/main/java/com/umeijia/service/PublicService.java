@@ -117,6 +117,10 @@ public class PublicService {
     @Autowired
     @Qualifier("teacherdao")
     private TeacherDao teacherdao;
+    @Autowired
+    @Qualifier("systemnotificationdao")
+    private SystemNotificationDao systemnotificationdao;
+
 
     @Path("/hello")
     @GET
@@ -2836,6 +2840,628 @@ public class PublicService {
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 更新校园介绍
+     *
+     * @param schoolIntroductionInfo
+     * @param headers
+     * @return
+     */
+    @Path("/updateSchoolIntroduction")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String updateSchoolIntroduction(@RequestBody String schoolIntroductionInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(schoolIntroductionInfo,"roleType","roleId","schoolId","description","schoolImages","instrumentImages","teacherImages");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(schoolIntroductionInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int schoolId = jobIn.getInt("schoolId");
+            String description = jobIn.getString("description");
+            String schoolImages = jobIn.getString("schoolImages");
+            String instrumentImages = jobIn.getString("instrumentImages");
+            String teacherImages = jobIn.getString("teacherImages");
+            if(roleType!=2&&roleType!=4){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "没有权限");
+                return jobOut.toString();
+            }
+            Kindergarten kg = kindergartendao.queryKindergarten(schoolId);
+            if(kg==null){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "没有找到该学校");
+                return jobOut.toString();
+            }else{
+                kg.setGarten_presence_imgs(schoolImages);
+                kg.setGarten_instrument_imgs(instrumentImages);
+                kg.setDescription(description);
+                kg.setTeacher_presence_imgs(teacherImages);
+                if(kindergartendao.updateKindergarten(kg)){
+                    jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                    jobOut.put("resultDesc", "操作成功");
+                }else{
+                    jobOut.put("resultCode", GlobalStatus.error.toString());
+                    jobOut.put("resultDesc", "操作失败");
+                }
+            }
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+    /**
+     * 查询校园介绍
+     *
+     * @param schoolIntroductionInfo
+     * @param headers
+     * @return
+     */
+    @Path("/querySchoolIntroduction")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String querySchoolIntroduction(@RequestBody String schoolIntroductionInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(schoolIntroductionInfo,"roleType","roleId","schoolId");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(schoolIntroductionInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int schoolId = jobIn.getInt("schoolId");
+            Kindergarten kg = kindergartendao.queryKindergarten(schoolId);
+            if(kg==null){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "无记录");
+                return jobOut.toString();
+            }
+            JSONObject jo = new JSONObject();
+            jo.put("name",kg.getName());
+            jo.put("description",kg.getDescription());
+            jo.put("leaderWishes",kg.getLeader_wishes());
+            jo.put("schoolImages",kg.getGarten_presence_imgs());
+            jo.put("teacherImages",kg.getTeacher_presence_imgs());
+            jo.put("instrumentImages",kg.getGarten_instrument_imgs());
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 更新校园介绍
+     *
+     * @param systemNotificationInfo
+     * @param headers
+     * @return
+     */
+    @Path("/addOrUpdateSystemNotification")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addOrUpdateSystemNotification(@RequestBody String systemNotificationInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(systemNotificationInfo,"roleType","roleId","type","id","title","content");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(systemNotificationInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int type = jobIn.getInt("type");
+            int id = jobIn.getInt("id");
+            String title = jobIn.getString("title");
+            String content = jobIn.getString("content");
+            if(roleType!=5){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "没有权限");
+                return jobOut.toString();
+            }
+            SystemNotification sn = new SystemNotification();
+            sn.setDate(new Date());
+            sn.setContent(content);
+            sn.setTitle(title);
+            if(systemnotificationdao.addSystemNotification(sn)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "添加成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "添加失败");
+            }
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+    /**
+     * 查询系统公告
+     *
+     * @param systemNotificationInfo
+     * @param headers
+     * @return
+     */
+    @Path("/querySystemNotification")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String querySystemNotification(@RequestBody String systemNotificationInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(systemNotificationInfo,"roleType","roleId");
+            if(!checkInput.equals("")){
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(systemNotificationInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            List<SystemNotification> systemNotifications = systemnotificationdao.querySystemNotifications();
+            if(systemNotifications==null){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "无记录");
+            }
+            JSONArray ja = new JSONArray();
+            for(SystemNotification item : systemNotifications){
+                JSONObject jo = new JSONObject();
+                jo.put("id",item.getId());
+                jo.put("title",item.getTitle());
+                jo.put("content",item.getContent());
+                jo.put("date",item.getDate().toString().contains(".")?item.getDate().toString().split("\\.")[0]:item.getDate().toString());
+                ja.add(jo);
+            }
+            jobOut.put("data",ja.toString());
+            jobOut.put("resultCode", GlobalStatus.succeed.toString());
+            jobOut.put("resultDesc", "操作成功");
+        } catch (Exception e) {
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 删除宝贝动态
+     *
+     * @param schoolnewsInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteShoolNews")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteShoolNews(@RequestBody String schoolnewsInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(schoolnewsInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(schoolnewsInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(gartennewsdao.invalidGartenNews(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 删除饮食记录
+     *
+     * @param foodRecordInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteFoodRecord")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteFoodRecord(@RequestBody String foodRecordInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(foodRecordInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(foodRecordInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(foodrecorddao.invalidFoodRecord(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 删除班级通知
+     *
+     * @param classNotificationInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteClassNotification")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteClassNotification(@RequestBody String classNotificationInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(classNotificationInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(classNotificationInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(classnotificationdao.invalidClassNotification(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 删除班级作业
+     *
+     * @param homeWorkInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteHomeWork")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteHomeWork(@RequestBody String homeWorkInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(homeWorkInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(homeWorkInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(homeworkdao.invalidHomeWork(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 删除班级活动
+     *
+     * @param classActivityInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteClassActivity")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteClassActivity(@RequestBody String classActivityInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(classActivityInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(classActivityInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(classnotificationdao.invalidClassNotification(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+    /**
+     * 删除摄像头
+     *
+     * @param cameraInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteCamera")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteCamera(@RequestBody String cameraInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(cameraInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(cameraInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(cameradao.invalidCamera(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 删除摄像头
+     *
+     * @param babyKnowledgeInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteBabyKnowledge")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteBabyKnowledge(@RequestBody String babyKnowledgeInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(babyKnowledgeInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(babyKnowledgeInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(babyknowledgedao.invaliBabyKnowledge(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 删除系统公告
+     *
+     * @param systemNotificationInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteSystemNotification")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteSystemNotification(@RequestBody String systemNotificationInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(systemNotificationInfo, "roleType", "roleId", "id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(systemNotificationInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("id");
+            if(systemnotificationdao.invalidSystemNotification(id)){
+                jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                jobOut.put("resultDesc", "删除成功");
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "删除失败");
+            }
+        } catch (Exception e) {
+
+            jobOut.put("resultCode", GlobalStatus.error.toString());
+            e.printStackTrace();
+            jobOut.put("resultDesc", "操作失败");
+        }
+        return jobOut.toString();
+    }
+
+
+    /**
+     * 删除课程表
+     *
+     * @param courseSchedualInfo
+     * @param headers
+     * @return
+     */
+
+    @Path("/deleteCourseSchedual")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteCourseSchedual(@RequestBody String courseSchedualInfo, @Context HttpHeaders headers) {
+        JSONObject jobOut = new JSONObject();
+        try {
+            String checkInput = judgeValidationOfInputJson(courseSchedualInfo, "roleType", "roleId", "class_id");
+            if (!checkInput.equals("")) {
+                return checkInput;
+            }
+            JSONObject jobIn = JSONObject.fromObject(courseSchedualInfo);
+            int roleType = jobIn.getInt("roleType");
+            int roleId = jobIn.getInt("roleId");
+            if (!checkIdAndToken(roleType, headers)) {
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "token已过期");
+                return jobOut.toString();
+            }
+            int id = jobIn.getInt("class_id");
+            Class cla = classdao.queryClass(id);
+            if(cla!=null){
+                cla.setCourse_schedule(" ; ; ; ; ");
+                if(classdao.updateClass(cla)){
+                    jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                    jobOut.put("resultDesc", "删除成功");
+                }else{
+                    jobOut.put("resultCode", GlobalStatus.error.toString());
+                    jobOut.put("resultDesc", "删除失败");
+                }
+            }else{
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "未找到class");
+            }
+
+        } catch (Exception e) {
+
             jobOut.put("resultCode", GlobalStatus.error.toString());
             e.printStackTrace();
             jobOut.put("resultDesc", "操作失败");

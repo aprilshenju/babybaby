@@ -25,7 +25,7 @@ public class GartenNewsDao {
     public GartenNews queryGartenNews(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from GartenNews as gnews where gnews.id=%d",id);
+        String sql = String.format("from GartenNews as gnews where gnews.id=%d and gnews.valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -43,7 +43,7 @@ public class GartenNewsDao {
     public List<GartenNews> queryGartenNewss(long school_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d order by gnews.modifyDate desc",school_id);
+        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d and gnews.valid=1 order by gnews.modifyDate desc",school_id);
         Query query = session.createQuery(sql);
         List <GartenNews> list = query.list();
         session.close();
@@ -64,7 +64,7 @@ public class GartenNewsDao {
         }
         Integer pageNumber = pager.getPageNumber();
         Integer pageSize = pager.getPageSize();
-        String hql=String.format("from GartenNews gn where gn.kindergarten.id=%d",school_id);
+        String hql=String.format("from GartenNews gn where gn.kindergarten.id=%d and gnews.valid=1",school_id);
         String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
         Session session=DBManager.getSession();
         Query query=session.createQuery(countHql);
@@ -112,6 +112,29 @@ public class GartenNewsDao {
             session.flush();
             session.getTransaction().commit();
             result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
+    public boolean invalidGartenNews(long g_id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update GartenNews bs set bs.valid=0 where bs.id=%d",g_id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
         } catch (HibernateException e) {
             e.printStackTrace();
             session.getTransaction().rollback();

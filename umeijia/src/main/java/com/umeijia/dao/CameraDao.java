@@ -29,7 +29,7 @@ public class CameraDao {
     public Camera queryCamera(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.id=%d",id);
+        String sql = String.format("from Camera as ca where ca.id=%d and valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -47,7 +47,7 @@ public class CameraDao {
     public List queryPrivateCamerasList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.cla.id=%d and ca.is_public=0",class_id);
+        String sql = String.format("from Camera as ca where ca.cla.id=%d and ca.is_public=0 and valid=1",class_id);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();
@@ -63,7 +63,7 @@ public class CameraDao {
     public List queryPublicCamerasList(long garten_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.is_public=1",garten_id);
+        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.is_public=1 and valid=1",garten_id);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();
@@ -105,6 +105,29 @@ public class CameraDao {
             session.flush();
             session.getTransaction().commit();
             result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
+    public boolean invalidCamera(long g_id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update Camera bs set bs.valid=0 where bs.id=%d",g_id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
         } catch (HibernateException e) {
             e.printStackTrace();
             session.getTransaction().rollback();

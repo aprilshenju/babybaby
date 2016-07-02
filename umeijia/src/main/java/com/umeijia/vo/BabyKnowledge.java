@@ -29,5 +29,15 @@ public class BabyKnowledge {  //育儿知识，静态表
 	}
 	private String question;
 	private String answer;
-	private String url; // 可能会有跳转链接 
+	private String url; // 可能会有跳转链接
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    private boolean valid;
 }
