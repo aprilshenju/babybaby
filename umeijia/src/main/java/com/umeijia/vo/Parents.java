@@ -38,14 +38,24 @@ public class Parents {
 
 	private Date expire; // 过期时间
 	private String token; //登陆token
-
+	private  boolean valid;
     public Parents(){
 
     }
-	public Parents(String phone,String email,String name,Student stu,long cla_id,String pwd,String relation,String avatar){
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	public Parents(String phone, String email, String name, Student stu, long cla_id, String pwd, String relation, String avatar){
 		this.phone_num=phone;
 		this.email=email;
 		this.name=name;
+
 		this.student=stu;
 		this.class_id=cla_id;
 		this.pwd_md=pwd;
@@ -53,7 +63,8 @@ public class Parents {
 		this.avatar_path=avatar;
 		regist_date=new Date();
 		expire=regist_date;
-		token="11";
+		token="1";
+		valid=true;
 	}
 
 	public long getId() {

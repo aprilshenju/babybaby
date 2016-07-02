@@ -19,10 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // ip/umeijia/teacher_service/hello
 
@@ -141,12 +138,15 @@ public class TeacherService {
 
             String phone = job.getString("phone");
             String email = job.getString("email");
-            String pwd = job.getString("password");
+   /*         String pwd = job.getString("password");*/
             String name = job.getString("name");
             long class_id = job.getLong("class_id");
             long stu_id=job.getLong("baby_id");
             String relation = job.getString("relation");
             String avatar = job.getString("avatar");
+
+            String pwd = SMSMessageService.GenerateRandomNumber();
+            String org_pwd=pwd;
             String pwd_md = MD5.GetSaltMD5Code(pwd);
             Student baby = studentdao.queryStudent(stu_id);
             if(baby==null){
@@ -159,7 +159,11 @@ public class TeacherService {
             if(parentsdao.addParents(p)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加家长");
-
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",org_pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
                 // 添加成功，后台异步更新通讯录
                 UpdateParentContractsThread th_update=new UpdateParentContractsThread(class_id);
                 th_update.start();
@@ -263,8 +267,8 @@ public class TeacherService {
             }
             String phone = job.getString("phone");
             String email = job.getString("email");
-            String pwd = job.getString("password");
-            pwd=MD5.GetSaltMD5Code(pwd);
+         /*   String pwd = job.getString("password");
+            pwd=MD5.GetSaltMD5Code(pwd);*/
             String name = job.getString("name");
 /*            long class_id = job.getLong("class_id");*/
             long garten_id=job.getLong("garten_id");
@@ -273,6 +277,10 @@ public class TeacherService {
             String descrip=job.getString("description"); //老师介绍
     //        boolean is_leader = job.getBoolean("leader"); //是否是园长
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
+            String pwd = SMSMessageService.GenerateRandomNumber(); //获取随即密码
+            String org_pwd=pwd;
+            pwd=MD5.GetSaltMD5Code(pwd); //计算盐值
+
             Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-"); //普通老师
             if(teacherdao.addTeacher(ordTeacher)){
             /*    Class cla =classdao.queryClass(class_id);
@@ -288,6 +296,12 @@ public class TeacherService {
                     job_out.put("resultDesc","成功添加老师");
                     return  job_out.toString();
                 }*/
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",org_pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
+
                 UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten_id);
                 thread.start();
                 job_out.put("resultCode",GlobalStatus.error.toString());
@@ -422,13 +436,17 @@ public class TeacherService {
             String avata=job.getString("avatar");
             String descrip = job.getString("description");
             String wishes = job.getString("wishes");
-            Teacher t=teacherdao.queryTeacher(phone);
+            String email = job.getString("email");
+
+            Teacher t=teacherdao.queryTeacher(tid);
             if(t!=null)
             {
                 t.setName(name); // 重设相关信息
                 t.setAvatar_path(avata);
                 t.setDescription(descrip);
                 t.setWishes(wishes);
+                t.setPhone_num(phone);
+                t.setEmail(email);
                 if(teacherdao.updateTeacher(t)){
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功修改信息");

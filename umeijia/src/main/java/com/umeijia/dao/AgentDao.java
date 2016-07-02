@@ -26,7 +26,7 @@ public class AgentDao {
     public Agent queryAgent(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Agent as u where u.id=%d", id);
+        String sql = String.format("from Agent as u where u.id=%d and u.valid=1", id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -41,7 +41,7 @@ public class AgentDao {
     public Agent queryAgent(String phoneNumber) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Agent as u where u.phone_num=\'%s\'", phoneNumber);
+        String sql = String.format("from Agent as u where u.phone_num=\'%s\' and u.valid=1", phoneNumber);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -56,7 +56,7 @@ public class AgentDao {
     public Agent queryAgentByEmail(String email) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Agent as u where u.email=\'%s\'", email);
+        String sql = String.format("from Agent as u where u.email=\'%s\' and u.valid=1", email);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -82,7 +82,7 @@ public class AgentDao {
     public boolean verifyToken(long id,String tkn){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("select u.expire from Agent as u where u.id=%d and u.token=\'%s\'",id,tkn);
+        String sql = String.format("select u.expire from Agent as u where u.id=%d and u.token=\'%s\' and u.valid=1",id,tkn);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -101,7 +101,7 @@ public class AgentDao {
     public Agent loginCheckByPhone(String phoneNumber, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Agent as u where u.phone_num=\'%s\'", phoneNumber);
+        String sql = String.format("from Agent as u where u.phone_num=\'%s\' and u.valid=1", phoneNumber);
         Query query = session.createQuery(sql);
         List list = query.list();
         if(list.size()>0) {
@@ -112,7 +112,7 @@ public class AgentDao {
                     session.beginTransaction();
                     agent.setToken(MD5.GetSaltMD5Code(agent.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
                     Date now=new Date();
-                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     agent.setExpire(dead);
                     session.update(agent);
                     session.flush();
@@ -136,7 +136,7 @@ public class AgentDao {
     public Agent loginCheckByEmail(String email, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Agent as u where u.email=\'%s\'", email);
+        String sql = String.format("from Agent as u where u.email=\'%s\' and u.valid=1", email);
         Query query = session.createQuery(sql);
         List list = query.list();
         if(list.size()>0) {
@@ -147,7 +147,7 @@ public class AgentDao {
                     session.beginTransaction();
                     agent.setToken(MD5.GetSaltMD5Code(agent.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
                     Date now=new Date();
-                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     agent.setExpire(dead);
                     session.update(agent);
                     session.flush();
@@ -192,7 +192,7 @@ public class AgentDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Agent agent set agent.pwd_md=\'%s\' where agent.phone_num=\'%s\'",passwd,phoneNumber);
+            String hql=String.format("update Agent agent set agent.pwd_md=\'%s\' where agent.phone_num=\'%s\' and agent.valid=1",passwd,phoneNumber);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -219,6 +219,32 @@ public class AgentDao {
             session.flush();
             session.getTransaction().commit();
             result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
+    /**
+     * 将该角色设为无效
+     * **/
+    public boolean invalidAgent(long id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update Agent u set u.valid=%d where u.id=%d",0,id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
         } catch (HibernateException e) {
             e.printStackTrace();
             session.getTransaction().rollback();

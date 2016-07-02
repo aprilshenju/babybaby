@@ -102,7 +102,19 @@ public class Agent {
 	private Date expire; // 过期时间
 	private String token; //登陆token
 
+	private  boolean valid;
+
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
 	public  Agent(){
+
 
 	}
 
@@ -110,19 +122,16 @@ public class Agent {
 		this.id=id;
 	}
 
-	public Agent(String phone,String email,String pwd,String name,Date date,String company,float price){
-		phone_num=phone;
-		this.email=email;
-		pwd_md=pwd;
-		this.name=name;
-		regist_date=date;
-		company_name=company;
-		price_rate=price;
-		this.avarta=" ";
-		this.expire=new Date();
-		this.token=" ";
-
+	public Agent(String email, Date regist_date, String name, String pwd_md, String phone_num, String avarta, Set<Kindergarten> gartens, String company_name, float price_rate) {
+		this.email = email;
+		this.regist_date = regist_date;
+		this.name = name;
+		this.pwd_md = pwd_md;
+		this.phone_num = phone_num;
+		this.avarta = avarta;
+		this.gartens = gartens;
+		this.company_name = company_name;
+		this.price_rate = price_rate;
+		valid=true; //新创建的账号默认有效
 	}
-
-	
 }

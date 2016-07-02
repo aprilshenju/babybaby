@@ -176,6 +176,7 @@ public class ParentsService {
                 boolean app_push=job.getBoolean("app_push");
                 boolean wechat_push=job.getBoolean("wechat_push");
                 String avata=job.getString("avatar");
+                String email = job.getString("email");
         /*        String descrip = job.getString("");
                 String wishes = job.getString("wishes")*/
 
@@ -187,6 +188,9 @@ public class ParentsService {
                     p.setAllow_app_push(app_push);
                     p.setAllow_wechat_push(wechat_push);
                     p.setAvatar_path(avata);
+                    p.setPhone_num(phone);
+                    p.setEmail(email);
+
                     if(parentsdao.updateParents(p)){
                         job_out.put("resultCode", GlobalStatus.succeed.toString());
                         job_out.put("resultDesc","成功修改信息");

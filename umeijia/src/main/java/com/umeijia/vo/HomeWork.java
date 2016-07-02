@@ -68,4 +68,14 @@ public class HomeWork {
 	private Date date;
 	private long teacher_id;
 	private long class_id;
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    private boolean valid;
 }

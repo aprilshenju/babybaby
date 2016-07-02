@@ -17,14 +17,23 @@ public class Teacher {
 	private Set<GartenNews>gartenNewses;
 	private Date expire; // 过期时间
 	private String token; //登陆token
-
+	private  boolean valid;
 
 	public  Teacher(){
 
 	}
 
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
 	public Teacher(long id){
 		this.id=id;
+
 	}
 
 	public Teacher(String name,String avatar,String pwd_md,Kindergarten garten,String phone,String descrip,String email,boolean leader,String wishes){
@@ -38,6 +47,7 @@ public class Teacher {
 		this.regist_date=new Date();
 		this.is_leader=leader;
 		this.wishes=wishes;
+		valid=true;
 	}
 
 

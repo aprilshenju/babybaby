@@ -29,7 +29,7 @@ public class HomeWorkDao {
     public HomeWork queryHomeWork(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from HomeWork as work where work.id=%d",id);
+        String sql = String.format("from HomeWork as work where work.id=%d and valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -47,7 +47,7 @@ public class HomeWorkDao {
     public List<HomeWork> queryHomeWorks(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from HomeWork as work where work.class_id=%d order by work.date desc",class_id);
+        String sql = String.format("from HomeWork as work where work.class_id=%d and valid=1 order by work.date desc",class_id);
         Query query = session.createQuery(sql);
         List <HomeWork> list = query.list();
         session.close();
@@ -67,7 +67,7 @@ public class HomeWorkDao {
         }
         Integer pageNumber = pager.getPageNumber();
         Integer pageSize = pager.getPageSize();
-        String hql=String.format("from HomeWork bs where bs.class_id=%d",class_id);
+        String hql=String.format("from HomeWork bs where bs.class_id=%d and valid=1",class_id);
         String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
         Session session=DBManager.getSession();
         Query query=session.createQuery(countHql);
@@ -124,6 +124,31 @@ public class HomeWorkDao {
             return result;
         }
     }
+
+
+    public boolean invalidHomeWork(long g_id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update HomeWork bs set bs.valid=0 where bs.id=%d",g_id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
 
 
     public boolean deleteHomeWork(long id) {

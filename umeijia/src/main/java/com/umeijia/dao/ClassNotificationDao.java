@@ -29,7 +29,7 @@ public class ClassNotificationDao {
     public ClassNotification queryClassNotification(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassNotification as ca where ca.id=%d",id);
+        String sql = String.format("from ClassNotification as ca where ca.id=%d and valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -47,7 +47,7 @@ public class ClassNotificationDao {
     public List<ClassNotification> queryClassNotifications(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassNotification as ca where ca.class_id=%d order by ca.date desc",class_id);
+        String sql = String.format("from ClassNotification as ca where ca.class_id=%d and valid=1 order by ca.date desc",class_id);
         Query query = session.createQuery(sql);
         List <ClassNotification> list = query.list();
         session.close();
@@ -67,7 +67,7 @@ public class ClassNotificationDao {
         }
         Integer pageNumber = pager.getPageNumber();
         Integer pageSize = pager.getPageSize();
-        String hql=String.format("from ClassNotification bs where bs.class_id=%d",class_id);
+        String hql=String.format("from ClassNotification bs where bs.class_id=%d and valid=1",class_id);
         String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
         Session session=DBManager.getSession();
         Query query=session.createQuery(countHql);
@@ -108,7 +108,7 @@ public class ClassNotificationDao {
         String notificationSubscribers="";
         Session session = DBManager.getSession();
         session.clear();
-        String hql = String.format("select subscribers from ClassNotification as c where c.id=%d",id);
+        String hql = String.format("select subscribers from ClassNotification as c where c.id=%d and valid=1",id);
         Query query = session.createQuery(hql);
         //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
         List<Object> list = query.list();
@@ -139,6 +139,31 @@ public class ClassNotificationDao {
             return result;
         }
     }
+
+
+    public boolean invalidClassNotification(long g_id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update ClassNotification bs set bs.valid=0 where bs.id=%d",g_id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
 
 
     public boolean deleteClassNotification(long id) {

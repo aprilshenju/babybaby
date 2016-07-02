@@ -13,6 +13,16 @@ public class GartenNews {
 	private Teacher teacher;  // 老师发布的新闻
 	private Kindergarten kindergarten;
 
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    private boolean valid;
+
 	public  GartenNews(){
 
 	}

@@ -21,8 +21,9 @@
 		</id>
 		<property name="ip_url" column="ip_url" unique="true" not-null="true"></property>
 		<property name="description" column="description"></property>	
-		<property name="manufactory" column="manufactory"></property>   
-		<property name="type" column="type" ></property>		
+		<property name="manufactory" column="manufactory"></property>
+        <property name="valid" column="valid"></property>
+        <property name="type" column="type" ></property>
 		<property name="state" column="state"></property>   
 		<property name="thumb_path" column="thumb_path"></property>
 		<property name="active_period" column="active_period"></property>

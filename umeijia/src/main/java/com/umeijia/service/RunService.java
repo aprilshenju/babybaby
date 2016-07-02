@@ -2,6 +2,7 @@ package com.umeijia.service;
 
 import com.umeijia.dao.*;
 import com.umeijia.util.GlobalStatus;
+import com.umeijia.util.LockerLogger;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
@@ -16,9 +17,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Path("/run_service")
@@ -80,17 +79,17 @@ public class RunService {
     @Produces(MediaType.TEXT_PLAIN)
     public String test2(){
         //初始化数据
-        Administrator admin = new Administrator("1333333333","1233@dd.com",MD5.GetSaltMD5Code("admin123"),"超级管理员",new Date(),true);
+        Administrator admin = new Administrator("13000000000","1233@dd.com",MD5.GetSaltMD5Code("admin123"),"超级管理员",new Date(),true);
         administratordao.addAdministrator(admin);
 
-        Agent ag = new Agent("1300000000","agent@163.com",MD5.GetSaltMD5Code("agent123"),"小张",new Date(),"新东方",32.5f);
+        Agent ag = new Agent("agent@163.com",new Date(),"小张",MD5.GetSaltMD5Code("agent123"),"13111111111","111.jpg",null,"新东方",0.75f);
         agentdao.addAgent(ag);
         Kindergarten garten = new Kindergarten("光明幼儿园","科华南路","028-85400752","一起呵护祖国的花朵","1.jpg","2.jpg","3.jpg",ag);
         kindergartendao.addKindergarten(garten);
-        Teacher leader = new Teacher("段园长","1.jpg",MD5.GetSaltMD5Code("leader123"),garten,"1358888888","让我带大家一起学习吧","dff9933@163.com",true,"让孩子们茁壮成长");
+        Teacher leader = new Teacher("段园长","1.jpg",MD5.GetSaltMD5Code("leader123"),garten,"13222222222","让我带大家一起学习吧","dff9933@163.com",true,"让孩子们茁壮成长");
         teacherdao.addTeacher(leader);
-        Teacher te = new Teacher("谢老师","1.jpg",MD5.GetSaltMD5Code("tea123"),garten,"1359999999","一起摇摆","ppj9933@163.com",false," ");
-        Teacher te2 = new Teacher("曾老师","2.jpg",MD5.GetSaltMD5Code("tea123"),garten,"13533333","好男人就是我","db83555@163.com",false," ");
+        Teacher te = new Teacher("谢老师","1.jpg",MD5.GetSaltMD5Code("123456"),garten,"18090037299","一起摇摆","ppj9933@163.com",false," ");
+        Teacher te2 = new Teacher("曾老师","2.jpg",MD5.GetSaltMD5Code("123456"),garten,"15680079196","好男人就是我","db83555@163.com",false," ");
         teacherdao.addTeacher(te);
         teacherdao.addTeacher(te2);
         com.umeijia.vo.Class cla = new Class("大二班","就快要升一年级了，宝宝们","上午:舞蹈;下午:算术;","张宁三:133;","李老师:14553",garten);
@@ -101,8 +100,9 @@ public class RunService {
         Student stu2 = new Student("刘屯屯","小屯屯","男",new Date(),138,36,"2.jpg",cla,false,d,d,d);
         studentdao.addStudent(stu1);
         studentdao.addStudent(stu2);
-        Parents parent = new Parents("15608036231","3523535@qq.com","刘洋",stu2,cla.getId(),MD5.GetSaltMD5Code("par123"),"爸爸","1.jpg");
-        parentsdao.addParents(parent);
+        Parents parent1 = new Parents("18090037299","3523535@qq.com","仝大大",stu1,cla.getId(),MD5.GetSaltMD5Code("123456"),"爷爷","1.jpg");
+        Parents parent2 = new Parents("15680079196","35235111@qq.com","刘大大",stu2,cla.getId(),MD5.GetSaltMD5Code("123456"),"爸爸","1.jpg");
+        parentsdao.addParents(parent1);
 
         Camera ca = new Camera("222.10.13.3","222.10.13.3:355/video","操场转角",
                 "海康威视",garten,"sunfllower_came1.jpg",true,"ccccc","8-10;12-14;15-17;",cla);
@@ -117,7 +117,7 @@ public class RunService {
         gartennewsdao.addGartenNews(news);
         gartennewsdao.addGartenNews(news2);
 
-        BabyShowtime showtiem = new BabyShowtime("为了庆祝儿童节的到来,老师们组织了歌舞表演","2.jpg;3.jpg",cla.getId(),stu1.getId(),te2.getId(),parent.getId(),1);
+        BabyShowtime showtiem = new BabyShowtime("为了庆祝儿童节的到来,老师们组织了歌舞表演","2.jpg;3.jpg",cla.getId(),stu1.getId(),te2.getId(),parent1.getId(),1);
         babyshowtimedao.addBabyShowtime(showtiem);
         ShowtimeComments comment = new ShowtimeComments(true,showtiem,1,1,0,0,d,"跳得真好看");
         showtimecommentsdao.addShowtimeComments(comment);
@@ -135,6 +135,9 @@ public class RunService {
         Date d2 = new Date(d.getTime()+3600000000l);
         ClassActivity activity = new ClassActivity("开学季春游","为了迎接春天的到来,我们班组织了一次春游","2.jpg;1.jpg;",d,d2,te.getId(),1,"1","1",d.toString(),cla.getId(),te.getName(),te.getPhone_num());
         classactivitydao.addClassActivity(activity);
+
+        LockerLogger.log.info("xxxx");
+        LockerLogger.log.error("");
 
         return "welcom to UMJ server... run service ";
     }
@@ -283,13 +286,17 @@ public class RunService {
             }
             String phone = job.getString("phone");
             String email = job.getString("email");
-            String pwd = job.getString("password");
-            pwd=MD5.GetSaltMD5Code(pwd);
+         /*   String pwd = job.getString("password");
+            pwd=MD5.GetSaltMD5Code(pwd);*/
             String name = job.getString("name");
             long garten_id=job.getLong("garten_id");
             String avatar = job.getString("avatar");
             String wishes = job.getString("wishes"); //园长寄语，老师不传
             String descrip=job.getString("description"); //老师介绍
+            String pwd=SMSMessageService.GenerateRandomNumber(); //生成随即密码
+            String org_pwd = pwd;
+            pwd=MD5.GetSaltMD5Code(pwd); //计算密码盐值摘要
+
             //        boolean is_leader = job.getBoolean("leader"); //是否是园长
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
             if(garten.getLeader_id()>0){
@@ -306,6 +313,11 @@ public class RunService {
                 garten.setTeacher_contacts(leader_contact);
                 if( kindergartendao.updateKindergarten(garten))
                 {
+                    Map<String,Object> map = new HashMap<String,Object>();
+                    map.put("phoneNum",phone);
+                    map.put("verifyCode",org_pwd);
+                    map.put("type",2);
+                    SMSMessageService .cmds.add(map);
                     job_out.put("resultCode",GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功添加园长");
                     return job_out.toString();
@@ -438,15 +450,28 @@ public class RunService {
                     return job_out.toString();
                 }
                 String phone= job.getString("phone");
-                String pwd= job.getString("pwd");
-                pwd=MD5.GetSaltMD5Code(pwd);
+//                String pwd= job.getString("pwd");
+//                pwd=MD5.GetSaltMD5Code(pwd);
                 String name= job.getString("name");
                 String email=job.getString("email");
                 String company=job.getString("company");
                 float price = (float) job.getDouble("price");
-                Date date = new Date();
-                Agent agent=new Agent(phone,email,pwd,name,date,company,price);
-                if(agentdao.addAgent(agent)){
+                String avatar=job.getString("avatar");
+            // 随机生成密码
+            String pwd=SMSMessageService.GenerateRandomNumber();
+            String org_pwd=pwd;
+            pwd=MD5.GetSaltMD5Code(pwd);
+
+            Date date = new Date();
+            Agent agent=new Agent(email,new Date(),name,pwd,phone,avatar,null,company,price);
+            if(agentdao.addAgent(agent)){
+                // 加入短信队列发送密码
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",org_pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
+
                     job_out.put("resultCode",GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功添加代理商");
                     return  job_out.toString();
@@ -486,14 +511,24 @@ public class RunService {
             }
 
             String phone= job.getString("phone");
-            String pwd= job.getString("pwd");
-            pwd=MD5.GetSaltMD5Code(pwd);
+    /*        String pwd= job.getString("pwd");
+            pwd=MD5.GetSaltMD5Code(pwd);*/
             String name= job.getString("name");
             String email=job.getString("email");
             Date date = new Date();
+            String pwd = SMSMessageService.GenerateRandomNumber();// 生成随机密码
+            String org_pwd=pwd;
+            pwd=MD5.GetSaltMD5Code(pwd); //获取 盐值md5摘要
+
             Administrator admin =  new Administrator(phone,email,pwd,name,date,false);
             if(administratordao.addAdministrator(admin))
             {
+
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",org_pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加管理员");
                 return  job_out.toString();
@@ -527,6 +562,8 @@ public class RunService {
             String company=job.getString("company");
             float price = (float) job.getDouble("price");
             String avata = job.getString("avatar");
+            String email =job.getString("email");
+            String phone=job.getString("phone");
 
             Agent ag=agentdao.queryAgent(tid);
             if(ag!=null)
@@ -535,7 +572,8 @@ public class RunService {
                 ag.setAvarta(avata);
                 ag.setCompany_name(company);
                 ag.setPrice_rate(price);
-
+                ag.setPhone_num(phone);
+                ag.setEmail(email);
                 if(agentdao.updateAgent(ag)){
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功修改信息");

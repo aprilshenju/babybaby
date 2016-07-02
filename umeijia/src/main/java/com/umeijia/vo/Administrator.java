@@ -72,6 +72,8 @@ public class Administrator {
 
 	private Date expire; // 过期时间
 	private String token; //登陆token
+private boolean valid; //账号是否有效
+
 
 	public  Administrator(){
 
@@ -84,8 +86,19 @@ public class Administrator {
 			this.name=name;
 			regist_date=date;
 			this.is_super=super_root;
+		valid=true; //默认新建账号有效
 
 	}
 
+	public boolean is_super() {
+		return is_super;
+	}
 
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
 }

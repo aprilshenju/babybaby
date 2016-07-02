@@ -139,6 +139,16 @@ public class ClassActivity {
 
 	private String contact_phone; // 联系电话
 
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    private boolean valid;
+
 	/// 删除班级活动，可以将 班级id设为 -1
 
 }

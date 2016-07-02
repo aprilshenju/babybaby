@@ -28,7 +28,7 @@ public class FoodRecordDao {
     public FoodRecord queryFoodRecord(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from FoodRecord as food where food.id=%d",id);
+        String sql = String.format("from FoodRecord as food where food.id=%d and valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -48,7 +48,7 @@ public class FoodRecordDao {
     public FoodRecord queryFoodRecordByClassId(long classId,int year,int month,int day) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from FoodRecord as food where food.class_id=%d and year(food.date)=%d and month(food.date)=%d and day(food.date)=%d",classId,year,month,day);
+        String sql = String.format("from FoodRecord as food where food.class_id=%d and year(food.date)=%d and month(food.date)=%d and day(food.date)=%d and valid=1",classId,year,month,day);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -86,7 +86,7 @@ public class FoodRecordDao {
     public List<FoodRecord> queryFoodRecordList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from FoodRecord as fd where fd.cla.id=%d order by fd.date desc",class_id);
+        String sql = String.format("from FoodRecord as fd where fd.cla.id=%d and valid=1 order by fd.date desc",class_id);
         Query query = session.createQuery(sql);
         List <FoodRecord> list = query.list();
         session.close();
@@ -140,6 +140,28 @@ public class FoodRecordDao {
         }
     }
 
+    public boolean invalidFoodRecord(long g_id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update FoodRecord bs set bs.valid=0 where bs.id=%d",g_id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
 
     public boolean deleteFoodRecord(long id) {
         boolean result=false;

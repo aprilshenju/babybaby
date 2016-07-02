@@ -31,7 +31,7 @@ public class TeacherDao {
     public Teacher queryTeacher(long id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as u where u.id=%d",id);
+        String sql = String.format("from Teacher as u where u.id=%d and u.valid=1",id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -46,7 +46,7 @@ public class TeacherDao {
     public Teacher queryTeacher(String phoneNumber) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as u where u.phone_num=\'%s\'", phoneNumber);
+        String sql = String.format("from Teacher as u where u.phone_num=\'%s\' and u.valid=1", phoneNumber);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -61,7 +61,7 @@ public class TeacherDao {
     public  List<Teacher> getTeachersByGarten(Long garten_id){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as t where t.kindergarten.id=%d",garten_id);
+        String sql = String.format("from Teacher as t where t.kindergarten.id=%d and t.valid=1",garten_id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -78,7 +78,7 @@ public class TeacherDao {
     public Teacher queryTeacherByEmail(String email) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as u where u.email=\'%s\'", email);
+        String sql = String.format("from Teacher as u where u.email=\'%s\' and u.valid=1", email);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -93,7 +93,7 @@ public class TeacherDao {
     public boolean verifyToken(long id,String tkn){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("select u.expire from Teacher as u where u.id=%d and u.token=\'%s\'",id,tkn);
+        String sql = String.format("select u.expire from Teacher as u where u.id=%d and u.token=\'%s\' and u.valid=1",id,tkn);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -112,7 +112,7 @@ public class TeacherDao {
     public Teacher loginCheckByPhone(String phoneNumber, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as u where u.phone_num=\'%s\'", phoneNumber);
+        String sql = String.format("from Teacher as u where u.phone_num=\'%s\' and u.valid=1", phoneNumber);
         Query query = session.createQuery(sql);
         List list = query.list();
         if(list.size()>0) {
@@ -123,7 +123,7 @@ public class TeacherDao {
                     session.beginTransaction();
                     teacher.setToken(MD5.GetSaltMD5Code(teacher.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
                     Date now=new Date();
-                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     teacher.setExpire(dead);
                     session.update(teacher);
                     session.flush();
@@ -147,7 +147,7 @@ public class TeacherDao {
     public Teacher loginCheckByEmail(String email, String passwd) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as u where u.email=\'%s\'", email);
+        String sql = String.format("from Teacher as u where u.email=\'%s\' and u.valid=1", email);
         Query query = session.createQuery(sql);
         List list = query.list();
         if(list.size()>0) {
@@ -158,7 +158,7 @@ public class TeacherDao {
                     session.beginTransaction();
                     teacher.setToken(MD5.GetSaltMD5Code(teacher.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
                     Date now=new Date();
-                    Date dead = new Date(now .getTime() + 7200000); //两个小时有效期
+                    Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     teacher.setExpire(dead);
                     session.update(teacher);
                     session.flush();
@@ -223,7 +223,7 @@ public class TeacherDao {
     public List<Teacher> queryTeachersByGarten(long gartenID) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Teacher as u where u.kindergarten.id=%d",gartenID);
+        String sql = String.format("from Teacher as u where u.kindergarten.id=%d and u.valid=1",gartenID);
         Query query = session.createQuery(sql);
         List list =query.list();
         List<Teacher> teachers=new ArrayList<Teacher>();
@@ -234,6 +234,33 @@ public class TeacherDao {
         }
         return teachers;
     }
+
+    /**
+     * 将该角色设为无效
+     * **/
+    public boolean invalidTeacher(long id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update Teacher u set u.valid=%d where u.id=%d",0,id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
 
     public boolean deleteTeacher(String phoneNumber) {
         boolean result=false;
