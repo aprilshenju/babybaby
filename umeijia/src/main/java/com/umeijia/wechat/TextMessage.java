@@ -4,13 +4,13 @@ package com.umeijia.wechat;
  * Created by hadoop on 2016/6/29.
  */
 public class TextMessage extends  BaseMessage{
-    private String content;
+    private String Content;
 
     public String getContent() {
-        return content;
+        return Content;
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.Content = content;
     }
 }

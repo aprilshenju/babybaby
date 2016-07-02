@@ -4,24 +4,24 @@ package com.umeijia.wechat;
  * Created by hadoop on 2016/6/29.
  */
 public class EventMessage extends BaseMessage{
-    private String event;
-    private String eEventKey;
+    private String Event;
+    private String EventKey;
 
 
     public String getEvent() {
-        return event;
+        return Event;
     }
 
     public void setEvent(String event) {
-        this.event = event;
+        this.Event = event;
     }
 
     public String geteEventKey() {
-        return eEventKey;
+        return EventKey;
     }
 
     public void seteEventKey(String eEventKey) {
-        this.eEventKey = eEventKey;
+        this.EventKey = eEventKey;
     }
 
 }
