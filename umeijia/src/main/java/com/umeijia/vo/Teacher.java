@@ -19,6 +19,16 @@ public class Teacher {
 	private String token; //登陆token
 	private  boolean valid;
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    private String gender;
+
 	public  Teacher(){
 
 	}

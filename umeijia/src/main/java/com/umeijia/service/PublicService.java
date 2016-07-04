@@ -26,6 +26,10 @@ import java.util.*;
  * Created by shenju on 2016/6/20.
  */
 
+/**
+ * ！！！！！由于现在很多表多了valid字段，所以在使用set的时候，要把关系先弄断
+ */
+
 @Service
 @Path("/public_service")
 public class PublicService {
@@ -364,7 +368,7 @@ public class PublicService {
      * @param id
      * @return
      */
-    public String getNameFromRoleTypeAndRoleId(int type, long id) {
+    public  String getNameFromRoleTypeAndRoleId(int type, long id) {
         String result = "";
         switch (type) {
             case 1:
@@ -2161,6 +2165,7 @@ public class PublicService {
             bk.setQuestion(question);
             bk.setAnswer(answer);
             bk.setUrl(linkUrl);
+            bk.setDate(new Date());
             boolean flag = false;
             if (type == 1) {
                 flag = babyknowledgedao.addBabyKnowledge(bk);
@@ -2862,40 +2867,21 @@ public class PublicService {
      * @param headers
      * @return
      */
-    @Path("/queryPhoneNumIsExist")
+    @Path("/queryPhoneNumOrEmailIsExist")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String queryPhoneNumIsExist(@RequestBody String phoneInfo, @Context HttpHeaders headers) {
         JSONObject jobOut = new JSONObject();
         try {
-            String checkInput = judgeValidationOfInputJson(phoneInfo,"phoneNum");
+            String checkInput = judgeValidationOfInputJson(phoneInfo,"phoneNum","email");
             if(!checkInput.equals("")){
                 return checkInput;
             }
             JSONObject jobIn = JSONObject.fromObject(phoneInfo);
             String phoneNum = jobIn.getString("phoneNum");
-            int exsitRoleType=-1;
-            boolean exsitFlag = false;
-            if(teacherdao.queryTeacher(phoneNum)!=null){
-                if(teacherdao.queryTeacher(phoneNum).getIs_leader()){
-                    exsitRoleType = 2;
-                }
-                else exsitRoleType = 1;
-                exsitFlag = true;
-            }else if(parentsdao.queryParents(phoneNum)!=null){
-                exsitRoleType = 3;
-                exsitFlag = true;
-            }else if(agentdao.queryAgent(phoneNum)!=null){
-                exsitRoleType = 4;
-                exsitFlag = true;
-            }else if(administratordao.queryAdministrator(phoneNum)!=null){
-                exsitRoleType = 5;
-                exsitFlag = true;
-            }else{
-            }
-            jobOut.put("exsitFlag",exsitFlag);
-            jobOut.put("exsitRoleType",exsitRoleType);
+            String email = jobIn.getString("email");
+            jobOut.put("exsitFlag",isPhoneOrEmailExist(phoneNum,email));
             jobOut.put("resultCode", GlobalStatus.succeed.toString());
             jobOut.put("resultDesc", "操作成功");
         } catch (Exception e) {
@@ -2904,6 +2890,23 @@ public class PublicService {
             jobOut.put("resultDesc", "操作失败");
         }
         return jobOut.toString();
+    }
+
+
+    public  boolean isPhoneOrEmailExist(String phoneNum,String email){
+        boolean exsitFlag = false;
+        if(teacherdao.queryTeacher(phoneNum)!=null||teacherdao.queryTeacherByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(parentsdao.queryParents(phoneNum)!=null||parentsdao.queryParentsByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(agentdao.queryAgent(phoneNum)!=null||agentdao.queryAgentByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(administratordao.queryAdministrator(phoneNum)!=null||administratordao.queryAdministratorByEmail(email)!=null){
+            exsitFlag = true;
+        }else{
+
+        }
+        return exsitFlag;
     }
 
     /**
@@ -3058,6 +3061,7 @@ public class PublicService {
                 sn.setDate(new Date());
                 sn.setContent(content);
                 sn.setTitle(title);
+                sn.setPublishId(roleId);
                 if(systemnotificationdao.addSystemNotification(sn)){
                     jobOut.put("resultCode", GlobalStatus.succeed.toString());
                     jobOut.put("resultDesc", "操作成功");
@@ -3069,6 +3073,7 @@ public class PublicService {
                 SystemNotification sn = systemnotificationdao.querySystemNotification(id);
                 sn.setContent(content);
                 sn.setTitle(title);
+                sn.setPublishId(roleId);
                 if(systemnotificationdao.updateSystemNotification(sn)){
                     jobOut.put("resultCode", GlobalStatus.succeed.toString());
                     jobOut.put("resultDesc", "操作成功");
