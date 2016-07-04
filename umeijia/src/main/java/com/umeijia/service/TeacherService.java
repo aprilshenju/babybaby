@@ -152,7 +152,7 @@ public class TeacherService {
             long stu_id=job.getLong("baby_id");
             String relation = job.getString("relation");
             String avatar = job.getString("avatar");
-
+            String gender=job.getString("gender");
             //用户账号是否已注册判断
             if(isPhoneOrEmailExist(phone,email)){
                 //已经存在
@@ -178,7 +178,7 @@ public class TeacherService {
                 return job_out.toString();
             }
 
-            Parents p = new Parents(phone,email,name,baby,class_id,cla.getGarten().getId(),pwd_md,relation,avatar);
+            Parents p = new Parents(phone,email,name,baby,class_id,cla.getGarten().getId(),pwd_md,relation,avatar,gender);
             if(parentsdao.addParents(p)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加家长");

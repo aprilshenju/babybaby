@@ -1,6 +1,7 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
+import com.umeijia.util.LockerLogger;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.Agent;
 import org.hibernate.FlushMode;
@@ -115,12 +116,14 @@ public class AgentDao {
                     Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     agent.setExpire(dead);
                     session.update(agent);
+                    LockerLogger.log.info("加盟商登陆成功");
                     session.flush();
                     session.getTransaction().commit();
                 } catch (HibernateException e) {
+                    LockerLogger.log.info("加盟商登陆异常....");
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                   agent=null;
+             //      agent=null;
                 } finally{
                     session.close();
                     return agent;
@@ -155,7 +158,7 @@ public class AgentDao {
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-                    agent=null;
+              //      agent=null;
                 } finally{
                     session.close();
                     return agent;
