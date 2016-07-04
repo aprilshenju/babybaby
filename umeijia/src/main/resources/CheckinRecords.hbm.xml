@@ -19,10 +19,18 @@
 			<generator class="native"></generator>
 		</id>
 		<property name="date" column="date"></property>	
-		<property name="period" column="period"></property>
-		<property name="image_path" column="image_path" ></property>		
-		<property name="state" column="state"></property>
-		<property name="temperature"  column="temperature"></property>
+		<property name="image_path_1" column="image_path_1" ></property>
+        <property name="image_path_2" column="image_path_2" ></property>
+        <property name="image_path_3" column="image_path_3" ></property>
+        <property name="image_path_4" column="image_path_4" ></property>
+        <property name="state_1" column="state_1"></property>
+        <property name="state_2" column="state_2"></property>
+        <property name="state_3" column="state_3"></property>
+        <property name="state_4" column="state_4"></property>
+		<property name="temperature_1"  column="temperature_1"></property>
+        <property name="temperature_2"  column="temperature_2"></property>
+        <property name="temperature_3"  column="temperature_3"></property>
+        <property name="temperature_4"  column="temperature_4"></property>
 
            <!-- 这个需要关联么？ -->
           <property name="stu_id" column="stu_id"></property> 

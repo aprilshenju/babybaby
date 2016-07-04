@@ -30,7 +30,7 @@ public class Camera {
     private boolean valid;
 
 	public  Camera(){
-
+        this.valid=true;
 	}
 
 	public Camera(String ip,String video_url,String description,String manufactory,Kindergarten garten,String type,boolean ispublic,String img_path,String period,Class cla){
