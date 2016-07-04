@@ -63,6 +63,22 @@ public class CheckinRecordsDao {
     }
 
 
+    public CheckinRecords queryCheckinRecordsByBabyAndClassAndTime(long classId,long babyId,int year,int month,int day){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.class_id=%d and cr.stu_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d order by date desc",classId,babyId,year,month,day);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            CheckinRecords cr = (CheckinRecords) list.get(0);
+            return cr;
+        }else {
+            return null;
+        }
+    }
+
+
     /**
      * 老师或园长查询
      * @param classId

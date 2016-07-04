@@ -24,7 +24,7 @@ public class GartenNews {
     private boolean valid;
 
 	public  GartenNews(){
-
+        this.valid=true;
 	}
 
 	public  GartenNews(String title,String summary,String descrip,String img_urls,Teacher te,Kindergarten garten){

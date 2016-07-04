@@ -54,7 +54,7 @@ public class SystemNotification {
     private boolean valid;
 
     public SystemNotification(){
-
+        this.valid=true;
     }
 
 

@@ -35,6 +35,10 @@ public class BabyKnowledge {  //育儿知识，静态表
         return valid;
     }
 
+    public BabyKnowledge(){
+        this.valid=true;
+    }
+
     public void setValid(boolean valid) {
         this.valid = valid;
     }

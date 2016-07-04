@@ -24,6 +24,7 @@ public class ClassNotification {
 	}
 
 	public ClassNotification() {
+        this.valid=true;
 	}
 
 	public void setTitle(String title) {
