@@ -86,10 +86,10 @@ public class RunService {
         agentdao.addAgent(ag);
         Kindergarten garten = new Kindergarten("光明幼儿园","科华南路","028-85400752","一起呵护祖国的花朵","1.jpg","2.jpg","3.jpg",ag);
         kindergartendao.addKindergarten(garten);
-        Teacher leader = new Teacher("段园长","1.jpg",MD5.GetSaltMD5Code("leader123"),garten,"13222222222","让我带大家一起学习吧","dff9933@163.com",true,"让孩子们茁壮成长");
+        Teacher leader = new Teacher("段园长","1.jpg",MD5.GetSaltMD5Code("leader123"),garten,"13222222222","让我带大家一起学习吧","dff9933@163.com",true,"让孩子们茁壮成长","男");
         teacherdao.addTeacher(leader);
-        Teacher te = new Teacher("谢老师","1.jpg",MD5.GetSaltMD5Code("123456"),garten,"18090037299","一起摇摆","ppj9933@163.com",false," ");
-        Teacher te2 = new Teacher("曾老师","2.jpg",MD5.GetSaltMD5Code("123456"),garten,"15680079196","好男人就是我","db83555@163.com",false," ");
+        Teacher te = new Teacher("谢老师","1.jpg",MD5.GetSaltMD5Code("123456"),garten,"18090037299","一起摇摆","ppj9933@163.com",false," ","男");
+        Teacher te2 = new Teacher("曾老师","2.jpg",MD5.GetSaltMD5Code("123456"),garten,"15680079196","好男人就是我","db83555@163.com",false," ","男");
         teacherdao.addTeacher(te);
         teacherdao.addTeacher(te2);
         com.umeijia.vo.Class cla = new Class("大二班","就快要升一年级了，宝宝们","上午:舞蹈;下午:算术;","张宁三:133;","李老师:14553",garten);
@@ -181,6 +181,7 @@ public class RunService {
             String avatar = job.getString("leader_avatar");
             String wishes = job.getString("leader_wishes"); //园长寄语，老师不传
             String leader_descrip=job.getString("leader_description"); //老师介绍
+            String leader_gender=job.getString("leader_gender");
 
             Date date = new Date();
             if(isPhoneOrEmailExist(phone,email)){
@@ -194,7 +195,7 @@ public class RunService {
             garten.setLeader_wishes(wishes);
             if(kindergartendao.addKindergarten(garten)){
                 // 成功添加幼儿园
-                Teacher leader=new Teacher(name,avatar,pwd,garten,phone,leader_descrip,email,true,wishes); //园长
+                Teacher leader=new Teacher(name,avatar,pwd,garten,phone,leader_descrip,email,true,wishes,leader_gender); //园长
                 if(teacherdao.addTeacher(leader)){
                     garten.setLeader_wishes(wishes); //更新幼儿园 寄语
                     garten.setLeader_id(leader.getId()); //更新幼儿园 园长
@@ -301,8 +302,10 @@ public class RunService {
             String avatar = job.getString("avatar");
             String wishes = job.getString("wishes"); //园长寄语，老师不传
             String descrip=job.getString("description"); //老师介绍
+            String gender=job.getString("gender");
             String pwd=SMSMessageService.GenerateRandomNumber(); //生成随即密码
             String org_pwd = pwd;
+
             pwd=MD5.GetSaltMD5Code(pwd); //计算密码盐值摘要
 
             if(isPhoneOrEmailExist(phone,email)){
@@ -320,7 +323,7 @@ public class RunService {
                 job_out.put("resultDesc","添加失败:该幼儿园已有园长");
                 return job_out.toString();
             }
-            Teacher leader=new Teacher(name,avatar,pwd,garten,phone,descrip,email,true,wishes); //园长
+            Teacher leader=new Teacher(name,avatar,pwd,garten,phone,descrip,email,true,wishes,gender); //园长
             if(teacherdao.addTeacher(leader)){
                 garten.setLeader_wishes(wishes); //更新幼儿园 寄语
                 garten.setLeader_id(leader.getId()); //更新幼儿园 园长

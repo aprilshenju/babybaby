@@ -298,6 +298,7 @@ public class TeacherService {
             String avatar = job.getString("avatar");
      //       String wishes = job.getString("wishes"); //园长寄语，老师不传
             String descrip=job.getString("description"); //老师介绍
+            String gender=job.getString("gender");
     //        boolean is_leader = job.getBoolean("leader"); //是否是园长
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
             String pwd = SMSMessageService.GenerateRandomNumber(); //获取随即密码
@@ -311,7 +312,7 @@ public class TeacherService {
                 return job_out.toString();
             }
 
-            Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-"); //普通老师
+            Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-",gender); //普通老师
             if(teacherdao.addTeacher(ordTeacher)){
             /*    Class cla =classdao.queryClass(class_id);
                 if(cla==null){
@@ -380,6 +381,7 @@ public class TeacherService {
                 job_out.put("email",t.getEmail());
                 job_out.put("name",t.getName());
                 job_out.put("avatar",t.getAvatar_path());
+                job_out.put("gender",t.getGender());
                 Iterator<Class> it=cla_set.iterator();
                 String cla_ids="";
                 String cla_names="";
