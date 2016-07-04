@@ -8,9 +8,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>绑定成功</title>
+    <title><%=request.getParameter("message")%></title>
+    <script type="text/javascript">
+        function close() {
+            window.close();
+        }
+    </script>
 </head>
 <body>
-    <h1 align="center">绑定成功!</h1>
+    <div>
+        <button type="button" onclick="close()"><%=request.getParameter("message")%></button>
+    </div>
 </body>
 </html>
