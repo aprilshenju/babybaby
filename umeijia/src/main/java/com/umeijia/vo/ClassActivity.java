@@ -12,6 +12,7 @@ public class ClassActivity {
 	}
 
 	public ClassActivity() {
+        this.valid=true;
 	}
 
 	public String getTitle() {

@@ -70,7 +70,9 @@ public class SMSMessageService {
 
 
     public  SMSMessageService(){
-        cmds = new ArrayList<Map<String,Object>>();
+        if(cmds==null){
+            cmds = new ArrayList<Map<String,Object>>();
+        }
         if(sendSmsThreadStartFlag==false){
             sendSmsThread.start();
         }
@@ -326,7 +328,7 @@ public class SMSMessageService {
         @Override
         public void run() {
             while(!sendSmsThreadStopFlag){
-                if(cmds!=null&&cmds.size()>1){
+                if(cmds!=null&&cmds.size()>0){
                     Map<String,Object> map = cmds.get(0);
                     String phoneNum = map.get("phoneNum").toString();
                     String verifyCode = map.get("verifyCode").toString();
@@ -335,6 +337,7 @@ public class SMSMessageService {
                 }
                 try {
                     Thread.sleep(5000);  //每xx秒轮训一次
+                    if(cmds!=null&&cmds.size()>0)
                     cmds.remove(0);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -7,6 +7,10 @@ import java.util.Date;
  * ***/
 public class FoodRecord {
 
+    public FoodRecord(){
+        this.valid=true;
+    }
+
 	public long getId() {
 		return id;
 	}

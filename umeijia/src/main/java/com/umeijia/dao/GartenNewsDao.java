@@ -64,7 +64,7 @@ public class GartenNewsDao {
         }
         Integer pageNumber = pager.getPageNumber();
         Integer pageSize = pager.getPageSize();
-        String hql=String.format("from GartenNews gn where gn.kindergarten.id=%d and gnews.valid=1",school_id);
+        String hql=String.format("from GartenNews gn where gn.kindergarten.id=%d and gn.valid=1",school_id);
         String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
         Session session=DBManager.getSession();
         Query query=session.createQuery(countHql);
