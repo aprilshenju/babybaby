@@ -46,7 +46,7 @@ public class Teacher {
 
 	}
 
-	public Teacher(String name,String avatar,String pwd_md,Kindergarten garten,String phone,String descrip,String email,boolean leader,String wishes){
+	public Teacher(String name,String avatar,String pwd_md,Kindergarten garten,String phone,String descrip,String email,boolean leader,String wishes,String gender){
 		this.name=name;
 		this.avatar_path=avatar;
 		this.pwd_md=pwd_md;
@@ -58,8 +58,18 @@ public class Teacher {
 		this.is_leader=leader;
 		this.wishes=wishes;
 		valid=true;
+		this.gender=gender;
 	}
 
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	private String gender;
 
 	public Kindergarten getKindergarten() {
 		return kindergarten;

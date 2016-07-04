@@ -30,6 +30,7 @@
 		<property name="description" column="description" ></property>		
 		<property name="is_leader" column="is_leader"></property>
 
+		<property name="gender" column="gender" unique="true" not-null="true"></property>
         <property name="email" column="email" unique="true" not-null="true"></property>
 		<property name="regist_date" column="regist_date"></property> 
 		<property name="wishes" column="wishes"></property>

@@ -298,7 +298,6 @@ public class ParentsDao {
         List list = query.list();
         session.close();
         List<Parents> parents=new ArrayList<Parents>();
-        session.close();
         for (int i = 0; i < list.size(); i++){
             Parents t=(Parents)list.get(i);
             parents.add(t);

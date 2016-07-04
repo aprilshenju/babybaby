@@ -159,12 +159,14 @@ public class WechatUtil {
     }
 
     public static void main(String[] args) {
-        try {
-            String openId = "o0JSAwntVdc6xbomFzu7o5ByQvEQ";
-            sendTemplateMessage(openId, "亲爱的小山山同学家长，小山山同学有一条考勤信息", "小山山", "2013年11月18日8时30分", "第一幼儿园", "谢谢您的关注", 3);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            String openId = "o0JSAwntVdc6xbomFzu7o5ByQvEQ";
+//            sendTemplateMessage(openId, "亲爱的小山山同学家长，小山山同学有一条考勤信息", "小山山", "2013年11月18日8时30分", "第一幼儿园", "谢谢您的关注", 3);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        String phone = "18090037299";
+        System.out.println(isPhone(phone));
     }
 
     public static boolean isEmail(String input) {
@@ -175,8 +177,7 @@ public class WechatUtil {
     }
 
     public static boolean isPhone(String input) {
-        Pattern pattern = Pattern.compile("^(((13[0-9])|(15([0-3]|[5-9]))|(18[0,5-9]))\\\\d{8})|(0\\\\d{2}-\\\\d{8})|" +
-                "(0\\\\d{3}-\\\\d{7})$");
+        Pattern pattern = Pattern.compile("^((13[0-9])|(15[^4,\\\\D])|(18[0,5-9]))\\\\d{8}$");
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();
     }
