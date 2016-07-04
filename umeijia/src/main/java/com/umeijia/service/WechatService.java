@@ -35,7 +35,7 @@ public class WechatService {
     @Qualifier("parentsdao")
     private ParentsDao parentsdao;
 
-    private final String serverIp = "http://xiaoxiaomi.imwork.net/umeijiaServer/";
+    private final String serverIp = "http://182.150.6.36/umeijiaServer/";
     private final String bindUrl = serverIp + "rest/wechat_service/login";
 
     @Path("/login/{openId}")
