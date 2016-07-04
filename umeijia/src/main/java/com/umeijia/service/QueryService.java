@@ -2,24 +2,26 @@ package com.umeijia.service;
 
 import com.umeijia.dao.*;
 import com.umeijia.util.GlobalStatus;
-import com.umeijia.util.MD5;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
 import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 @Path("/query_service")
@@ -462,7 +464,7 @@ public class QueryService {
     }
 
 
- 
+
 
 
 

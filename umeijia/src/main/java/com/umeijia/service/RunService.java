@@ -100,8 +100,8 @@ public class RunService {
         Student stu2 = new Student("刘屯屯","小屯屯","男",new Date(),138,36,"2.jpg",cla,false,d,d,d);
         studentdao.addStudent(stu1);
         studentdao.addStudent(stu2);
-        Parents parent1 = new Parents("18090037299","3523535@qq.com","仝大大",stu1,cla.getId(),garten.getId(),MD5.GetSaltMD5Code("123456"),"爷爷","1.jpg");
-        Parents parent2 = new Parents("15680079196","35235111@qq.com","刘大大",stu2,cla.getId(),garten.getId(),MD5.GetSaltMD5Code("123456"),"爸爸","1.jpg");
+        Parents parent1 = new Parents("18090037299","3523535@qq.com","仝大大",stu1,cla.getId(),garten.getId(),MD5.GetSaltMD5Code("123456"),"爷爷","1.jpg","男");
+        Parents parent2 = new Parents("15680079196","35235111@qq.com","刘大大",stu2,cla.getId(),garten.getId(),MD5.GetSaltMD5Code("123456"),"爸爸","1.jpg","男");
         parentsdao.addParents(parent1);
         parentsdao.addParents(parent2);
 
@@ -367,6 +367,7 @@ public class RunService {
             } else if(!email.isEmpty()){ // 邮箱登录
                 ag= agentdao.loginCheckByEmail(email,pwd_md);
             }
+            LockerLogger.log.info("加盟商开始登陆..");
             if(ag!=null)
             {
                 Set<Kindergarten> gartens = ag.getGartens();

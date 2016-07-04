@@ -59,7 +59,7 @@ public class Parents {
 		this.gender = gender;
 	}
 
-	public Parents(String phone, String email, String name, Student stu, long cla_id, long garten_id, String pwd, String relation, String avatar){
+	public Parents(String phone, String email, String name, Student stu, long cla_id, long garten_id, String pwd, String relation, String avatar,String gen){
 		this.phone_num=phone;
 		this.email=email;
 		this.name=name;
@@ -71,7 +71,7 @@ public class Parents {
 		this.avatar_path=avatar;
 		regist_date=new Date();
 		expire=regist_date;
-
+		this.gender=gen;
 		token="1";
 		valid=true;
 	}
