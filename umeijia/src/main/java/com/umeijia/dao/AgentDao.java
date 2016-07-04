@@ -1,7 +1,6 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
-import com.umeijia.util.LockerLogger;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.Agent;
 import org.hibernate.FlushMode;
@@ -107,8 +106,10 @@ public class AgentDao {
         List list = query.list();
         if(list.size()>0) {
             Agent agent = (Agent) list.get(0);
+         //   LockerLogger.log.info("找到了代理商");
             if(passwd.equals(agent.getPwd_md())){ //密码匹配
                 try {
+               //     LockerLogger.log.info("代理商密码也匹配");
                     session.setFlushMode(FlushMode.AUTO);
                     session.beginTransaction();
                     agent.setToken(MD5.GetSaltMD5Code(agent.getPhone_num()+passwd+new Date().toString())); //登陆时，即重新计算token，保存数据库
@@ -116,14 +117,14 @@ public class AgentDao {
                     Date dead = new Date(now .getTime() + DBManager.EXPIRE_SECONDS); //两个小时有效期
                     agent.setExpire(dead);
                     session.update(agent);
-                    LockerLogger.log.info("加盟商登陆成功");
+                //    LockerLogger.log.info("加盟商登陆成功");
                     session.flush();
                     session.getTransaction().commit();
                 } catch (HibernateException e) {
-                    LockerLogger.log.info("加盟商登陆异常....");
+               //     LockerLogger.log.info("加盟商登陆异常....");
                     e.printStackTrace();
                     session.getTransaction().rollback();
-             //      agent=null;
+                   agent=null;
                 } finally{
                     session.close();
                     return agent;
@@ -158,7 +159,7 @@ public class AgentDao {
                 } catch (HibernateException e) {
                     e.printStackTrace();
                     session.getTransaction().rollback();
-              //      agent=null;
+                    agent=null;
                 } finally{
                     session.close();
                     return agent;

@@ -1,7 +1,6 @@
 package com.umeijia.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by shenju on 2016/6/21.
@@ -20,7 +19,6 @@ public class TestAll {
             e.printStackTrace();
         }*/
 
-        Date d = new Date();
-        System.out.println(d.toString());
+    System.out.print(MD5.GetSaltMD5Code("agent123"));
     }
 }
