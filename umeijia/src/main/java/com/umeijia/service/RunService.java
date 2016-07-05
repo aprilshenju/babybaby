@@ -1,8 +1,10 @@
 package com.umeijia.service;
 
 import com.umeijia.dao.*;
+import com.umeijia.enums.OptEnum;
 import com.umeijia.util.GlobalStatus;
 import com.umeijia.util.LockerLogger;
+import com.umeijia.util.LogUtil;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
@@ -73,7 +75,9 @@ public class RunService {
     @Autowired
     @Qualifier("classactivitydao")
     private ClassActivityDao classactivitydao;
-
+    @Autowired
+    @Qualifier("dailylogdao")
+    private DailyLogDao dailylogdao;
     @Path("/hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -165,7 +169,8 @@ public class RunService {
                 return job_out.toString();
             }
             Agent agent = new Agent(tid);
-
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             String garten_name= job.getString("garten_name");
             String addr= job.getString("addr"); //幼儿园地址
             String contact=job.getString("garten_contact"); //幼儿园联系方式
@@ -214,6 +219,9 @@ public class RunService {
                     {
                         job_out.put("resultCode",GlobalStatus.succeed.toString());
                         job_out.put("resultDesc","成功添加幼儿园和园长");
+                        //添加日志
+                        DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加幼儿园和园长","幼儿园id:"+String.valueOf(garten.getId())+",园长id:"+String.valueOf(leader.getId()));
+                        dailylogdao.addDailyLog(dailyLog);
                         return job_out.toString();
                     }
                 }
@@ -259,6 +267,13 @@ public class RunService {
             String garten_instrument_imgs=job.getString("garten_instrument_imgs");// 教学设施列表
             String garten_presence_imgs=job.getString("garten_presence_imgs");//幼儿园图片展示列表*/
 
+            String phone = job.getString("leader_phone");
+            String email = job.getString("leader_email");
+            //   String pwd = job.getString("leader_password");
+            //     pwd=MD5.GetSaltMD5Code(pwd);
+
+
+
             Date date = new Date();
             Kindergarten garten = new Kindergarten(name,addr,contact,descrip,teacher_presence_imgs,garten_instrument_imgs,garten_presence_imgs,agent);
 
@@ -269,6 +284,150 @@ public class RunService {
             }
             job_out.put("resultCode",GlobalStatus.error.toString());
             job_out.put("resultDesc","添加幼儿园失败");
+            return job_out.toString();
+
+        } catch (JSONException e) {
+            return "error";  //json  构造异常，直接返回error
+        }
+    }
+
+    /***
+     *
+     *运营人员天添加 幼儿园
+     * **/
+    @Path("/correctGarten")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String correctGarten(@RequestBody String userinfo, @Context HttpHeaders headers) {
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out = new JSONObject();
+        try{
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!agentdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效token");
+                return job_out.toString();
+            }
+            Agent agent = new Agent(tid);
+            //获取上传的幼儿园新属性
+            long garten_id = job.getLong("garten_id");
+            String garten_name= job.getString("name");
+            String addr= job.getString("addr"); //幼儿园地址
+            String contact=job.getString("contact"); //幼儿园联系方式
+            String descrip=job.getString("description"); // 幼儿园介绍
+            String teacher_presence_imgs=job.getString("teacher_presence_imgs");// 教师风采图片列表
+            String garten_instrument_imgs=job.getString("garten_instrument_imgs");// 教学设施列表
+            String garten_presence_imgs=job.getString("garten_presence_imgs");//幼儿园图片展示列表*/
+
+            String phone =job.getString("leader_phone");
+            String email =job.getString("leader_email"); //邮箱
+            String name = job.getString("leader_name");  //名字
+            String avatar = job.getString("leader_avatar"); //头像
+            String wishes = job.getString("leader_wishes"); //园长寄语，老师不传
+            String leader_descrip=job.getString("leader_description"); //老师介绍
+            String leader_gender=job.getString("leader_gender"); //性别
+
+
+            Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
+            if(garten==null){
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效幼儿园id");
+                return job_out.toString();
+            }
+            if(agent.getGartens().contains(garten)==false){
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","当前加盟商无权限");
+                return job_out.toString();
+            }
+            //设置幼儿园新的属性
+            garten.setName(garten_name);
+            garten.setAddr(addr);
+            garten.setContact_num(contact);
+            garten.setDescription(descrip);
+            garten.setTeacher_presence_imgs(teacher_presence_imgs);
+            garten.setGarten_instrument_imgs(garten_instrument_imgs);
+            garten.setTeacher_presence_imgs(garten_presence_imgs);
+            garten.setLeader_wishes(wishes);
+        // 修改园长信息
+            Teacher old_leader = teacherdao.queryTeacher(garten.getLeader_id());
+            if(old_leader!=null){
+                    if(old_leader.getPhone_num().equals(phone)){
+                        //园长不变,只是修改信息
+                        old_leader.setName(name);
+                        old_leader.setWishes(wishes);
+                        old_leader.setPhone_num(phone);
+                        old_leader.setAvatar_path(avatar);
+                        old_leader.setEmail(email);
+                        old_leader.setDescription(leader_descrip);
+                        old_leader.setGender(leader_gender);
+                       if(teacherdao.updateTeacher(old_leader)==false){
+                           job_out.put("resultCode",GlobalStatus.error.toString());
+                           job_out.put("resultDesc","修改园长信息失败");
+                           return job_out.toString();
+                       }
+                    }else{
+                        //替换园长
+                        String new_passwd=SMSMessageService.GenerateRandomNumber();
+                        String new_passwd_md=MD5.GetSaltMD5Code(new_passwd);
+                        Teacher new_leader=teacherdao.queryTeacher(phone);
+                        if(new_leader!=null){
+                            //一个老师提升为园长
+                            new_leader.setName(name);
+                            new_leader.setWishes(wishes);
+                            new_leader.setPhone_num(phone);
+                            new_leader.setAvatar_path(avatar);
+                            new_leader.setEmail(email);
+                            new_leader.setDescription(leader_descrip);
+                            new_leader.setGender(leader_gender);
+                            new_leader.setIs_leader(true);
+                            if(teacherdao.updateTeacher(new_leader)==false){
+                                job_out.put("resultCode",GlobalStatus.error.toString());
+                                job_out.put("resultDesc","修改园长信息失败");
+                                return job_out.toString();
+                            }
+                            //废除老园长
+                            old_leader.setIs_leader(false);
+                            old_leader.setValid(false);
+                            if(teacherdao.updateTeacher(old_leader)==false){
+                                job_out.put("resultCode",GlobalStatus.error.toString());
+                                job_out.put("resultDesc","修改园长信息失败");
+                                return job_out.toString();
+                            }
+                            garten.setLeader_id(new_leader.getId()); //设置新的园长id
+                        }else{
+                            //置换为一个新园长,发送新密码
+                            old_leader.setName(name);
+                            old_leader.setWishes(wishes);
+                            old_leader.setPhone_num(phone);
+                            old_leader.setAvatar_path(avatar);
+                            old_leader.setEmail(email);
+                            old_leader.setDescription(leader_descrip);
+                            old_leader.setGender(leader_gender);
+                            old_leader.setIs_leader(true);
+                            old_leader.setPwd_md(new_passwd_md); //设置新密码
+                            if(teacherdao.updateTeacher(old_leader)==false) //替换原来园长记录
+                            {
+                                job_out.put("resultCode",GlobalStatus.error.toString());
+                                job_out.put("resultDesc","修改园长信息失败");
+                                return job_out.toString();
+                            }
+                        }
+                    }
+
+            }else{ //直接新加园长
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","该幼儿园原来没有园长");
+                return job_out.toString();
+            }
+            if(kindergartendao.updateKindergarten(garten)){
+                job_out.put("resultCode",GlobalStatus.succeed.toString());
+                job_out.put("resultDesc","成功修改幼儿园");
+                return  job_out.toString();
+            }
+            job_out.put("resultCode",GlobalStatus.error.toString());
+            job_out.put("resultDesc","修改幼儿园失败");
             return job_out.toString();
 
         } catch (JSONException e) {
@@ -477,6 +636,8 @@ public class RunService {
                     job_out.put("resultDesc","token已过期");
                     return job_out.toString();
                 }
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
                 String phone= job.getString("phone");
 //                String pwd= job.getString("pwd");
 //                pwd=MD5.GetSaltMD5Code(pwd);
@@ -510,6 +671,9 @@ public class RunService {
 
                     job_out.put("resultCode",GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功添加代理商");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加代理商","代理商id:"+String.valueOf(agent.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                     return  job_out.toString();
                 }
                 job_out.put("resultCode",GlobalStatus.error.toString());
@@ -546,6 +710,8 @@ public class RunService {
                 return job_out.toString();
             }
 
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             String phone= job.getString("phone");
     /*        String pwd= job.getString("pwd");
             pwd=MD5.GetSaltMD5Code(pwd);*/
@@ -574,6 +740,9 @@ public class RunService {
                 SMSMessageService .cmds.add(map);
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加管理员");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加管理员","管理员id:"+String.valueOf(admin.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 return  job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());

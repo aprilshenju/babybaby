@@ -2,7 +2,9 @@ package com.umeijia.service;
 
 
 import com.umeijia.dao.*;
+import com.umeijia.enums.OptEnum;
 import com.umeijia.util.GlobalStatus;
+import com.umeijia.util.LogUtil;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.Class;
 import com.umeijia.vo.*;
@@ -52,7 +54,9 @@ public class TeacherService {
     @Autowired
     @Qualifier("classdao")
     private  ClassDao classdao;
-
+    @Autowired
+    @Qualifier("dailylogdao")
+    private DailyLogDao dailylogdao;
     @Path("/hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -82,6 +86,8 @@ public class TeacherService {
             }
             String name = job.getString("name");
             String nick_name = job.getString("nick_name");
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             long class_id = job.getLong("class_id");
             String avatar = job.getString("avatar");
             String gender=job.getString("gender");
@@ -110,6 +116,9 @@ public class TeacherService {
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("baby_id",stu.getId()); //返回 baby_id
                 job_out.put("resultDesc","成功添加宝贝");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加学生","学生id:"+String.valueOf(stu.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 return  job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());
@@ -148,6 +157,8 @@ public class TeacherService {
             String email = job.getString("email");
    /*         String pwd = job.getString("password");*/
             String name = job.getString("name");
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             long class_id = job.getLong("class_id");
             long stu_id=job.getLong("baby_id");
             String relation = job.getString("relation");
@@ -182,6 +193,9 @@ public class TeacherService {
             if(parentsdao.addParents(p)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加家长");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加家长","家长id："+String.valueOf(p.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 Map<String,Object> map = new HashMap<String,Object>();
                 map.put("phoneNum",phone);
                 map.put("verifyCode",org_pwd);
@@ -202,7 +216,7 @@ public class TeacherService {
         return job_out.toString();
     }
     /***
-     * 添加家长
+     * 添加班级
      * curl -X POST -H "Content-Type:application/json" -d {"phone":"13534456644","password":"134df","name":"ltt4aoshou","email":"12345@qq.com","class_id":"1","baby_id":"1","relation":"dad","avatar":"fdef.jpg","gender":"0"}
      * http://127.0.0.1/umeijiaServer/teacher_service/addParents
      * **/
@@ -221,6 +235,8 @@ public class TeacherService {
                 job_out.put("resultDesc","token已过期");
                 return job_out.toString();
             }
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
                 String name = job.getString("name");
                 String introduciton=job.getString("introduciton");
                 long garten_id=job.getLong("garten");
@@ -246,6 +262,9 @@ public class TeacherService {
                     if(classdao.addClass(cla)){
                         job_out.put("resultCode",GlobalStatus.succeed.toString());
                         job_out.put("resultDesc","成功添加班级");
+                        //添加日志
+                        DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加班级","班级id:"+String.valueOf(cla.getId()));
+                        dailylogdao.addDailyLog(dailyLog);
                         return job_out.toString();
                     }
                 }
@@ -288,6 +307,8 @@ public class TeacherService {
                 job_out.put("resultDesc","只有园长才能添加老师");
                 return job_out.toString();
             }
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             String phone = job.getString("phone");
             String email = job.getString("email");
          /*   String pwd = job.getString("password");
@@ -337,6 +358,9 @@ public class TeacherService {
                 thread.start();
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加老师");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加老师","老师id:"+String.valueOf(ordTeacher.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 return job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());
@@ -470,6 +494,7 @@ public class TeacherService {
             String wishes = job.getString("wishes");
             String email = job.getString("email");
 
+
             Teacher t=teacherdao.queryTeacher(tid);
             if(t!=null)
             {
@@ -493,6 +518,66 @@ public class TeacherService {
         return job_out.toString();
     }
 
+    @Path("/invalidTeacher")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String invalidTeacher(@RequestBody String userinfo, @Context HttpHeaders headers){
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out=new JSONObject();
+        try {
+            // 用户 登陆token 验证
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效token");
+                return job_out.toString();
+            }
+
+            Teacher leader = teacherdao.queryTeacher(tid);
+            if(leader==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","非法操作人员");
+                return job_out.toString();
+            }
+            if(leader.getIs_leader()==false){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","只有园长才能删除老师");
+                return job_out.toString();
+            }
+
+            String phone=job.getString("teacher_id");
+            Teacher t=teacherdao.queryTeacher(phone);
+            if(t!=null)
+            {
+                t.setValid(false); // 老师设为无效
+                if(teacherdao.updateTeacher(t)){
+                    Set<Class> class_set=t.getClasses();
+                    Iterator<Class>it=class_set.iterator();
+                    while (it.hasNext()){
+                        Class one_class=(Class)it.next();
+                        one_class.getTeachers().remove(t); //移除对应老师
+                        classdao.updateClass(one_class);
+                    }
+                    Kindergarten garten = t.getKindergarten();
+                    garten.getTeachers().remove(t);
+                    kindergartendao.updateKindergarten(garten); //更新幼儿园老师列表
+                    //更新幼儿园老师通信录
+                    UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten.getId());
+                    thread.start();
+                    job_out.put("resultCode", GlobalStatus.succeed.toString());
+                    job_out.put("resultDesc","成功删除老师");
+                    return  job_out.toString(); //成功
+                }
+            }
+            job_out.put("resultCode", GlobalStatus.error.toString());
+            job_out.put("resultDesc","删除老师失败");
+        }catch (JSONException e){
+            return "error";  //json  构造异常，直接返回error
+        }
+        return job_out.toString();
+    }
 
 
     /***

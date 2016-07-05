@@ -3,6 +3,7 @@ package com.umeijia.service;
 import cn.jpush.api.push.model.notification.Notification;
 import com.sun.jersey.multipart.FormDataParam;
 import com.umeijia.dao.*;
+import com.umeijia.enums.OptEnum;
 import com.umeijia.util.*;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
@@ -3756,6 +3757,9 @@ public class PublicService {
                 if (cameradao.addCamera(camera)) {
                     returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
                     returnJsonObject.put("resultDesc", "操作成功");
+                    //添加日志
+                    DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加摄像头","摄像头id:"+String.valueOf(camera.getId()));
+                    dailylogdao.addDailyLog(dailyLog);
                 } else {
                     returnJsonObject.put("resultCode", GlobalStatus.error.toString());
                     returnJsonObject.put("resultDesc", "添加摄像头失败");
@@ -3814,6 +3818,7 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "获取json失败");
             return returnJsonObject.toString();
         }
+        LockerLogger.log.info(reqJson);
         String checkReqJson = judgeValidationOfInputJson(reqJson, "fileType", "gardenId", "classId",
                 "babyId", "interfaceType", "fileName", "roleType", "roleId");
         if (!checkReqJson.equals("")) {
