@@ -53,6 +53,20 @@ public class KinderGartenDao {
         }
     }
 
+    public List<Kindergarten> queryKindergartens() {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Kindergarten");
+        Query query = session.createQuery(sql);
+        List <Kindergarten> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public boolean addKindergarten(Kindergarten garten) {
         boolean result=false;
         Session session = DBManager.getSession();

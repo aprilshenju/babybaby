@@ -137,6 +137,16 @@ public class CheckinRecords {
     private String image_path_4;
 	private long stu_id;
 	private long class_id;
+
+    public long getSchool_id() {
+        return school_id;
+    }
+
+    public void setSchool_id(long school_id) {
+        this.school_id = school_id;
+    }
+
+    private long school_id;
 	private String state_1; //签到状态
     private String state_2; //签到状态
     private String state_3; //签到状态

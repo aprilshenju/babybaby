@@ -58,6 +58,21 @@ public class TeacherDao {
         }
     }
 
+    public Teacher queryTeacherBySchoolAndPhone(String phoneNumber,int schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Teacher as u where u.phone_num=\'%s\' and u.kindergarten.id=%d and u.valid=1", phoneNumber,schoolId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            Teacher teacher = (Teacher) list.get(0);
+            return teacher;
+        }else {
+            return null;
+        }
+    }
+
     public  List<Teacher> getTeachersByGarten(Long garten_id){
         Session session = DBManager.getSession();
         session.clear();

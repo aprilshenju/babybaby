@@ -69,6 +69,16 @@ public class HomeWork {
 	private long teacher_id;
 	private long class_id;
 
+	public long getSchool_id() {
+		return school_id;
+	}
+
+	public void setSchool_id(long school_id) {
+		this.school_id = school_id;
+	}
+
+	private long school_id;
+
     public boolean isValid() {
         return valid;
     }

@@ -70,6 +70,20 @@ public class ParentsDao {
         }
     }
 
+    public List<Parents> queryParentsByClassId(long classId){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Parents as u where u.class_id.id=%d and u.valid=1", classId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public Parents queryParents(String phoneNumber) {
         Session session = DBManager.getSession();
         session.clear();

@@ -40,6 +40,35 @@ public class ClassDao {
         }
     }
 
+    public List<Class> queryClassBySchoolId(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Class as c where c.garten.id=%d", schoolId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    public List<Class> queryClassBySchoolIdAndClassName(long schoolId,String className) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Class as c where c.garten.id=%d and c.name=%s", schoolId,className);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
  /*   public String getTeacherContacts(long class_id){
         String teacherContacts="";
         Session session = DBManager.getSession();

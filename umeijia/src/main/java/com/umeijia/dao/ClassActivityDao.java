@@ -82,6 +82,48 @@ public class ClassActivityDao {
         }
     }
 
+    public List queryOneClassActivitysListByClassAndTitle(long class_id,String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassActivity as ca where ca.class_id=%d and ca.title=%s and valid=1 order by ca.start_date desc",class_id,title);
+        Query query = session.createQuery(sql);
+        List <ClassActivity> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List queryOneClassActivitysListByTitle(String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassActivity as ca where  ca.title=%s and valid=1 order by ca.start_date desc",title);
+        Query query = session.createQuery(sql);
+        List <ClassActivity> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List queryOneClassActivitysListBySchoolId(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassActivity as ca where ca.school_id=%d and valid=1 order by ca.start_date desc",schoolId);
+        Query query = session.createQuery(sql);
+        List <ClassActivity> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public boolean addClassActivity(ClassActivity activity) {
         boolean result=false;
         Session session = DBManager.getSession();

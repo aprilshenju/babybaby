@@ -40,6 +40,20 @@ public class BabyKnowledgeDao {
         }
     }
 
+    public List<BabyKnowledge> queryBabyKnowledgeByTitle(String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from BabyKnowledge as knowledge where knowledge.question=%d and valid=1",title);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public List getBabyKnowledgeList() {
         Session session = DBManager.getSession();
         session.clear();

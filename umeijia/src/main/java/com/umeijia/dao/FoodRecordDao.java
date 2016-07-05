@@ -97,6 +97,20 @@ public class FoodRecordDao {
         }
     }
 
+    public List<FoodRecord> queryFoodRecordListBySchool(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from FoodRecord as fd where fd.school_id=%d and valid=1 order by fd.date desc",schoolId);
+        Query query = session.createQuery(sql);
+        List <FoodRecord> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public boolean setFoodRecord(long class_id,String foodrecord,String images){
         boolean result=false;
         Session session = DBManager.getSession();

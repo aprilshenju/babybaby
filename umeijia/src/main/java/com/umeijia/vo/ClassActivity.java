@@ -112,6 +112,16 @@ public class ClassActivity {
 	private String participate_time; //参与时间
 	private long class_id;
 
+	public long getSchool_id() {
+		return school_id;
+	}
+
+	public void setSchool_id(long school_id) {
+		this.school_id = school_id;
+	}
+
+	private long school_id;
+
 	public long getClass_id() {
 		return class_id;
 	}

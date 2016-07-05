@@ -58,6 +58,48 @@ public class ClassNotificationDao {
         }
     }
 
+    public List<ClassNotification> queryClassNotificationsByClassAndTitle(long class_id,String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassNotification as ca where ca.class_id=%d and ca.title=%s and valid=1 order by ca.date desc",class_id,title);
+        Query query = session.createQuery(sql);
+        List <ClassNotification> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<ClassNotification> queryClassNotificationsByTitle(String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassNotification as ca where ca.title=%s and valid=1 order by ca.date desc",title);
+        Query query = session.createQuery(sql);
+        List <ClassNotification> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<ClassNotification> queryClassNotificationsBySchool(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassNotification as ca where ca.school_id=%d and valid=1 order by ca.date desc",schoolId);
+        Query query = session.createQuery(sql);
+        List <ClassNotification> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     /**
      * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）。
      * **/

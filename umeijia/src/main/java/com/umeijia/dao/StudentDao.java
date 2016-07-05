@@ -61,6 +61,64 @@ public class StudentDao {
         }
     }
 
+    public List<Student> queryStudentByClassId(long classId){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Student as u where u.cla.id=%d and u.valid=1", classId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<Student> queryStudentByStudentName(String name){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Student as u where u.name=%s and u.valid=1", name);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<Student> queryStudentByClassIdAndStudentName(int classId,String name){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Student as u where u.cla.id=%d and u.name=%s and u.valid=1", classId,name);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    public List<Student> queryStudentBySchool(long schoolId){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Student as u where u.school_id=%d and u.valid=1", schoolId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public boolean addStudent(Student student) {
         boolean result=false;
         Session session = DBManager.getSession();

@@ -40,6 +40,64 @@ public class CheckinRecordsDao {
         }
     }
 
+    public List<CheckinRecords> queryCheckinRecordsBySchool(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.school_id=%d",schoolId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<CheckinRecords> queryCheckinRecordsByClass(long classId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.class_id=%d",classId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    public List<CheckinRecords> queryCheckinRecordsByClassAndBabyId(long classId,long babyId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.class_id=%d and cr.stu_id=%d",classId,babyId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    public List<CheckinRecords> queryCheckinRecordsByBabyId(long babyId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.stu_id=%d",babyId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     /**
      * 家长查询
      * @param babyId
@@ -52,6 +110,21 @@ public class CheckinRecordsDao {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from CheckinRecords as cr where cr.stu_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d order by date desc",babyId,year,month,day);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
+    public List<CheckinRecords> queryCheckinRecordsByTime(int year,int month,int day){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d order by date desc",year,month,day);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -77,6 +150,24 @@ public class CheckinRecordsDao {
             return null;
         }
     }
+
+
+    public List<CheckinRecords> queryCheckinRecordsByBabyNameAndClassAndTime(long classId,long babyId,int year,int month,int day){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinRecords as cr where cr.class_id=%d and cr.stu_id=%d and year(cr.date)=%d and month(cr.date)=%d and day(cr.date)=%d order by date desc",classId,babyId,year,month,day);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+//            CheckinRecords cr = (CheckinRecords) list.get(0);
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
 
 
     /**

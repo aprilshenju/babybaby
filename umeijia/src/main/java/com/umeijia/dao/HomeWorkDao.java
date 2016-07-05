@@ -58,6 +58,48 @@ public class HomeWorkDao {
         }
     }
 
+    public List<HomeWork> queryHomeWorksByClassidAndTitle(long class_id,String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from HomeWork as work where work.class_id=%d and work.title=%s and valid=1 order by work.date desc",class_id,title);
+        Query query = session.createQuery(sql);
+        List <HomeWork> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<HomeWork> queryHomeWorksByTitle(String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from HomeWork as work where  work.title=%s and valid=1 order by work.date desc",title);
+        Query query = session.createQuery(sql);
+        List <HomeWork> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<HomeWork> queryHomeWorksBySchool(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from HomeWork as work where work.school_id=%d and valid=1 order by work.date desc",schoolId);
+        Query query = session.createQuery(sql);
+        List <HomeWork> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     /**
      * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）。
      * **/

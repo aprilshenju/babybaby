@@ -19,6 +19,16 @@ public class Student {
 	private  Date vip_start;
 	private Date vip_end; //会员开始结束时间
 	private  boolean valid;
+
+	public long getSchool_id() {
+		return school_id;
+	}
+
+	public void setSchool_id(long school_id) {
+		this.school_id = school_id;
+	}
+
+	private long school_id;
 	public Student(){
 
 	}

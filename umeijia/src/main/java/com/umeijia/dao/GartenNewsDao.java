@@ -55,6 +55,21 @@ public class GartenNewsDao {
     }
 
 
+    public List<GartenNews> queryGartenNewssByShoolIdAndTitle(long school_id,String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d and gnews.title=%s and gnews.valid=1 order by gnews.modifyDate desc",school_id,title);
+        Query query = session.createQuery(sql);
+        List <GartenNews> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+
     /**
      * 后续改为分页处理,page传入 每页多少项，当前需要第几页的内容。返回总项目数（总页数可通过计算获得）。
      * **/

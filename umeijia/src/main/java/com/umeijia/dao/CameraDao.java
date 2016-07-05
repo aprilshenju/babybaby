@@ -57,6 +57,63 @@ public class CameraDao {
             return null;
         }
     }
+
+
+    public List getCamerasList() {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.valid=1");
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List getCamerasListBySchoolId(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.valid=1",schoolId);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List getCamerasListBySchoolIdAndCameraName(long schoolId,String name) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.manufactory=%s and ca.valid=1",schoolId,name);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List getCamerasListByCameraName(String name) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where  ca.manufactory=%s and ca.valid=1",name);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
     /**
      * 一个幼儿园公共区域摄像头列表
      * **/

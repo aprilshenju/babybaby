@@ -33,7 +33,7 @@ private long id;
 		<property name="height" column="height" ></property>
 		<property name="weight" column="weight" ></property>
 		<property name="avatar_path" column="avatar_path" ></property>
-
+		<property name="school_id" column="school_id" ></property>
 		<property name="entrance_date" column="entrance_date" ></property>
 		<property name="vip" column="vip"></property>
 		<property name="vip_start" column="vip_start"></property>

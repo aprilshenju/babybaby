@@ -1132,6 +1132,7 @@ public class PublicService {
             cn.setDescription(jobIn.getString("description"));
             cn.setDate(new Date());
             cn.setClass_id(jobIn.getInt("classId"));
+            cn.setSchool_id(classdao.queryClass(cn.getClass_id()).getGarten().getId());
             String imageUrls = jobIn.getString("imageUrls");
             cn.setImage_urls(imageUrls);
             cn.setSubscribers("");
@@ -1378,11 +1379,11 @@ public class PublicService {
             String imageUrls = jobIn.getString("imageUrls");
             String state = jobIn.getString("state");
             float temperature = (float) jobIn.getDouble("temperature");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
-                return jobOut.toString();
-            }
+//            if (!checkIdAndToken(roleType, headers)) {
+//                jobOut.put("resultCode", GlobalStatus.error.toString());
+//                jobOut.put("resultDesc", "token已过期");
+//                return jobOut.toString();
+//            }
             if (roleType != 1 && roleType != 2) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "没有权限添加考勤记录");
@@ -1396,6 +1397,7 @@ public class PublicService {
             if(cir==null){ //没有记录直接添加
                 cir = new CheckinRecords();
                 cir.setClass_id(jobIn.getInt("classId"));
+                cir.setSchool_id(classdao.queryClass(cir.getClass_id()).getGarten().getId());
                 cir.setDate(new Date());
                 cir.setStu_id(checkincarddao.queryCheckinCard(cardId).getStu_id());
                 switch (period){
@@ -1814,6 +1816,7 @@ public class PublicService {
             hw.setImage_urls(imageUrls);
             hw.setDescription(description);
             hw.setClass_id(classId);
+            hw.setSchool_id(classdao.queryClass(classId).getGarten().getId());
             hw.setDate(new Date());
             hw.setTeacher_id(roleId);
             hw.setTitle(title);
@@ -1950,6 +1953,7 @@ public class PublicService {
             ca.setTitle(title);
             ca.setTeacher_id(roleId);
             ca.setClass_id(classId);
+            ca.setSchool_id(classdao.queryClass(classId).getGarten().getId());
             ca.setBaby_ids("");  //参与宝贝的ids
             ca.setContact_name(contactName);
             ca.setContent(content);

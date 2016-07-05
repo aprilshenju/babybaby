@@ -84,6 +84,16 @@ public class ClassNotification {
 
     private boolean valid;
 
+	public long getSchool_id() {
+		return school_id;
+	}
+
+	public void setSchool_id(long school_id) {
+		this.school_id = school_id;
+	}
+
+	private long school_id;
+
 	private String subscribers; // 分号分割,已查看通知的宝贝集合
 	
 	

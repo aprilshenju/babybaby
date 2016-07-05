@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.print.attribute.standard.JobImpressions;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,10 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Path("/query_service")
@@ -137,15 +135,47 @@ public class QueryService {
             }
 
             //        String hql=String.format("from BabyShowtime bs where bs.class_id=%d",class_id);
-            String hql = GenerateSqlFromInput(queryType,jobIn);
-            Pager pager = new Pager();
-            pager.setPageNumber(pageNum);
-            pager.setPageSize(pageSize);
-            pager = querydao.queryPager(hql,pager);
+//            String hql = GenerateSqlFromInput(queryType,jobIn);
+//            Pager pager = new Pager();
+//            pager.setPageNumber(pageNum);
+//            pager.setPageSize(pageSize);
+//            pager = querydao.queryPager(hql,pager);
             JSONArray ja = new JSONArray();
+            String checkInput2 = "";
             switch(queryType){
                 case"Teacher":
-                    List<Teacher> teachers = (List<Teacher>)pager.getList();
+                    if(roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId", "phoneNum", "classId");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_teacher = jobIn.getInt("schoolId");
+                    String phoneNum_teacher = jobIn.getString("phoneNum");
+                    int classId_teacher = jobIn.getInt("classId");
+                    List<Teacher> teachers = new ArrayList<Teacher>();
+                    /**
+                     * 什么都不传就返回学校的所有老师
+                     */
+                    if(phoneNum_teacher.equals("")&&classId_teacher==-1){
+                        teachers = teacherdao.queryTeachersByGarten(schoolId_teacher);
+                    }
+                    else if(!phoneNum_teacher.equals("")){
+                        Teacher t = teacherdao.queryTeacherBySchoolAndPhone(jobIn.getString("phoneNum"),schoolId_teacher);
+                        if(t!=null)
+                        teachers.add(t);
+                    }
+                    else if(classId_teacher!=-1){
+                        Set<Teacher> teachersInSet = classdao.queryClass(jobIn.getInt("classId")).getTeachers();
+                        if(teachersInSet!=null){
+                            for(Teacher item :teachersInSet){
+                                teachers.add(item);
+                            }
+                        }
+                    }
                     if(teachers==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -166,7 +196,24 @@ public class QueryService {
                     }
                     break;
                 case "Class":
-                    List<Class>  classes = (List<Class>)pager.getList();
+                    if(roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId", "className");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_class = jobIn.getInt("schoolId");
+                    String className_class = jobIn.getString("className");
+                    List<Class>  classes = new ArrayList<Class>();
+                    //如果不传className,直接返回所有的班级
+                    if(className_class.equals("")){
+                        classes = classdao.queryClassBySchoolId(schoolId_class);
+                    }else{
+                        classes = classdao.queryClassBySchoolIdAndClassName(schoolId_class,className_class);
+                    }
                     if(classes==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -181,7 +228,30 @@ public class QueryService {
                     }
                     break;
                 case "Student":
-                    List<Student> students = (List<Student>)pager.getList();
+                    if(roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId", "classId","babyName");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_student = jobIn.getInt("schoolId");
+                    int classid_student = jobIn.getInt("classId");
+                    String babyName_student = jobIn.getString("babyName");
+                    List<Student> students = new ArrayList<Student>();
+                    if(babyName_student.equals("")&&classid_student==-1){
+                        students = studentdao.queryStudentBySchool(schoolId_student);
+                    }else if(classid_student!=-1){
+                        if(babyName_student.equals("")){
+                            students = studentdao.queryStudentByClassId(classid_student);
+                        }else{
+                            students = studentdao.queryStudentByClassIdAndStudentName(classid_student,babyName_student);
+                        }
+                    }else if(!babyName_student.equals("")){
+                        students = studentdao.queryStudentByStudentName(babyName_student);
+                    }
                     if(students==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -198,7 +268,27 @@ public class QueryService {
                     }
                     break;
                 case "Agent":
-                    List<Agent> agents = (List<Agent>)pager.getList();
+                    if(roleType!=5){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "agentId");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    List<Agent> agents = new ArrayList<Agent>();
+                    int agentId_agent = jobIn.getInt("agentId");
+                    /**
+                     * 不传id就显示所有的加盟商
+                     */
+                    if(agentId_agent==-1){
+                        agents = agentdao.queryAgents();
+                    }else{
+                        Agent a = agentdao.queryAgent(agentId_agent);
+                        if(a!=null)
+                        agents.add(a);
+                    }
                     if(agents==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -214,7 +304,30 @@ public class QueryService {
                     }
                     break;
                 case "Kindergarten":
-                    List<Kindergarten> kindergartens = (List<Kindergarten>)pager.getList();
+                    if(roleType!=5&&roleType!=4){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_Kindergarten = jobIn.getInt("schoolId");
+                    List<Kindergarten> kindergartens = new ArrayList<Kindergarten>();
+                    if(schoolId_Kindergarten==-1){
+                        if(roleType==5){  //查看所有的学校
+                            kindergartens = kindergartendao.queryKindergartens();
+                        }else if(roleType==4){  //查看自己的学校
+                            kindergartens = kindergartendao.queryKindergartens(roleId);
+                        }
+
+                    }else{
+                        Kindergarten kg = kindergartendao.queryKindergarten(schoolId_Kindergarten);
+                        if(kg!=null){
+                            kindergartens.add(kg);
+                        }
+                    }
                     if(kindergartens==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -231,7 +344,30 @@ public class QueryService {
                     }
                     break;
                 case "Parents":
-                    List<Parents> parents = (List<Parents>)pager.getList();
+                    if(roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","classId","phoneNum");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_parent = jobIn.getInt("schoolId");
+                    int classId_parent = jobIn.getInt("classId");
+                    String phone_parent = jobIn.getString("phoneNum");
+                    //什么都不传显示本校的所有家长
+                    List<Parents> parents = new ArrayList<>();
+                    if(classId_parent==-1&&phone_parent.equals("")){
+                        parents = parentsdao.queryParentssByGarten(schoolId_parent);
+                    }else if(!phone_parent.equals("")){
+                        Parents p = parentsdao.queryParents(phone_parent);
+                        if(p!=null)
+                        parents.add(p);
+                    }else if(classId_parent!=-1){
+                        parents = parentsdao.queryParentsByClassId(classId_parent);
+                    }
+
                     if(parents==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -247,7 +383,24 @@ public class QueryService {
                     }
                     break;
                 case "GartenNews":
-                    List<GartenNews> gartenNews = (List<GartenNews>)pager.getList();
+                    if(roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","title");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_gartenNews = jobIn.getInt("schoolId");
+                    String title_gartenNews = jobIn.getString("title");
+                    List<GartenNews> gartenNews = new ArrayList<>();
+                    if(title_gartenNews.equals("")){
+                        gartenNews = gartennewsdao.queryGartenNewss(schoolId_gartenNews);
+                    }else{
+                        gartenNews = gartennewsdao.queryGartenNewssByShoolIdAndTitle(schoolId_gartenNews,title_gartenNews);
+                    }
+
                     if(gartenNews==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -262,7 +415,30 @@ public class QueryService {
                     }
                     break;
                 case "FoodRecord":
-                    List<FoodRecord> foodRecords = (List<FoodRecord>)pager.getList();
+                    if(roleType!=1&&roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","classId");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_foodRecord = jobIn.getInt("schoolId");
+                    int classId_foodRecord = jobIn.getInt("classId");
+                    List<FoodRecord> foodRecords = new ArrayList<>();
+                    if(classId_foodRecord==-1){
+                        if(roleType==1){ //如果不传则老师查看自己班级的，院长查看所有班级的
+                            for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
+                                foodRecords.addAll(foodrecorddao.queryFoodRecordList(item.getId()));
+                            }
+                        }else if(roleType==2){
+                            foodRecords = foodrecorddao.queryFoodRecordListBySchool(schoolId_foodRecord);
+                        }
+                    }else{
+                        foodRecords = foodrecorddao.queryFoodRecordList(classId_foodRecord);
+                    }
+
                     if(foodRecords==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -277,7 +453,77 @@ public class QueryService {
                     }
                     break;
                 case "CheckinRecords":
-                    List<CheckinRecords> checkinRecords = (List<CheckinRecords>)pager.getList();
+                    if(roleType!=1&&roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","classId","year","month","day","babyName");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_checkinRecords = jobIn.getInt("schoolId");
+                    int classId_checkinRecords = jobIn.getInt("classId");
+                    int year_checkinRecords = jobIn.getInt("year");
+                    int month_checkinRecords = jobIn.getInt("month");
+                    int day_checkinRecords = jobIn.getInt("day");
+                    String babyName_checkinRecords = jobIn.getString("babyName");
+                    List<CheckinRecords> checkinRecords = new ArrayList<CheckinRecords>();
+                    //什么都没选，院长显示学校的所有签到记录，老师显示班级的所有记录
+                    if(classId_checkinRecords==-1&&year_checkinRecords==-1&&babyName_checkinRecords.equals("")){
+                        if(roleId==1){
+                            for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
+                                checkinRecords.addAll(checkinrecorddao.queryCheckinRecordsByClass(item.getId()));
+                            }
+                        }else if(roleType==2){
+                            checkinRecords = checkinrecorddao.queryCheckinRecordsBySchool(schoolId_checkinRecords);
+                        }
+                    }else if(classId_checkinRecords!=-1){//传了班级
+                        if(year_checkinRecords!=-1){//传了班级，传了日期
+                            if(babyName_checkinRecords.equals("")){//传了班级，传了日期，没传姓名
+                                checkinRecords = checkinrecorddao.queryCheckinRecordsByClassAndTime(classId_checkinRecords,year_checkinRecords,month_checkinRecords,day_checkinRecords);
+                            }else{//传了班级，传了日期，也传了姓名
+                                for(Student item:studentdao.queryStudentByStudentName(babyName_checkinRecords)){
+                                    List<CheckinRecords> crs = checkinrecorddao.queryCheckinRecordsByBabyNameAndClassAndTime(classId_checkinRecords,item.getId(),year_checkinRecords,month_checkinRecords,day_checkinRecords);
+                                    if(crs!=null){
+                                        checkinRecords.addAll(crs);
+                                    }
+                                }
+                            }
+                        }else{
+                            if(babyName_checkinRecords.equals("")){//传了班级，没传日期，没传姓名
+                                checkinRecords = checkinrecorddao.queryCheckinRecordsByClass(classId_checkinRecords);
+                            }else{//传了班级，没传日期，传了姓名
+                                for(Student item:studentdao.queryStudentByStudentName(babyName_checkinRecords)){
+                                    List<CheckinRecords> crs = checkinrecorddao.queryCheckinRecordsByClassAndBabyId(classId_checkinRecords,item.getId());
+                                    if(crs!=null){
+                                        checkinRecords.addAll(crs);
+                                    }
+                                }
+                            }
+                        }
+
+                    }else if(year_checkinRecords!=-1){  //没传班级，传了日期
+                        if(babyName_checkinRecords.equals("")){//没传班级，传了日期，没传姓名
+                            checkinRecords = checkinrecorddao.queryCheckinRecordsByTime(year_checkinRecords,month_checkinRecords,day_checkinRecords);
+                        }else{//没传班级，传了日期，传了姓名
+                            for(Student item:studentdao.queryStudentByStudentName(babyName_checkinRecords)){
+                                List<CheckinRecords> crs = checkinrecorddao.queryCheckinRecordsByBabyAndTime(item.getId(),year_checkinRecords,month_checkinRecords,day_checkinRecords);
+                                if(crs!=null){
+                                    checkinRecords.addAll(crs);
+                                }
+                            }
+                        }
+
+                    }else if(!babyName_checkinRecords.equals("")){  //没传班级和日期，只传了宝贝姓名
+                        for(Student item:studentdao.queryStudentByStudentName(babyName_checkinRecords)){
+                            List<CheckinRecords> crs = checkinrecorddao.queryCheckinRecordsByBabyId(item.getId());
+                            if(crs!=null){
+                                checkinRecords.addAll(crs);
+                            }
+                        }
+                    }
+
                     if(checkinRecords==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -295,7 +541,37 @@ public class QueryService {
                     }
                     break;
                 case "ClassNotification":
-                    List<ClassNotification> classNotifications = (List<ClassNotification>)pager.getList();
+                    if(roleType!=1&&roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","classId","title");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_classnotification = jobIn.getInt("schoolId");
+                    int classId_classnotification = jobIn.getInt("classId");
+                    String title_classnotification = jobIn.getString("title");
+                    List<ClassNotification> classNotifications = new ArrayList<>();
+                    if(classId_classnotification==-1&&title_classnotification.equals("")){
+                        if(roleType==2){
+                            classNotifications = classnotificationdao.queryClassNotificationsBySchool(schoolId_classnotification);
+                        }else if(roleType==1){
+                            for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
+                                classNotifications.addAll(classnotificationdao.queryClassNotifications(item.getId()));
+                            }
+                        }
+
+                    }else if(classId_classnotification!=-1){
+                        if(!title_classnotification.equals("")){
+                            classNotifications = classnotificationdao.queryClassNotifications(classId_classnotification);
+                        }else{
+                            classNotifications = classnotificationdao.queryClassNotificationsByClassAndTitle(classId_classnotification,title_classnotification);
+                        }
+                    }else if(!title_classnotification.equals("")){
+                        classNotifications = classnotificationdao.queryClassNotificationsByTitle(title_classnotification);
+                    }
                     if(classNotifications==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -311,7 +587,37 @@ public class QueryService {
                     }
                     break;
                 case "HomeWork":
-                    List<HomeWork> homeWorks = (List<HomeWork>)pager.getList();
+                    if(roleType!=1&&roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","classId","title");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_homework = jobIn.getInt("schoolId");
+                    int classId_homework = jobIn.getInt("classId");
+                    String title_homework  = jobIn.getString("title");
+                    List<HomeWork> homeWorks = new ArrayList<>();
+                    if(classId_homework==-1&&title_homework.equals("")){
+                        if(roleType==2){
+                            homeWorks = homeworkdao.queryHomeWorksBySchool(schoolId_homework);
+                        }else if(roleType==1){
+                            for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
+                                homeWorks.addAll(homeworkdao.queryHomeWorks(item.getId()));
+                            }
+                        }
+
+                    }else if(classId_homework!=-1){
+                        if(!title_homework.equals("")){
+                            homeWorks = homeworkdao.queryHomeWorks(classId_homework);
+                        }else{
+                            homeWorks = homeworkdao.queryHomeWorksByClassidAndTitle(classId_homework,title_homework);
+                        }
+                    }else if(!title_homework.equals("")){
+                        homeWorks = homeworkdao.queryHomeWorksByTitle(title_homework);
+                    }
                     if(homeWorks==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -326,7 +632,37 @@ public class QueryService {
                     }
                     break;
                 case "ClassActivity":
-                    List<ClassActivity> classActivities = (List<ClassActivity>)pager.getList();
+                    if(roleType!=1&&roleType!=2){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","classId","title");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_classActivity = jobIn.getInt("schoolId");
+                    int classId_classActivity = jobIn.getInt("classId");
+                    String title_classActivity  = jobIn.getString("title");
+                    List<ClassActivity> classActivities = new ArrayList<>();
+                    if(classId_classActivity==-1&&title_classActivity.equals("")){
+                        if(roleType==2){
+                            classActivities = classactivitydao.queryOneClassActivitysListBySchoolId(schoolId_classActivity);
+                        }else if(roleType==1){
+                            for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
+                                classActivities.addAll(classactivitydao.queryOneClassActivitysList(item.getId()));
+                            }
+                        }
+
+                    }else if(classId_classActivity!=-1){
+                        if(!title_classActivity.equals("")){
+                            classActivities = classactivitydao.queryOneClassActivitysList(classId_classActivity);
+                        }else{
+                            classActivities = classactivitydao.queryOneClassActivitysListByClassAndTitle(classId_classActivity,title_classActivity);
+                        }
+                    }else if(!title_classActivity.equals("")){
+                        classActivities = classactivitydao.queryOneClassActivitysListByTitle(title_classActivity);
+                    }
                     if(classActivities==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -343,7 +679,12 @@ public class QueryService {
                     }
                     break;
                 case "FeedBack":
-                    List<FeedBack> feedBacks = (List<FeedBack>)pager.getList();
+                    if(roleType!=5){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    List<FeedBack> feedBacks = feedbackdao.getFeedBackList();
                     if(feedBacks==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -360,7 +701,37 @@ public class QueryService {
                     }
                     break;
                 case "Camera":
-                    List<Camera> cameras = (List<Camera>)pager.getList();
+                    if(roleType!=5&&roleType!=4){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId","name");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int schoolId_camera = jobIn.getInt("schoolId");
+                    String name_camera = jobIn.getString("name");
+                    List<Camera> cameras = new ArrayList<>();
+                    if(schoolId_camera==-1&&name_camera.equals("")){  //什么都没传
+                        if(roleType==5){
+                            cameras = cameradao.getCamerasList();
+                        }else if(roleType==4){
+                            for(Kindergarten item:agentdao.queryAgent(roleId).getGartens()){
+                                if(cameradao.getCamerasListBySchoolId(item.getId())!=null){
+                                    cameras.addAll(cameradao.getCamerasListBySchoolId(item.getId()));
+                                }
+                            }
+                        }
+                    }else if(schoolId_camera!=-1){
+                        if(name_camera.equals("")){
+                            cameras = cameradao.getCamerasListBySchoolId(schoolId_camera);
+                        }else{
+                            cameras = cameradao.getCamerasListBySchoolIdAndCameraName(schoolId_camera,name_camera);
+                        }
+                    }else if(!name_camera.equals("")){
+                        cameras = cameradao.getCamerasListByCameraName(name_camera);
+                    }
                     if(cameras==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -376,7 +747,23 @@ public class QueryService {
                     }
                     break;
                 case "BabyKnowledge":
-                    List<BabyKnowledge> babyKnowledges = (List<BabyKnowledge>)pager.getList();
+                    if(roleType!=5){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "title");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    List<BabyKnowledge> babyKnowledges = new ArrayList<>();
+                    String title_babyknowledge = jobIn.getString("title");
+                    if(title_babyknowledge.equals("")){
+                        babyKnowledges = babyknowledgedao.getBabyKnowledgeList();
+                    }else{
+                        babyKnowledges = babyknowledgedao.queryBabyKnowledgeByTitle(title_babyknowledge);
+                    }
+
                     if(babyKnowledges==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -391,7 +778,12 @@ public class QueryService {
                     }
                     break;
                 case "SystemNotification":
-                    List<SystemNotification> systemNotifications = (List<SystemNotification>)pager.getList();
+                    if(roleType!=5){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    List<SystemNotification> systemNotifications = systemnotificationdao.querySystemNotifications();
                     if(systemNotifications==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -407,7 +799,36 @@ public class QueryService {
                     }
                     break;
                 case "DailyLog":
-                    List<DailyLog> dailyLogs = (List<DailyLog>)pager.getList();
+                    if(roleType!=5){
+                        jobOut.put("resultCode", GlobalStatus.error.toString());
+                        jobOut.put("resultDesc", "没权限");
+                        return jobOut.toString();
+                    }
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "year","month","day","phoneNum");
+                    if (!checkInput2.equals("")) {
+                        return checkInput2;
+                    }
+                    int year_log = jobIn.getInt("year");
+                    int month_log = jobIn.getInt("month");
+                    int day_log = jobIn.getInt("day");
+                    String phoneNum_log = jobIn.getString("phoneNum");
+                    List<DailyLog> dailyLogs = new ArrayList<>();
+                    if(year_log==-1&&phoneNum_log.equals("")){
+                        dailyLogs =dailylogdao.queryDailyLogs();
+                    }else if(year_log!=-1){
+                        if(phoneNum_log.equals("")){
+                            dailyLogs = dailylogdao.queryDailyLogByDate(year_log,month_log,day_log);
+                        }else{
+                            long userType = getUserTypeAndIdFromPhone(phoneNum_log)[0];
+                            long userId = getUserTypeAndIdFromPhone(phoneNum_log)[1];
+                            dailyLogs =dailylogdao.queryDailyLogByDateAndUserTypeAndUserId(year_log,month_log,day_log,userType,userId);
+                        }
+                    }else if(!phoneNum_log.equals("")){
+                        long userType = getUserTypeAndIdFromPhone(phoneNum_log)[0];
+                        long userId = getUserTypeAndIdFromPhone(phoneNum_log)[1];
+                        dailyLogs = dailylogdao.queryDailyLogByUserTypeAndUserId(userType,userId);
+                    }
+
                     if(dailyLogs==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
                         jobOut.put("resultDesc", "无记录");
@@ -437,6 +858,43 @@ public class QueryService {
             jobOut.put("resultDesc", "操作失败");
         }
         return jobOut.toString();
+    }
+
+    public long[] getUserTypeAndIdFromPhone(String phoneNum){
+        long[] result = new long[2];
+        Teacher t = teacherdao.queryTeacher(phoneNum);
+        if(t!=null){
+            if(t.getIs_leader()){
+                result[0]=2;
+                result[1] = t.getId();
+            }else{
+                result[0]=2;
+                result[1] = t.getId();
+            }
+            return result;
+        }else{
+            Parents p = parentsdao.queryParents(phoneNum);
+            if(p!=null){
+                result[0]=3;
+                result[1] = p.getId();
+                return result;
+            }else{
+                Agent a = agentdao.queryAgent(phoneNum);
+                if(a!=null){
+                    result[0]=4;
+                    result[1] = a.getId();
+                    return result;
+                }else{
+                    Administrator ad = administratordao.queryAdministrator(phoneNum);
+                    if(ad!=null){
+                        result[0]=5;
+                        result[1] = ad.getId();
+                        return result;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
 
