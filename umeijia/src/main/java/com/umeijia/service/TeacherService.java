@@ -494,6 +494,7 @@ public class TeacherService {
             String wishes = job.getString("wishes");
             String email = job.getString("email");
 
+
             Teacher t=teacherdao.queryTeacher(tid);
             if(t!=null)
             {
@@ -517,6 +518,66 @@ public class TeacherService {
         return job_out.toString();
     }
 
+    @Path("/invalidTeacher")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String invalidTeacher(@RequestBody String userinfo, @Context HttpHeaders headers){
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out=new JSONObject();
+        try {
+            // 用户 登陆token 验证
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效token");
+                return job_out.toString();
+            }
+
+            Teacher leader = teacherdao.queryTeacher(tid);
+            if(leader==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","非法操作人员");
+                return job_out.toString();
+            }
+            if(leader.getIs_leader()==false){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","只有园长才能删除老师");
+                return job_out.toString();
+            }
+
+            String phone=job.getString("teacher_id");
+            Teacher t=teacherdao.queryTeacher(phone);
+            if(t!=null)
+            {
+                t.setValid(false); // 老师设为无效
+                if(teacherdao.updateTeacher(t)){
+                    Set<Class> class_set=t.getClasses();
+                    Iterator<Class>it=class_set.iterator();
+                    while (it.hasNext()){
+                        Class one_class=(Class)it.next();
+                        one_class.getTeachers().remove(t); //移除对应老师
+                        classdao.updateClass(one_class);
+                    }
+                    Kindergarten garten = t.getKindergarten();
+                    garten.getTeachers().remove(t);
+                    kindergartendao.updateKindergarten(garten); //更新幼儿园老师列表
+                    //更新幼儿园老师通信录
+                    UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten.getId());
+                    thread.start();
+                    job_out.put("resultCode", GlobalStatus.succeed.toString());
+                    job_out.put("resultDesc","成功删除老师");
+                    return  job_out.toString(); //成功
+                }
+            }
+            job_out.put("resultCode", GlobalStatus.error.toString());
+            job_out.put("resultDesc","删除老师失败");
+        }catch (JSONException e){
+            return "error";  //json  构造异常，直接返回error
+        }
+        return job_out.toString();
+    }
 
 
     /***
