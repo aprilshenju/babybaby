@@ -167,7 +167,7 @@ public class WechatService {
     }
 
     @Path("/bindW")
-    @POST
+    @GET
     @Consumes("application/x-www-form-urlencoded")
     public Viewable bindWechat(@FormParam("name") String account, @FormParam("password") String passwd, @FormParam
             ("openId") String openId, @Context HttpServletRequest request, @Context HttpServletResponse response) {

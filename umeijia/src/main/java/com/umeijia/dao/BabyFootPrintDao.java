@@ -69,7 +69,7 @@ public class BabyFootPrintDao {
         }
         Integer pageNumber = pager.getPageNumber();
         Integer pageSize = pager.getPageSize();
-        String hql=String.format("from BabyFootPrint bs where bs.class_id=%d",baby_id);
+        String hql=String.format("from BabyFootPrint bs where bs.baby_id=%d",baby_id);
         String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
         Session session=DBManager.getSession();
         Query query=session.createQuery(countHql);
