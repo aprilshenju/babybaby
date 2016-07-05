@@ -26,6 +26,14 @@ import java.util.*;
 @Service
 @Path("/teacher_service")
 public class TeacherService {
+
+    @Autowired
+    @Qualifier("administratordao")
+    private AdministratorDao administratordao;
+    @Autowired
+    @Qualifier("agentdao")
+    private AgentDao agentdao;
+
     @Autowired
     @Qualifier("parentsdao")
     private ParentsDao parentsdao;  // 家长 是 由 老师 添加的
@@ -144,6 +152,21 @@ public class TeacherService {
             long stu_id=job.getLong("baby_id");
             String relation = job.getString("relation");
             String avatar = job.getString("avatar");
+            String gender=job.getString("gender");
+            //用户账号是否已注册判断
+            if(isPhoneOrEmailExist(phone,email)){
+                //已经存在
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
+                return job_out.toString();
+            }
+
+            Class cla = classdao.queryClass(class_id);
+            if(cla==null){
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效班级id");
+                return job_out.toString();
+            }
 
             String pwd = SMSMessageService.GenerateRandomNumber();
             String org_pwd=pwd;
@@ -155,7 +178,7 @@ public class TeacherService {
                 return job_out.toString();
             }
 
-            Parents p = new Parents(phone,email,name,baby,class_id,pwd_md,relation,avatar);
+            Parents p = new Parents(phone,email,name,baby,class_id,cla.getGarten().getId(),pwd_md,relation,avatar,gender);
             if(parentsdao.addParents(p)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加家长");
@@ -275,13 +298,21 @@ public class TeacherService {
             String avatar = job.getString("avatar");
      //       String wishes = job.getString("wishes"); //园长寄语，老师不传
             String descrip=job.getString("description"); //老师介绍
+            String gender=job.getString("gender");
     //        boolean is_leader = job.getBoolean("leader"); //是否是园长
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
             String pwd = SMSMessageService.GenerateRandomNumber(); //获取随即密码
             String org_pwd=pwd;
             pwd=MD5.GetSaltMD5Code(pwd); //计算盐值
+            //用户账号是否已注册判断
+            if(isPhoneOrEmailExist(phone,email)){
+                //已经存在
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
+                return job_out.toString();
+            }
 
-            Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-"); //普通老师
+            Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-",gender); //普通老师
             if(teacherdao.addTeacher(ordTeacher)){
             /*    Class cla =classdao.queryClass(class_id);
                 if(cla==null){
@@ -304,8 +335,8 @@ public class TeacherService {
 
                 UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten_id);
                 thread.start();
-                job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","更新班级老师列表失败");
+                job_out.put("resultCode",GlobalStatus.succeed.toString());
+                job_out.put("resultDesc","成功添加老师");
                 return job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());
@@ -350,6 +381,7 @@ public class TeacherService {
                 job_out.put("email",t.getEmail());
                 job_out.put("name",t.getName());
                 job_out.put("avatar",t.getAvatar_path());
+                job_out.put("gender",t.getGender());
                 Iterator<Class> it=cla_set.iterator();
                 String cla_ids="";
                 String cla_names="";
@@ -522,5 +554,23 @@ public class TeacherService {
             kindergartendao.updateKindergarten(garten);
         }
     }
+
+
+    public  boolean isPhoneOrEmailExist(String phoneNum,String email){
+        boolean exsitFlag = false;
+        if(teacherdao.queryTeacher(phoneNum)!=null||teacherdao.queryTeacherByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(parentsdao.queryParents(phoneNum)!=null||parentsdao.queryParentsByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(agentdao.queryAgent(phoneNum)!=null||agentdao.queryAgentByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(administratordao.queryAdministrator(phoneNum)!=null||administratordao.queryAdministratorByEmail(email)!=null){
+            exsitFlag = true;
+        }else{
+
+        }
+        return exsitFlag;
+    }
+
 
 }

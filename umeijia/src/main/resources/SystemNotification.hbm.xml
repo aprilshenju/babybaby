@@ -10,6 +10,7 @@
 			<generator class="native"></generator>
 		</id>
 		<property name="title" column="title"></property>
+        <property name="publishId" column="publishId"></property>
         <property name="valid" column="valid"></property>
 		<property name="content" column="content"></property>
 		<property name="date" column="date"  ></property>

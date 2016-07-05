@@ -86,10 +86,10 @@ public class RunService {
         agentdao.addAgent(ag);
         Kindergarten garten = new Kindergarten("光明幼儿园","科华南路","028-85400752","一起呵护祖国的花朵","1.jpg","2.jpg","3.jpg",ag);
         kindergartendao.addKindergarten(garten);
-        Teacher leader = new Teacher("段园长","1.jpg",MD5.GetSaltMD5Code("leader123"),garten,"13222222222","让我带大家一起学习吧","dff9933@163.com",true,"让孩子们茁壮成长");
+        Teacher leader = new Teacher("段园长","1.jpg",MD5.GetSaltMD5Code("leader123"),garten,"13222222222","让我带大家一起学习吧","dff9933@163.com",true,"让孩子们茁壮成长","男");
         teacherdao.addTeacher(leader);
-        Teacher te = new Teacher("谢老师","1.jpg",MD5.GetSaltMD5Code("123456"),garten,"18090037299","一起摇摆","ppj9933@163.com",false," ");
-        Teacher te2 = new Teacher("曾老师","2.jpg",MD5.GetSaltMD5Code("123456"),garten,"15680079196","好男人就是我","db83555@163.com",false," ");
+        Teacher te = new Teacher("谢老师","1.jpg",MD5.GetSaltMD5Code("123456"),garten,"18090037299","一起摇摆","ppj9933@163.com",false," ","男");
+        Teacher te2 = new Teacher("曾老师","2.jpg",MD5.GetSaltMD5Code("123456"),garten,"15680079196","好男人就是我","db83555@163.com",false," ","男");
         teacherdao.addTeacher(te);
         teacherdao.addTeacher(te2);
         com.umeijia.vo.Class cla = new Class("大二班","就快要升一年级了，宝宝们","上午:舞蹈;下午:算术;","张宁三:133;","李老师:14553",garten);
@@ -100,9 +100,10 @@ public class RunService {
         Student stu2 = new Student("刘屯屯","小屯屯","男",new Date(),138,36,"2.jpg",cla,false,d,d,d);
         studentdao.addStudent(stu1);
         studentdao.addStudent(stu2);
-        Parents parent1 = new Parents("18090037299","3523535@qq.com","仝大大",stu1,cla.getId(),MD5.GetSaltMD5Code("123456"),"爷爷","1.jpg");
-        Parents parent2 = new Parents("15680079196","35235111@qq.com","刘大大",stu2,cla.getId(),MD5.GetSaltMD5Code("123456"),"爸爸","1.jpg");
+        Parents parent1 = new Parents("18090037299","3523535@qq.com","仝大大",stu1,cla.getId(),garten.getId(),MD5.GetSaltMD5Code("123456"),"爷爷","1.jpg","男");
+        Parents parent2 = new Parents("15680079196","35235111@qq.com","刘大大",stu2,cla.getId(),garten.getId(),MD5.GetSaltMD5Code("123456"),"爸爸","1.jpg","男");
         parentsdao.addParents(parent1);
+        parentsdao.addParents(parent2);
 
         Camera ca = new Camera("222.10.13.3","222.10.13.3:355/video","操场转角",
                 "海康威视",garten,"sunfllower_came1.jpg",true,"ccccc","8-10;12-14;15-17;",cla);
@@ -174,19 +175,36 @@ public class RunService {
             String garten_presence_imgs=job.getString("garten_presence_imgs");//幼儿园图片展示列表*/
             String phone = job.getString("leader_phone");
             String email = job.getString("leader_email");
-            String pwd = job.getString("leader_password");
-            pwd=MD5.GetSaltMD5Code(pwd);
+         //   String pwd = job.getString("leader_password");
+       //     pwd=MD5.GetSaltMD5Code(pwd);
             String name = job.getString("leader_name");
             String avatar = job.getString("leader_avatar");
             String wishes = job.getString("leader_wishes"); //园长寄语，老师不传
             String leader_descrip=job.getString("leader_description"); //老师介绍
+            String leader_gender=job.getString("leader_gender");
+
+     //       LockerLogger.log.info("幼儿园信息解析成功");
 
             Date date = new Date();
+            if(isPhoneOrEmailExist(phone,email)){
+                //已经存在
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
+                return job_out.toString();
+            }
+
             Kindergarten garten = new Kindergarten(garten_name,addr,contact,descrip,teacher_presence_imgs,garten_instrument_imgs,garten_presence_imgs,agent);
             garten.setLeader_wishes(wishes);
             if(kindergartendao.addKindergarten(garten)){
                 // 成功添加幼儿园
-                Teacher leader=new Teacher(name,avatar,pwd,garten,phone,leader_descrip,email,true,wishes); //园长
+                String pwd = SMSMessageService.GenerateRandomNumber();
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
+                pwd=MD5.GetSaltMD5Code(pwd);
+                Teacher leader=new Teacher(name,avatar,pwd,garten,phone,leader_descrip,email,true,wishes,leader_gender); //园长
                 if(teacherdao.addTeacher(leader)){
                     garten.setLeader_wishes(wishes); //更新幼儿园 寄语
                     garten.setLeader_id(leader.getId()); //更新幼儿园 园长
@@ -293,9 +311,18 @@ public class RunService {
             String avatar = job.getString("avatar");
             String wishes = job.getString("wishes"); //园长寄语，老师不传
             String descrip=job.getString("description"); //老师介绍
+            String gender=job.getString("gender");
             String pwd=SMSMessageService.GenerateRandomNumber(); //生成随即密码
             String org_pwd = pwd;
+
             pwd=MD5.GetSaltMD5Code(pwd); //计算密码盐值摘要
+
+            if(isPhoneOrEmailExist(phone,email)){
+                //已经存在
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
+                return job_out.toString();
+            }
 
             //        boolean is_leader = job.getBoolean("leader"); //是否是园长
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
@@ -305,7 +332,7 @@ public class RunService {
                 job_out.put("resultDesc","添加失败:该幼儿园已有园长");
                 return job_out.toString();
             }
-            Teacher leader=new Teacher(name,avatar,pwd,garten,phone,descrip,email,true,wishes); //园长
+            Teacher leader=new Teacher(name,avatar,pwd,garten,phone,descrip,email,true,wishes,gender); //园长
             if(teacherdao.addTeacher(leader)){
                 garten.setLeader_wishes(wishes); //更新幼儿园 寄语
                 garten.setLeader_id(leader.getId()); //更新幼儿园 园长
@@ -349,6 +376,7 @@ public class RunService {
             } else if(!email.isEmpty()){ // 邮箱登录
                 ag= agentdao.loginCheckByEmail(email,pwd_md);
             }
+            LockerLogger.log.info("加盟商开始登陆..");
             if(ag!=null)
             {
                 Set<Kindergarten> gartens = ag.getGartens();
@@ -457,6 +485,14 @@ public class RunService {
                 String company=job.getString("company");
                 float price = (float) job.getDouble("price");
                 String avatar=job.getString("avatar");
+
+            if(isPhoneOrEmailExist(phone,email)){
+                //已经存在
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
+                return job_out.toString();
+            }
+
             // 随机生成密码
             String pwd=SMSMessageService.GenerateRandomNumber();
             String org_pwd=pwd;
@@ -519,6 +555,13 @@ public class RunService {
             String pwd = SMSMessageService.GenerateRandomNumber();// 生成随机密码
             String org_pwd=pwd;
             pwd=MD5.GetSaltMD5Code(pwd); //获取 盐值md5摘要
+
+            if(isPhoneOrEmailExist(phone,email)){
+                //已经存在
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
+                return job_out.toString();
+            }
 
             Administrator admin =  new Administrator(phone,email,pwd,name,date,false);
             if(administratordao.addAdministrator(admin))
@@ -666,5 +709,22 @@ public class RunService {
         }
         return job_out.toString();
     }
+
+    public  boolean isPhoneOrEmailExist(String phoneNum,String email){
+        boolean exsitFlag = false;
+        if(teacherdao.queryTeacher(phoneNum)!=null||teacherdao.queryTeacherByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(parentsdao.queryParents(phoneNum)!=null||parentsdao.queryParentsByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(agentdao.queryAgent(phoneNum)!=null||agentdao.queryAgentByEmail(email)!=null){
+            exsitFlag = true;
+        }else if(administratordao.queryAdministrator(phoneNum)!=null||administratordao.queryAdministratorByEmail(email)!=null){
+            exsitFlag = true;
+        }else{
+
+        }
+        return exsitFlag;
+    }
+
 
 }

@@ -2,6 +2,7 @@ package com.umeijia.service;
 
 import com.umeijia.dao.*;
 import com.umeijia.util.GlobalStatus;
+import com.umeijia.util.LockerLogger;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.*;
 import net.sf.json.JSONException;
@@ -15,15 +16,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -33,6 +25,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -70,9 +63,12 @@ public class SMSMessageService {
 
 
     public  SMSMessageService(){
-        cmds = new ArrayList<Map<String,Object>>();
+        if(cmds==null){
+            cmds = new ArrayList<Map<String,Object>>();
+        }
         if(sendSmsThreadStartFlag==false){
             sendSmsThread.start();
+            LockerLogger.log.info("开启短信发送线程");
         }
 
     }
@@ -158,10 +154,11 @@ public class SMSMessageService {
             String text = "";
             if(type==1){
                 text = "【幼美加】您的验证码是 " + verifyCode;
-            }else if (type==2){
+            }else if (type==2)
                 text = "【幼美加】您的初始密码是 " + verifyCode;
-            }
-            System.out.println(sendSms(apikey, text, mobile));
+
+            sendSms(apikey, text, mobile);
+            LockerLogger.log.info(text);
 //            System.out.println(tpl_value);
 //            System.out.println(tplSendSms(apikey, tpl_id, tpl_value, mobile));
         } catch (Exception e) {
@@ -176,6 +173,7 @@ public class SMSMessageService {
         params.put("apikey", apikey);
         params.put("text", text);
         params.put("mobile", mobile);
+        LockerLogger.log.info("开始发送短信");
         return post(URI_SEND_SMS, params);
     }
 
@@ -217,7 +215,9 @@ public class SMSMessageService {
         String responseText = "";
         CloseableHttpResponse response = null;
         try {
+            LockerLogger.log.info("开始构建短信");
             HttpPost method = new HttpPost(url);
+
             if (paramsMap != null) {
                 List<NameValuePair> paramList = new ArrayList<NameValuePair>();
                 for (Map.Entry<String, String> param : paramsMap.entrySet()) {
@@ -226,7 +226,9 @@ public class SMSMessageService {
                 }
                 method.setEntity(new UrlEncodedFormEntity(paramList, ENCODING));
             }
+            LockerLogger.log.info("完成构建短信");
             response = client.execute(method);
+            LockerLogger.log.info("短信已发出");
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 responseText = EntityUtils.toString(entity);
@@ -322,27 +324,31 @@ public class SMSMessageService {
     }
 
 
-    Thread sendSmsThread = new Thread(new Runnable() {
+    Thread sendSmsThread= new Thread(new Runnable() {
         @Override
         public void run() {
-            while(!sendSmsThreadStopFlag){
-                if(cmds!=null&&cmds.size()>1){
-                    Map<String,Object> map = cmds.get(0);
-                    String phoneNum = map.get("phoneNum").toString();
-                    String verifyCode = map.get("verifyCode").toString();
-                    int type = (Integer)map.get("type");
-                    callThirdPartySmsInterface(phoneNum,verifyCode,type);
+            try {
+                while(!sendSmsThreadStopFlag){
+                    if(cmds!=null&&cmds.size()>0){
+                        Map<String,Object> map = cmds.get(0);
+                        String phoneNum = map.get("phoneNum").toString();
+                        String verifyCode = map.get("verifyCode").toString();
+                        int type = (Integer)map.get("type");
+                        callThirdPartySmsInterface(phoneNum,verifyCode,type);
+
+                        Thread.sleep(20);  //每xx秒轮训一次
+                        cmds.remove(0);
+                        LockerLogger.log.info("发送短信");
+                    }
+                    else{
+                        Thread.sleep(200);
+                    }
                 }
-                try {
-                    Thread.sleep(5000);  //每xx秒轮训一次
-                    cmds.remove(0);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     });
-
 
     /**
      * 生成6位随机验证码

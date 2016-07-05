@@ -18,6 +18,7 @@ public class TestAll {
     /*   } catch (ParseException e) {
             e.printStackTrace();
         }*/
-//        System.out.print();
+
+    System.out.print(MD5.GetSaltMD5Code("agent123"));
     }
 }

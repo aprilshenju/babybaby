@@ -14,7 +14,7 @@ public class HomeWork {
 	}
 
 	public HomeWork(){
-
+        this.valid=true;
 	}
 
 

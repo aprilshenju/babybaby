@@ -17,6 +17,7 @@
 		</id>
 		<property name="question" column="question"></property>
         <property name="valid" column="valid"></property>
+        <property name="date" column="date"></property>
         <property name="answer" column="answer" length="1500"></property>
 		<property name="url" column="url" ></property>		        
 	</class>

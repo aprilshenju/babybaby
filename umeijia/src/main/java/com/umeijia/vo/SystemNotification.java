@@ -43,6 +43,16 @@ public class SystemNotification {
     private String content;
     private Date date;
 
+    public long getPublishId() {
+        return publishId;
+    }
+
+    public void setPublishId(long publishId) {
+        this.publishId = publishId;
+    }
+
+    private long publishId;
+
     public boolean isValid() {
         return valid;
     }
@@ -54,7 +64,7 @@ public class SystemNotification {
     private boolean valid;
 
     public SystemNotification(){
-
+        this.valid=true;
     }
 
 

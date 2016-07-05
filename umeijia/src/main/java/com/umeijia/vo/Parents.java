@@ -3,7 +3,7 @@ package com.umeijia.vo;
 import java.util.Date;
 
 public class Parents {
-	private int gender;
+	private String gender;
 	private String email;
 	private Date regist_date;
 	private boolean allow_app_push; // 家长是否允许app推送
@@ -51,11 +51,19 @@ public class Parents {
 		this.valid = valid;
 	}
 
-	public Parents(String phone, String email, String name, Student stu, long cla_id, String pwd, String relation, String avatar){
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Parents(String phone, String email, String name, Student stu, long cla_id, long garten_id, String pwd, String relation, String avatar,String gen){
 		this.phone_num=phone;
 		this.email=email;
 		this.name=name;
-
+		this.garten_id=garten_id;
 		this.student=stu;
 		this.class_id=cla_id;
 		this.pwd_md=pwd;
@@ -63,6 +71,7 @@ public class Parents {
 		this.avatar_path=avatar;
 		regist_date=new Date();
 		expire=regist_date;
+		this.gender=gen;
 		token="1";
 		valid=true;
 	}
@@ -102,12 +111,6 @@ public class Parents {
 	}
 	public void setClass_id(long class_id) {
 		this.class_id = class_id;
-	}
-	public int getGender() {
-		return gender;
-	}
-	public void setGender(int gender) {
-		this.gender = gender;
 	}
 	public String getEmail() {
 		return email;
