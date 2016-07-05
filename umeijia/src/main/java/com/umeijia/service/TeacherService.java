@@ -335,8 +335,8 @@ public class TeacherService {
 
                 UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten_id);
                 thread.start();
-                job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","更新班级老师列表失败");
+                job_out.put("resultCode",GlobalStatus.succeed.toString());
+                job_out.put("resultDesc","成功添加老师");
                 return job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());
