@@ -212,7 +212,8 @@ public class WechatService {
         }else{
             message = "未知错误，请重试";
         }
-        return new Viewable("/result.jsp?message="+message);
+        request.setAttribute("message", message);
+        return new Viewable("/result.jsp",null);
     }
 
     private TextMessage generateTextMessage(String fromUserName, String toUserName, String createTime, String content) {
@@ -221,7 +222,7 @@ public class WechatService {
         textMessage.setFromUserName(toUserName);
         textMessage.setCreateTime(createTime);
         textMessage.setMsgType("text");
-        textMessage.setContent(bindUrl + "/" + fromUserName);
+        textMessage.setContent(content);
         return textMessage;
     }
 }
