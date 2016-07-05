@@ -1,7 +1,6 @@
 package com.umeijia.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by shenju on 2016/6/21.
@@ -19,8 +18,6 @@ public class TestAll {
     /*   } catch (ParseException e) {
             e.printStackTrace();
         }*/
-
-        Date d = new Date();
-        System.out.println(d.toString());
+//        System.out.print();
     }
 }
