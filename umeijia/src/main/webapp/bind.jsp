@@ -14,7 +14,7 @@
   <body>
     <div id="box">
 		<%String basePath = request.getContextPath();%>
-    	<form action="<%=basePath%>/rest/wechat_service/bindW" method="get" enctype="application/x-www-form-urlencoded">
+    	<form action="<%=basePath%>/rest/wechat_service/bindW" method="post" enctype="application/x-www-form-urlencoded">
     		账号：<input type="text" id="name" name="name"></input><br>
     		密码：<input type="password" id="password" name="password"></input>
     		<input type="text" id="openId" name="openId" value="<%=request.getAttribute("openId")%>" style="display:none" />

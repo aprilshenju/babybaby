@@ -17,11 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Map;
+
+//import org.springframework.util.DigestUtils;
+//import org.springframework.util.DigestUtils;
 
 //import org.springframework.util.DigestUtils;
 
@@ -167,10 +171,11 @@ public class WechatService {
     }
 
     @Path("/bindW")
-    @GET
-    @Consumes("application/x-www-form-urlencoded")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Viewable bindWechat(@FormParam("name") String account, @FormParam("password") String passwd, @FormParam
             ("openId") String openId, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        System.out.println("收到绑定的请求");
         String message = null;
         if (request != null) {
             try {

@@ -2,7 +2,9 @@ package com.umeijia.service;
 
 
 import com.umeijia.dao.*;
+import com.umeijia.enums.OptEnum;
 import com.umeijia.util.GlobalStatus;
+import com.umeijia.util.LogUtil;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.Class;
 import com.umeijia.vo.*;
@@ -52,7 +54,9 @@ public class TeacherService {
     @Autowired
     @Qualifier("classdao")
     private  ClassDao classdao;
-
+    @Autowired
+    @Qualifier("dailylogdao")
+    private DailyLogDao dailylogdao;
     @Path("/hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -82,6 +86,8 @@ public class TeacherService {
             }
             String name = job.getString("name");
             String nick_name = job.getString("nick_name");
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             long class_id = job.getLong("class_id");
             String avatar = job.getString("avatar");
             String gender=job.getString("gender");
@@ -110,6 +116,9 @@ public class TeacherService {
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("baby_id",stu.getId()); //返回 baby_id
                 job_out.put("resultDesc","成功添加宝贝");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加学生","学生id:"+String.valueOf(stu.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 return  job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());
@@ -148,6 +157,8 @@ public class TeacherService {
             String email = job.getString("email");
    /*         String pwd = job.getString("password");*/
             String name = job.getString("name");
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             long class_id = job.getLong("class_id");
             long stu_id=job.getLong("baby_id");
             String relation = job.getString("relation");
@@ -182,6 +193,9 @@ public class TeacherService {
             if(parentsdao.addParents(p)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加家长");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加家长","家长id："+String.valueOf(p.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 Map<String,Object> map = new HashMap<String,Object>();
                 map.put("phoneNum",phone);
                 map.put("verifyCode",org_pwd);
@@ -202,7 +216,7 @@ public class TeacherService {
         return job_out.toString();
     }
     /***
-     * 添加家长
+     * 添加班级
      * curl -X POST -H "Content-Type:application/json" -d {"phone":"13534456644","password":"134df","name":"ltt4aoshou","email":"12345@qq.com","class_id":"1","baby_id":"1","relation":"dad","avatar":"fdef.jpg","gender":"0"}
      * http://127.0.0.1/umeijiaServer/teacher_service/addParents
      * **/
@@ -221,6 +235,8 @@ public class TeacherService {
                 job_out.put("resultDesc","token已过期");
                 return job_out.toString();
             }
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
                 String name = job.getString("name");
                 String introduciton=job.getString("introduciton");
                 long garten_id=job.getLong("garten");
@@ -246,6 +262,9 @@ public class TeacherService {
                     if(classdao.addClass(cla)){
                         job_out.put("resultCode",GlobalStatus.succeed.toString());
                         job_out.put("resultDesc","成功添加班级");
+                        //添加日志
+                        DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加班级","班级id:"+String.valueOf(cla.getId()));
+                        dailylogdao.addDailyLog(dailyLog);
                         return job_out.toString();
                     }
                 }
@@ -288,6 +307,8 @@ public class TeacherService {
                 job_out.put("resultDesc","只有园长才能添加老师");
                 return job_out.toString();
             }
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             String phone = job.getString("phone");
             String email = job.getString("email");
          /*   String pwd = job.getString("password");
@@ -337,6 +358,9 @@ public class TeacherService {
                 thread.start();
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加老师");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加老师","老师id:"+String.valueOf(ordTeacher.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 return job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());
