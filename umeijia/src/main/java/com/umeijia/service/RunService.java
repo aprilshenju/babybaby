@@ -175,13 +175,15 @@ public class RunService {
             String garten_presence_imgs=job.getString("garten_presence_imgs");//幼儿园图片展示列表*/
             String phone = job.getString("leader_phone");
             String email = job.getString("leader_email");
-            String pwd = job.getString("leader_password");
-            pwd=MD5.GetSaltMD5Code(pwd);
+         //   String pwd = job.getString("leader_password");
+       //     pwd=MD5.GetSaltMD5Code(pwd);
             String name = job.getString("leader_name");
             String avatar = job.getString("leader_avatar");
             String wishes = job.getString("leader_wishes"); //园长寄语，老师不传
             String leader_descrip=job.getString("leader_description"); //老师介绍
             String leader_gender=job.getString("leader_gender");
+
+     //       LockerLogger.log.info("幼儿园信息解析成功");
 
             Date date = new Date();
             if(isPhoneOrEmailExist(phone,email)){
@@ -195,6 +197,13 @@ public class RunService {
             garten.setLeader_wishes(wishes);
             if(kindergartendao.addKindergarten(garten)){
                 // 成功添加幼儿园
+                String pwd = SMSMessageService.GenerateRandomNumber();
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
+                pwd=MD5.GetSaltMD5Code(pwd);
                 Teacher leader=new Teacher(name,avatar,pwd,garten,phone,leader_descrip,email,true,wishes,leader_gender); //园长
                 if(teacherdao.addTeacher(leader)){
                     garten.setLeader_wishes(wishes); //更新幼儿园 寄语
