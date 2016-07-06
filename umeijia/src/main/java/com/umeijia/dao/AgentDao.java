@@ -38,6 +38,21 @@ public class AgentDao {
         }
     }
 
+    public Agent queryAgentByName(String name) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Agent as u where u.name=%s and u.valid=1", name);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            Agent agent = (Agent) list.get(0);
+            return agent;
+        }else {
+            return null;
+        }
+    }
+
     public List<Agent> queryAgents() {
         Session session = DBManager.getSession();
         session.clear();

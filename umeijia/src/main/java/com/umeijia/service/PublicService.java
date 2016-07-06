@@ -950,8 +950,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看反馈");
                 return jobOut.toString();
             }
-
-            List<FeedBack> result = feedbackdao.getFeedBackList();
+            List<FeedBack> result = feedbackdao.queryFeedBacks();
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -1762,7 +1761,7 @@ public class PublicService {
             }
             if (roleType != 1 && roleType != 2 && roleType != 3) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "没有权限查看饮食");
+                jobOut.put("resultDesc", "没有权限查看课程表");
                 return jobOut.toString();
             }
             Class cls = classdao.queryClass(classId);
@@ -3121,7 +3120,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "token已过期");
                 return jobOut.toString();
             }
-            List<SystemNotification> systemNotifications = systemnotificationdao.querySystemNotifications();
+            List<SystemNotification> systemNotifications = systemnotificationdao.getSystemNotification();
             if(systemNotifications==null){
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");

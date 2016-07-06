@@ -55,7 +55,7 @@ public class ClassDao {
     }
 
 
-    public List<Class> queryClassBySchoolIdAndClassName(long schoolId,String className) {
+    public Class queryClassBySchoolIdAndClassName(long schoolId,String className) {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Class as c where c.garten.id=%d and c.name=%s", schoolId,className);
@@ -63,7 +63,7 @@ public class ClassDao {
         List list = query.list();
         session.close();
         if(list.size()>0){
-            return list;
+            return (Class)list.get(0);
         }else {
             return null;
         }

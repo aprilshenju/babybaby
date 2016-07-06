@@ -89,7 +89,7 @@ public class StudentDao {
         }
     }
 
-    public List<Student> queryStudentByClassIdAndStudentName(int classId,String name){
+    public List<Student> queryStudentByClassIdAndStudentName(long classId,String name){
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Student as u where u.cla.id=%d and u.name=%s and u.valid=1", classId,name);
