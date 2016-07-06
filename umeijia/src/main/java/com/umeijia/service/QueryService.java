@@ -164,7 +164,8 @@ public class QueryService {
                      * 什么都不传就返回学校的所有老师
                      */
                     if(phoneNum_teacher.equals("")&&classId_teacher==-1){
-                        teachers = teacherdao.queryTeachersByGarten(schoolId_teacher);
+                        pager = teacherdao.queryTeachersByGarten(schoolId_teacher,pager);
+                        teachers = pager.getList();
                     }
                     else if(!phoneNum_teacher.equals("")){
                         Teacher t = teacherdao.queryTeacherBySchoolAndPhone(jobIn.getString("phoneNum"),schoolId_teacher);
@@ -216,7 +217,8 @@ public class QueryService {
                     List<Class>  classes = new ArrayList<Class>();
                     //如果不传className,直接返回所有的班级
                     if(className_class.equals("")){
-                        classes = classdao.queryClassBySchoolId(schoolId_class);
+                        pager = classdao.queryClassBySchoolId(schoolId_class,pager);
+                        classes = pager.getList();
                     }else{
                         classes.add(classdao.queryClassBySchoolIdAndClassName(schoolId_class,className_class));
                     }
@@ -256,8 +258,10 @@ public class QueryService {
                     }
                     String babyName_student = jobIn.getString("babyName");
                     List<Student> students = new ArrayList<Student>();
+                    //什么都不传
                     if(babyName_student.equals("")&&classid_student==-1){
-                        students = studentdao.queryStudentBySchool(schoolId_student);
+                        pager = studentdao.queryStudentBySchool(schoolId_student,pager);
+                        students = pager.getList();
                     }else if(classid_student!=-1){
                         if(babyName_student.equals("")){
                             students = studentdao.queryStudentByClassId(classid_student);
@@ -305,9 +309,9 @@ public class QueryService {
                     }
                     List<Class> classes_c = new ArrayList<>();
                     if(classId_CourseSchedual==-1){  //什么都不传，老师查看自己班级的，院长查看所有班级的
-                        if(roleType==1){
+                        if(roleType==2){
                             classes_c = classdao.queryClassBySchoolId(schoolId_CourseSchedual);
-                        }else if(roleType==2){
+                        }else if(roleType==1){
                             for(Class item : teacherdao.queryTeacher(roleId).getClasses()){
                                 classes_c.add(item);
                             }
@@ -354,7 +358,8 @@ public class QueryService {
                      * 不传id就显示所有的加盟商
                      */
                     if(agentId_agent==-1){
-                        agents = agentdao.queryAgents();
+                        pager = agentdao.queryAgents(pager);
+                        agents = pager.getList();
                     }else{
                         Agent a = agentdao.queryAgent(agentId_agent);
                         if(a!=null)
@@ -443,7 +448,8 @@ public class QueryService {
                     //什么都不传显示本校的所有家长
                     List<Parents> parents = new ArrayList<>();
                     if(classId_parent==-1&&phone_parent.equals("")){
-                        parents = parentsdao.queryParentssByGarten(schoolId_parent);
+                        pager = parentsdao.queryParentssByGarten(schoolId_parent,pager);
+                        parents = pager.getList();
                     }else if(!phone_parent.equals("")){
                         Parents p = parentsdao.queryParents(phone_parent);
                         if(p!=null)
@@ -483,7 +489,8 @@ public class QueryService {
                     String title_gartenNews = jobIn.getString("title");
                     List<GartenNews> gartenNews = new ArrayList<>();
                     if(title_gartenNews.equals("")){
-                        gartenNews = gartennewsdao.queryGartenNewss(schoolId_gartenNews);
+                        pager = gartennewsdao.queryGartenNewss(schoolId_gartenNews,pager);
+                        gartenNews = pager.getList();
                     }else{
                         gartenNews = gartennewsdao.queryGartenNewssByShoolIdAndTitle(schoolId_gartenNews,title_gartenNews);
                     }
@@ -529,7 +536,8 @@ public class QueryService {
                                 foodRecords.addAll(foodrecorddao.queryFoodRecordList(item.getId()));
                             }
                         }else if(roleType==2){
-                            foodRecords = foodrecorddao.queryFoodRecordListBySchool(schoolId_foodRecord);
+                            pager = foodrecorddao.queryFoodRecordListBySchool(schoolId_foodRecord,pager);
+                            foodRecords = pager.getList();
                         }
                     }else{
                         foodRecords = foodrecorddao.queryFoodRecordList(classId_foodRecord);
@@ -581,7 +589,8 @@ public class QueryService {
                                 checkinRecords.addAll(checkinrecorddao.queryCheckinRecordsByClass(item.getId()));
                             }
                         }else if(roleType==2){
-                            checkinRecords = checkinrecorddao.queryCheckinRecordsBySchool(schoolId_checkinRecords);
+                            pager = checkinrecorddao.queryCheckinRecordsBySchool(schoolId_checkinRecords,pager);
+                            checkinRecords = pager.getList();
                         }
                     }else if(classId_checkinRecords!=-1){//传了班级
                         if(year_checkinRecords!=-1){//传了班级，传了日期
@@ -670,7 +679,8 @@ public class QueryService {
                     List<ClassNotification> classNotifications = new ArrayList<>();
                     if(classId_classnotification==-1&&title_classnotification.equals("")){
                         if(roleType==2){
-                            classNotifications = classnotificationdao.queryClassNotificationsBySchool(schoolId_classnotification);
+                            pager = classnotificationdao.queryClassNotificationsBySchool(schoolId_classnotification,pager);
+                            classNotifications = pager.getList();
                         }else if(roleType==1){
                             for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
                                 classNotifications.addAll(classnotificationdao.queryClassNotifications(item.getId()));
@@ -726,7 +736,8 @@ public class QueryService {
                     List<HomeWork> homeWorks = new ArrayList<>();
                     if(classId_homework==-1&&title_homework.equals("")){
                         if(roleType==2){
-                            homeWorks = homeworkdao.queryHomeWorksBySchool(schoolId_homework);
+                            pager = homeworkdao.queryHomeWorksBySchool(schoolId_homework,pager);
+                            homeWorks = pager.getList();
                         }else if(roleType==1){
                             for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
                                 homeWorks.addAll(homeworkdao.queryHomeWorks(item.getId()));
@@ -734,7 +745,7 @@ public class QueryService {
                         }
 
                     }else if(classId_homework!=-1){
-                        if(!title_homework.equals("")){
+                        if(title_homework.equals("")){
                             homeWorks = homeworkdao.queryHomeWorks(classId_homework);
                         }else{
                             homeWorks = homeworkdao.queryHomeWorksByClassidAndTitle(classId_homework,title_homework);
@@ -780,7 +791,8 @@ public class QueryService {
                     List<ClassActivity> classActivities = new ArrayList<>();
                     if(classId_classActivity==-1&&title_classActivity.equals("")){
                         if(roleType==2){
-                            classActivities = classactivitydao.queryOneClassActivitysListBySchoolId(schoolId_classActivity);
+                            pager = classactivitydao.queryOneClassActivitysListBySchoolId(schoolId_classActivity,pager);
+                            classActivities = pager.getList();
                         }else if(roleType==1){
                             for(Class item:teacherdao.queryTeacher(roleId).getClasses()){
                                 classActivities.addAll(classactivitydao.queryOneClassActivitysList(item.getId()));
@@ -788,7 +800,7 @@ public class QueryService {
                         }
 
                     }else if(classId_classActivity!=-1){
-                        if(!title_classActivity.equals("")){
+                        if(title_classActivity.equals("")){
                             classActivities = classactivitydao.queryOneClassActivitysList(classId_classActivity);
                         }else{
                             classActivities = classactivitydao.queryOneClassActivitysListByClassAndTitle(classId_classActivity,title_classActivity);
@@ -852,7 +864,8 @@ public class QueryService {
                     List<Camera> cameras = new ArrayList<>();
                     if(schoolId_camera==-1&&name_camera.equals("")){  //什么都没传
                         if(roleType==5){
-                            cameras = cameradao.getCamerasList();
+                            pager = cameradao.getCamerasList(pager);
+                            cameras = pager.getList();
                         }else if(roleType==4){
                             for(Kindergarten item:agentdao.queryAgent(roleId).getGartens()){
                                 if(cameradao.getCamerasListBySchoolId(item.getId())!=null){
@@ -899,7 +912,8 @@ public class QueryService {
                     List<BabyKnowledge> babyKnowledges = new ArrayList<>();
                     String title_babyknowledge = jobIn.getString("title");
                     if(title_babyknowledge.equals("")){
-                        babyKnowledges = babyknowledgedao.getBabyKnowledgeList();
+                        pager =  babyknowledgedao.getBabyKnowledgeList(pager);
+                        babyKnowledges = pager .getList();
                     }else{
                         babyKnowledges = babyknowledgedao.queryBabyKnowledgeByTitle(title_babyknowledge);
                     }
@@ -958,7 +972,8 @@ public class QueryService {
                     String phoneNum_log = jobIn.getString("phoneNum");
                     List<DailyLog> dailyLogs = new ArrayList<>();
                     if(year_log==-1&&phoneNum_log.equals("")){
-                        dailyLogs =dailylogdao.queryDailyLogs();
+                        pager = dailylogdao.queryDailyLogs(pager);
+                        dailyLogs = pager.getList();
                     }else if(year_log!=-1){
                         if(phoneNum_log.equals("")){
                             dailyLogs = dailylogdao.queryDailyLogByDate(year_log,month_log,day_log);
@@ -1038,7 +1053,7 @@ public class QueryService {
                 result[0]=2;
                 result[1] = t.getId();
             }else{
-                result[0]=2;
+                result[0]=1;
                 result[1] = t.getId();
             }
             return result;

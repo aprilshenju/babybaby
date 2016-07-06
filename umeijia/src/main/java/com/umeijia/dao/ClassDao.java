@@ -3,6 +3,8 @@ package com.umeijia.dao;
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.Class;
 import com.umeijia.vo.Kindergarten;
+import com.umeijia.vo.Pager;
+import com.umeijia.vo.Teacher;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -40,18 +42,42 @@ public class ClassDao {
         }
     }
 
-    public List<Class> queryClassBySchoolId(long schoolId) {
+    public List<Class> queryClassBySchoolId(long school_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Class as c where c.garten.id=%d", schoolId);
+        String sql = String.format("from Class as c where c.garten.id=%d", school_id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
         if(list.size()>0){
+
             return list;
         }else {
             return null;
         }
+    }
+
+    public Pager queryClassBySchoolId(long schoolId,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from Class as c where c.garten.id=%d", schoolId);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<Class> list=(List<Class>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
 
