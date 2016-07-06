@@ -78,7 +78,7 @@ public class StudentDao {
     public List<Student> queryStudentByStudentName(String name){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Student as u where u.name=%s and u.valid=1", name);
+        String sql = String.format("from Student as u where u.name=\'%s\' and u.valid=1", name);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -92,7 +92,7 @@ public class StudentDao {
     public List<Student> queryStudentByClassIdAndStudentName(long classId,String name){
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Student as u where u.cla.id=%d and u.name=%s and u.valid=1", classId,name);
+        String sql = String.format("from Student as u where u.cla.id=%d and u.name=\'%s\' and u.valid=1", classId,name);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

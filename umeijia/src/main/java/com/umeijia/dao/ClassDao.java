@@ -58,7 +58,7 @@ public class ClassDao {
     public Class queryClassBySchoolIdAndClassName(long schoolId,String className) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Class as c where c.garten.id=%d and c.name=%s", schoolId,className);
+        String sql = String.format("from Class as c where c.garten.id=%d and c.name=\'%s\'", schoolId,className);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

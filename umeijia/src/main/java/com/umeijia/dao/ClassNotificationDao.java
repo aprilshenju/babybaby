@@ -61,7 +61,7 @@ public class ClassNotificationDao {
     public List<ClassNotification> queryClassNotificationsByClassAndTitle(long class_id,String title) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassNotification as ca where ca.class_id=%d and ca.title=%s and valid=1 order by ca.date desc",class_id,title);
+        String sql = String.format("from ClassNotification as ca where ca.class_id=%d and ca.title=\'%s\' and valid=1 order by ca.date desc",class_id,title);
         Query query = session.createQuery(sql);
         List <ClassNotification> list = query.list();
         session.close();
@@ -75,7 +75,7 @@ public class ClassNotificationDao {
     public List<ClassNotification> queryClassNotificationsByTitle(String title) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from ClassNotification as ca where ca.title=%s and valid=1 order by ca.date desc",title);
+        String sql = String.format("from ClassNotification as ca where ca.title=\'%s\' and valid=1 order by ca.date desc",title);
         Query query = session.createQuery(sql);
         List <ClassNotification> list = query.list();
         session.close();

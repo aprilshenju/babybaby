@@ -90,7 +90,7 @@ public class CameraDao {
     public List getCamerasListBySchoolIdAndCameraName(long schoolId,String name) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.manufactory=%s and ca.valid=1",schoolId,name);
+        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.manufactory=\'%s\' and ca.valid=1",schoolId,name);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();
@@ -104,7 +104,7 @@ public class CameraDao {
     public List getCamerasListByCameraName(String name) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Camera as ca where  ca.manufactory=%s and ca.valid=1",name);
+        String sql = String.format("from Camera as ca where  ca.manufactory=\'%s\' and ca.valid=1",name);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();

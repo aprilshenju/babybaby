@@ -61,7 +61,7 @@ public class HomeWorkDao {
     public List<HomeWork> queryHomeWorksByClassidAndTitle(long class_id,String title) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from HomeWork as work where work.class_id=%d and work.title=%s and valid=1 order by work.date desc",class_id,title);
+        String sql = String.format("from HomeWork as work where work.class_id=%d and work.title=\'%s\' and valid=1 order by work.date desc",class_id,title);
         Query query = session.createQuery(sql);
         List <HomeWork> list = query.list();
         session.close();
@@ -75,7 +75,7 @@ public class HomeWorkDao {
     public List<HomeWork> queryHomeWorksByTitle(String title) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from HomeWork as work where  work.title=%s and valid=1 order by work.date desc",title);
+        String sql = String.format("from HomeWork as work where  work.title=\'%s\' and valid=1 order by work.date desc",title);
         Query query = session.createQuery(sql);
         List <HomeWork> list = query.list();
         session.close();
