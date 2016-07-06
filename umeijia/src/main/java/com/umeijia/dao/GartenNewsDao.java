@@ -58,7 +58,7 @@ public class GartenNewsDao {
     public List<GartenNews> queryGartenNewssByShoolIdAndTitle(long school_id,String title) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d and gnews.title=%s and gnews.valid=1 order by gnews.modifyDate desc",school_id,title);
+        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d and gnews.title=\'%s\' and gnews.valid=1 order by gnews.modifyDate desc",school_id,title);
         Query query = session.createQuery(sql);
         List <GartenNews> list = query.list();
         session.close();

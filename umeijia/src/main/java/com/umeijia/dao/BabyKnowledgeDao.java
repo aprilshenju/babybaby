@@ -43,7 +43,7 @@ public class BabyKnowledgeDao {
     public List<BabyKnowledge> queryBabyKnowledgeByTitle(String title) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyKnowledge as knowledge where knowledge.question=%d and valid=1",title);
+        String sql = String.format("from BabyKnowledge as knowledge where knowledge.question=\'%s\' and valid=1",title);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
