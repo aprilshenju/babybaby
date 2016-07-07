@@ -2,6 +2,8 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.CheckinRecords;
+import com.umeijia.vo.FoodRecord;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -40,18 +42,27 @@ public class CheckinRecordsDao {
         }
     }
 
-    public List<CheckinRecords> queryCheckinRecordsBySchool(long schoolId) {
-        Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("from CheckinRecords as cr where cr.school_id=%d",schoolId);
-        Query query = session.createQuery(sql);
-        List list = query.list();
-        session.close();
-        if(list.size()>0){
-            return list;
-        }else {
-            return null;
+    public Pager queryCheckinRecordsBySchool(long schoolId,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
         }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=  String.format("from CheckinRecords as cr where cr.school_id=%d",schoolId);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<CheckinRecords> list=(List<CheckinRecords>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     public List<CheckinRecords> queryCheckinRecordsByClass(long classId) {
