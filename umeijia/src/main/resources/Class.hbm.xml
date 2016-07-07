@@ -29,6 +29,7 @@ private long id;
 		<property name="parents_contacts" column="parents_contacts"></property>
         <property name="class_introduction" column="class_introduction"></property>
 
+        <property name="valid" column="valid"></property>
           
          <set name="students" cascade="all" inverse="true" lazy="false">
                 <key column="class_id"></key>   

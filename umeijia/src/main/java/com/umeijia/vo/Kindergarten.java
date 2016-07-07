@@ -14,11 +14,22 @@ public class Kindergarten {
 	private Date create_date;
 	private  String teacher_contacts; //老师联系方式
 	private Long id;
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
 	private String name;
 	private Agent agent; //代理商id
 	private Set<Camera> cameras;
 	private Set<Class> classes; // 班级列表
 	private Set<Teacher> teachers;
+
+	private boolean valid;
 
 	public void setTeacher_contacts(String teacher_contacts) {
 		this.teacher_contacts = teacher_contacts;

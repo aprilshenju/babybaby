@@ -1,15 +1,11 @@
 package com.umeijia.service;
 
-import com.umeijia.dao.ClassDao;
-import com.umeijia.dao.ParentsDao;
-import com.umeijia.dao.StudentDao;
-import com.umeijia.dao.TeacherDao;
+import com.umeijia.dao.*;
 import com.umeijia.util.GlobalStatus;
+import com.umeijia.util.LockerLogger;
 import com.umeijia.util.MD5;
+import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
-import com.umeijia.vo.Parents;
-import com.umeijia.vo.Student;
-import com.umeijia.vo.Teacher;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
@@ -26,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -44,6 +41,10 @@ public class ParentsService {
     @Autowired
     @Qualifier("teacherdao")
     private TeacherDao teacherdao;
+    @Autowired
+    @Qualifier("kindergartendao")
+    private KinderGartenDao kindergartendao;
+
 
     @Path("/hello")
     @GET
@@ -81,6 +82,19 @@ public class ParentsService {
                 }
                 if(p!=null)
                 {
+                    //幼儿园和班级有效性判断
+                    Kindergarten garten = kindergartendao.queryKindergarten(p.getGarten_id());
+                    if(garten==null||garten.isValid()==false){
+                        job_out.put("resultCode", GlobalStatus.error.toString());
+                        job_out.put("resultDesc","所属幼儿园已无效");
+                        return  job_out.toString();
+                    }
+                    Class cla = classdao.queryClass(p.getClass_id());
+                    if(cla==null||cla.isValid()==false){
+                        job_out.put("resultCode", GlobalStatus.error.toString());
+                        job_out.put("resultDesc","所属班级已无效");
+                        return  job_out.toString();
+                    }
 
                     Student stu = p.getStudent();
 
@@ -184,12 +198,20 @@ public class ParentsService {
 
                 if(p!=null)
                 {
+                    String old_phone = p.getPhone_num();
+
                     p.setName(name);
                     p.setAllow_app_push(app_push);
                     p.setAllow_wechat_push(wechat_push);
                     p.setAvatar_path(avata);
                     p.setPhone_num(phone);
                     p.setEmail(email);
+
+                    if(!phone.equals(old_phone)){
+                        //更新通信录
+                        UpdateParentContractsThread thread = new UpdateParentContractsThread(p.getClass_id());
+                        thread.start();
+                    }
 
                     if(parentsdao.updateParents(p)){
                         job_out.put("resultCode", GlobalStatus.succeed.toString());
@@ -375,6 +397,33 @@ public class ParentsService {
     }
 
 
+    /***
+     * 当一个班添加一个家长或一个老师时，更新 幼儿园的老师通信录和班级家长通信录
+     *
+     *更新一个班级的 家长通信录
+     * **/
+    class UpdateParentContractsThread extends Thread {
+        long cla_id=0;
+        public UpdateParentContractsThread(long class_id) {
+            cla_id=class_id;
+        }
+        public void run() {
+            Class cla = classdao.queryClass(cla_id);
+            if(cla==null)   return ;
+            List<Parents> parents= parentsdao.getParentsByClass(cla_id);
+            String parents_contact="";
+            Iterator<Parents>it = parents.iterator();
+            while (it.hasNext()){
+                Parents p =it.next();
+                parents_contact+=p.getStudent().getName()+"-"+p.getRelationship()+
+                        "-"+p.getName()+"-"+p.getPhone_num()+"-"+p.getAvatar_path()+"-"+cla.getName();
+                // baby名称-baby妈妈-家长名字-电话-头像路径-
+                parents_contact+=";"; //下一条记录
+            }
+            cla.setParents_contacts(parents_contact);
+            classdao.updateClass(cla);
+        }
+    }
 
 
 }

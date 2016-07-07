@@ -13,6 +13,16 @@ public class Class {
 	private Set<Camera> cameras;
 	private Set<Teacher> teachers;
 
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	private  boolean valid;
+
 //    public Set<FoodRecord> getFoodRecords() {
 //        return foodRecords;
 //    }

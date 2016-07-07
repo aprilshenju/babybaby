@@ -19,7 +19,7 @@
 		<id name="id" column="id">
 			<generator class="native"></generator>
 		</id>
-		<property name="ip_url" column="ip_url" unique="true" not-null="true"></property>
+		<property name="ip_url" column="ip_url"  not-null="true"></property>
 		<property name="description" column="description"></property>	
 		<property name="manufactory" column="manufactory"></property>
         <property name="valid" column="valid"></property>

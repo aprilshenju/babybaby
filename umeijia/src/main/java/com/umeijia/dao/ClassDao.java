@@ -28,13 +28,27 @@ public class ClassDao {
     public Class queryClass(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from Class as c where c.id=%d", class_id);
+        String sql = String.format("from Class as c where c.id=%d and c.valid=1", class_id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
         if(list.size()>0){
             Class cla = (Class) list.get(0);
             return cla;
+        }else {
+            return null;
+        }
+    }
+
+    public List<Class> queryClassesByGarten(long garten_id) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Class as c where c.garten.id=%d and c.valid=1", garten_id);
+        Query query = session.createQuery(sql);
+        List <Class> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
         }else {
             return null;
         }
@@ -82,7 +96,7 @@ public class ClassDao {
         String parentsContacts="";
         Session session = DBManager.getSession();
         session.clear();
-        String hql = String.format("select c.parents_contacts from Class as c where c.id=%d",class_id);
+        String hql = String.format("select c.parents_contacts from Class as c where c.id=%d and c.valid=1",class_id);
         Query query = session.createQuery(hql);
         //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
         List<Object> list = query.list();
@@ -99,7 +113,7 @@ public class ClassDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Class c set c.parents_contacts=\'%s\' where c.id=%d",parentsContacts,class_id);
+            String hql=String.format("update Class c set c.parents_contacts=\'%s\' where c.id=%d and c.valid=1",parentsContacts,class_id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
@@ -120,7 +134,7 @@ public class ClassDao {
        Kindergarten garten=null;
         Session session = DBManager.getSession();
         session.clear();
-        String hql = String.format("select c.garten from Class as c where c.id=%d",class_id);
+        String hql = String.format("select c.garten from Class as c where c.id=%d and c.valid=1",class_id);
         Query query = session.createQuery(hql);
         //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
         List<Object> list = query.list();

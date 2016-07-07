@@ -37,6 +37,8 @@
         <property name="teacher_contacts" column="teacher_contacts"></property>
 
 
+        <property name="valid" column="valid"></property>
+
          <set name="cameras" cascade="all" inverse="true" lazy="false">
                 <key column="garten_id"></key>   
                 <one-to-many class="com.umeijia.vo.Camera"/>   
