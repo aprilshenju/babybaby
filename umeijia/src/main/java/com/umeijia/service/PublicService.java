@@ -1663,6 +1663,11 @@ public class PublicService {
             }
 
             FoodRecord fr = foodrecorddao.queryFoodRecordByClassId(classId,year,month,day);
+            if(fr==null){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "无记录");
+                return jobOut.toString();
+            }
             if (fr.getRecords() != null && !fr.getRecords().isEmpty()) {
                 jobOut.put("imageUrls",fr.getImage_urls());
                 jobOut.put("content",fr.getRecords());
@@ -2227,7 +2232,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看育儿知识");
                 return jobOut.toString();
             }
-            List<BabyKnowledge> babyKnowledges = babyknowledgedao.getBabyKnowledgeList();
+            List<BabyKnowledge> babyKnowledges = babyknowledgedao.queryBabyKnowledges();
             if (babyKnowledges == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
