@@ -2232,7 +2232,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看育儿知识");
                 return jobOut.toString();
             }
-            List<BabyKnowledge> babyKnowledges = babyknowledgedao.getBabyKnowledgeList();
+            List<BabyKnowledge> babyKnowledges = babyknowledgedao.queryBabyKnowledges();
             if (babyKnowledges == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
