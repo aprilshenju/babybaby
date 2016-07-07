@@ -2,6 +2,8 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.FoodRecord;
+import com.umeijia.vo.GartenNews;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -86,7 +88,7 @@ public class FoodRecordDao {
     public List<FoodRecord> queryFoodRecordList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from FoodRecord as fd where fd.cla.id=%d and valid=1 order by fd.date desc",class_id);
+        String sql = String.format("from FoodRecord as fd where fd.class_id=%d and valid=1 order by fd.date desc",class_id);
         Query query = session.createQuery(sql);
         List <FoodRecord> list = query.list();
         session.close();
@@ -95,6 +97,30 @@ public class FoodRecordDao {
         }else {
             return null;
         }
+    }
+
+    public Pager queryFoodRecordListBySchool(long schoolId,Pager pager) {
+
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=  String.format("from FoodRecord as fd where fd.school_id=%d and valid=1 order by fd.date desc",schoolId);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<FoodRecord> list=(List<FoodRecord>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     public boolean setFoodRecord(long class_id,String foodrecord,String images){

@@ -2,6 +2,8 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.util.MD5;
+import com.umeijia.vo.DailyLog;
+import com.umeijia.vo.Pager;
 import com.umeijia.vo.Teacher;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -47,6 +49,21 @@ public class TeacherDao {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Teacher as u where u.phone_num=\'%s\' and u.valid=1", phoneNumber);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            Teacher teacher = (Teacher) list.get(0);
+            return teacher;
+        }else {
+            return null;
+        }
+    }
+
+    public Teacher queryTeacherBySchoolAndPhone(String phoneNumber,int schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Teacher as u where u.phone_num=\'%s\' and u.kindergarten.id=%d and u.valid=1", phoneNumber,schoolId);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();
@@ -220,19 +237,27 @@ public class TeacherDao {
 /**
  * 一个幼儿园的所有老师集合
  * **/
-    public List<Teacher> queryTeachersByGarten(long gartenID) {
-        Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("from Teacher as u where u.kindergarten.id=%d and u.valid=1",gartenID);
-        Query query = session.createQuery(sql);
-        List list =query.list();
-        List<Teacher> teachers=new ArrayList<Teacher>();
-        session.close();
-        for (int i = 0; i < list.size(); i++){
-            Teacher t=(Teacher)list.get(i);
-            teachers.add(t);
+    public Pager queryTeachersByGarten(long gartenID,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
         }
-        return teachers;
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from Teacher as u where u.kindergarten.id=%d and u.valid=1",gartenID);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<Teacher> list=(List<Teacher>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     /**

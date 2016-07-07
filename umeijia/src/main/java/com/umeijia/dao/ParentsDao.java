@@ -2,7 +2,9 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.util.MD5;
+import com.umeijia.vo.Pager;
 import com.umeijia.vo.Parents;
+import com.umeijia.vo.Teacher;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -65,6 +67,20 @@ public class ParentsDao {
         if(list.size()>0){
             Parents parents = (Parents) list.get(0);
             return parents;
+        }else {
+            return null;
+        }
+    }
+
+    public List<Parents> queryParentsByClassId(long classId){
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Parents as u where u.class_id.id=%d and u.valid=1", classId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
         }else {
             return null;
         }
@@ -354,19 +370,28 @@ public class ParentsDao {
 /**
  * 一个幼儿园的所有老师集合
  * **/
-    public List<Parents> queryParentssByGarten(long gartenID) {
-        Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("from Parents as u where u.garten_id=%d and u.valid=1",gartenID);
-        Query query = session.createQuery(sql);
-        List list =query.list();
-        List<Parents> parentss=new ArrayList<Parents>();
-        session.close();
-        for (int i = 0; i < list.size(); i++){
-            Parents t=(Parents)list.get(i);
-            parentss.add(t);
+    public Pager queryParentssByGarten(long gartenID,Pager pager) {
+
+        if (pager == null) {
+            pager = new Pager();
         }
-        return parentss;
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql= String.format("from Parents as u where u.garten_id=%d and u.valid=1",gartenID);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<Parents> list=(List<Parents>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
 

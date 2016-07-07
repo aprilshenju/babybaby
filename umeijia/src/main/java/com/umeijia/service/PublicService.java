@@ -3,6 +3,7 @@ package com.umeijia.service;
 import cn.jpush.api.push.model.notification.Notification;
 import com.sun.jersey.multipart.FormDataParam;
 import com.umeijia.dao.*;
+import com.umeijia.enums.OptEnum;
 import com.umeijia.util.*;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
@@ -33,17 +34,20 @@ import java.util.*;
 @Service
 @Path("/public_service")
 public class PublicService {
-    String baseDir = "/UMJ_IMG_SERVER";
+    //下载文件接口路径
+    private final String fileDownloadInterfaceUrl = "/umeijiaServer/rest/public_service/fileDownload/get";
+    //服务器图片根目录
+    private final String baseDir = "/UMEIJIA_IMG_SERVER";
     //类别路径
-    String filePath = null;
-    String imgUrls = null;
+    private String filePath = null;
+    private String imgUrls = null;
     //原始图片存放路径
-    String imgPath = null;
+    private String imgPath = null;
     //视频存放路径
-    String videoPath = null;
+    private String videoPath = null;
     //小图存放路径
-    String thumbDir = null;
-    Thread thumbImgThread = null;
+    private String thumbDir = null;
+    private Thread thumbImgThread = null;
     @Autowired
     @Qualifier("administratordao")
     private AdministratorDao administratordao;
@@ -949,8 +953,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看反馈");
                 return jobOut.toString();
             }
-
-            List<FeedBack> result = feedbackdao.getFeedBackList();
+            List<FeedBack> result = feedbackdao.queryFeedBacks();
             if (result == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -1132,6 +1135,7 @@ public class PublicService {
             cn.setDescription(jobIn.getString("description"));
             cn.setDate(new Date());
             cn.setClass_id(jobIn.getInt("classId"));
+            cn.setSchool_id(classdao.queryClass(cn.getClass_id()).getGarten().getId());
             String imageUrls = jobIn.getString("imageUrls");
             cn.setImage_urls(imageUrls);
             cn.setSubscribers("");
@@ -1378,11 +1382,11 @@ public class PublicService {
             String imageUrls = jobIn.getString("imageUrls");
             String state = jobIn.getString("state");
             float temperature = (float) jobIn.getDouble("temperature");
-            if (!checkIdAndToken(roleType, headers)) {
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "token已过期");
-                return jobOut.toString();
-            }
+//            if (!checkIdAndToken(roleType, headers)) {
+//                jobOut.put("resultCode", GlobalStatus.error.toString());
+//                jobOut.put("resultDesc", "token已过期");
+//                return jobOut.toString();
+//            }
             if (roleType != 1 && roleType != 2) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "没有权限添加考勤记录");
@@ -1396,6 +1400,7 @@ public class PublicService {
             if(cir==null){ //没有记录直接添加
                 cir = new CheckinRecords();
                 cir.setClass_id(jobIn.getInt("classId"));
+                cir.setSchool_id(classdao.queryClass(cir.getClass_id()).getGarten().getId());
                 cir.setDate(new Date());
                 cir.setStu_id(checkincarddao.queryCheckinCard(cardId).getStu_id());
                 switch (period){
@@ -1661,6 +1666,11 @@ public class PublicService {
             }
 
             FoodRecord fr = foodrecorddao.queryFoodRecordByClassId(classId,year,month,day);
+            if(fr==null){
+                jobOut.put("resultCode", GlobalStatus.error.toString());
+                jobOut.put("resultDesc", "无记录");
+                return jobOut.toString();
+            }
             if (fr.getRecords() != null && !fr.getRecords().isEmpty()) {
                 jobOut.put("imageUrls",fr.getImage_urls());
                 jobOut.put("content",fr.getRecords());
@@ -1759,7 +1769,7 @@ public class PublicService {
             }
             if (roleType != 1 && roleType != 2 && roleType != 3) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "没有权限查看饮食");
+                jobOut.put("resultDesc", "没有权限查看课程表");
                 return jobOut.toString();
             }
             Class cls = classdao.queryClass(classId);
@@ -1814,6 +1824,7 @@ public class PublicService {
             hw.setImage_urls(imageUrls);
             hw.setDescription(description);
             hw.setClass_id(classId);
+            hw.setSchool_id(classdao.queryClass(classId).getGarten().getId());
             hw.setDate(new Date());
             hw.setTeacher_id(roleId);
             hw.setTitle(title);
@@ -1950,6 +1961,7 @@ public class PublicService {
             ca.setTitle(title);
             ca.setTeacher_id(roleId);
             ca.setClass_id(classId);
+            ca.setSchool_id(classdao.queryClass(classId).getGarten().getId());
             ca.setBaby_ids("");  //参与宝贝的ids
             ca.setContact_name(contactName);
             ca.setContent(content);
@@ -2223,7 +2235,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限查看育儿知识");
                 return jobOut.toString();
             }
-            List<BabyKnowledge> babyKnowledges = babyknowledgedao.getBabyKnowledgeList();
+            List<BabyKnowledge> babyKnowledges = babyknowledgedao.queryBabyKnowledges();
             if (babyKnowledges == null) {
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -3116,7 +3128,7 @@ public class PublicService {
                 jobOut.put("resultDesc", "token已过期");
                 return jobOut.toString();
             }
-            List<SystemNotification> systemNotifications = systemnotificationdao.querySystemNotifications();
+            List<SystemNotification> systemNotifications = systemnotificationdao.getSystemNotification();
             if(systemNotifications==null){
                 jobOut.put("resultCode", GlobalStatus.error.toString());
                 jobOut.put("resultDesc", "无记录");
@@ -3620,7 +3632,8 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "请求参数异常");
             return returnJsonObject.toString();
         }
-        String checkReqJson = judgeValidationOfInputJson(reqJson, "roleType","roleId","schoolId", "pageNum", "pageSize");
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "roleType", "roleId", "schoolId", "pageNum",
+                "pageSize");
         if (!checkReqJson.equals("")) {
             return checkReqJson;
         }
@@ -3683,7 +3696,7 @@ public class PublicService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String addOrUpdateCamera(@RequestBody String reqJson,@Context HttpHeaders headers) {
+    public String addOrUpdateCamera(@RequestBody String reqJson, @Context HttpHeaders headers) {
         System.out.println("收到添加或更新摄像头的请求");
         JSONObject returnJsonObject = new JSONObject();
         JSONObject jsonObject = JSONObject.fromObject(reqJson);
@@ -3718,7 +3731,7 @@ public class PublicService {
         type = jsonObject.getInt("type");
         roleType = jsonObject.getInt("roleType");
         roleId = jsonObject.getLong("roleId");
-        if(roleType!=4&&roleType!=5){
+        if (roleType != 4 && roleType != 5) {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "没有权限");
             return returnJsonObject.toString();
@@ -3749,9 +3762,14 @@ public class PublicService {
                 modifyDate = addDate;
                 Camera camera = new Camera(ipUrl, videoUrl, description, manufactory, clz, kindergarten, cameraType,
                         state, thumbPath, activePeriod, isPublic, addDate, modifyDate);
+                camera.setValid(true);
                 if (cameradao.addCamera(camera)) {
                     returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
                     returnJsonObject.put("resultDesc", "操作成功");
+                    //添加日志
+                    DailyLog dailyLog = LogUtil.generateDailyLog(new Date(), roleType, roleId, OptEnum.insert
+                            .toString(), "添加摄像头", "摄像头id:" + String.valueOf(camera.getId()));
+                    dailylogdao.addDailyLog(dailyLog);
                 } else {
                     returnJsonObject.put("resultCode", GlobalStatus.error.toString());
                     returnJsonObject.put("resultDesc", "添加摄像头失败");
@@ -3810,8 +3828,9 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "获取json失败");
             return returnJsonObject.toString();
         }
+        LockerLogger.log.info(reqJson);
         String checkReqJson = judgeValidationOfInputJson(reqJson, "fileType", "gardenId", "classId",
-                "babyId", "interfaceType", "fileName", "roleType", "roleId");
+                "babyId", "interfaceType", "fileName", "roleType", "roleId", "phone");
         if (!checkReqJson.equals("")) {
             return checkReqJson;
         }
@@ -3824,8 +3843,11 @@ public class PublicService {
         long babyId = -1;
         String interfaceType;
         String fileName;
+        String returnFileName = null;
+        String phone = null;
         roleType = job.getInt("roleType");
         roleId = job.getLong("roleId");
+        phone = job.getString("phone");
         if (!checkIdAndToken(roleType, headers)) {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "token已过期");
@@ -3905,16 +3927,18 @@ public class PublicService {
         try {
             switch (fileType) {
                 case 1://图片
-                    handlerFileUpload(filePath, fileName, ins, true);
+                    returnFileName = handlerFileUpload(filePath, fileName, ins, true, phone);
                     break;
                 case 2://视频
-                    handlerFileUpload(filePath, fileName, ins, false);
+                    returnFileName = handlerFileUpload(filePath, fileName, ins, false, phone);
                     break;
                 default:
                     returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
                     returnJsonObject.put("resultDesc", "未知的文件类型");
                     return returnJsonObject.toString();
             }
+            returnJsonObject.put("fileUrl", fileDownloadInterfaceUrl + "/" + interfaceType + "/" + fileType + "/" +
+                    gardenId + "/" + classId + "/" + babyId + "/" + returnFileName);
             returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
             returnJsonObject.put("resultDesc", "操作成功");
         } catch (IOException e) {
@@ -3924,22 +3948,16 @@ public class PublicService {
         return returnJsonObject.toString();
     }
 
-    @Path("/fileDownload/get/{roleId}/{roleType}/{interfaceType}/{fileType}/{gardenId}/{classId}/{babyId}/{isThumb}/{fileName}")
+    @Path("/fileDownload/get/{interfaceType}/{fileType}/{gardenId}/{classId}/{babyId}/{fileName}")
     @GET
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public byte[] fileDownloadByGet(@PathParam("interfaceType") String interfaceType, @PathParam("fileType") String
             fileType, @PathParam("gardenId") String gardenId, @PathParam("classId") String classId, @PathParam
-                                            ("babyId") String babyId, @PathParam("isThumb") String isThumb, @PathParam
-                                            ("fileName") String fileName, @PathParam("roleId") String roleId,
-                                    @PathParam("roleType") String roleType, @Context HttpHeaders headers) {
-        int role_type = Integer.valueOf(roleType);
-        if (!checkIdAndToken(role_type, headers)) {
-            LockerLogger.log.info("token过期，不能下载图片");
-            return null;
-        }
+            ("babyId") String babyId, @PathParam("fileName") String fileName, @QueryParam("isThumb") String isThumb,
+                                    @Context HttpHeaders headers) {
         int fType = Integer.valueOf(fileType);
-        boolean isThumbPic = Boolean.valueOf(isThumb);
         byte[] fileOctStream = null;
+        boolean isThumbPic = Boolean.valueOf(isThumb);
         switch (interfaceType) {
             case "publishOrUpdateSchoolNews"://发布编辑校园新闻接口
                 filePath = "/garden/" + gardenId + "/news/img";
@@ -4017,9 +4035,9 @@ public class PublicService {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public byte[] fileDownloadByPost(@PathParam("interfaceType") String interfaceType, @PathParam("fileType") String
             fileType, @PathParam("gardenId") String gardenId, @PathParam("classId") String classId, @PathParam
-                                            ("babyId") String babyId, @PathParam("isThumb") String isThumb, @PathParam
-                                            ("fileName") String fileName, @PathParam("roleId") String roleId,
-                                    @PathParam("roleType") String roleType, @Context HttpHeaders headers) {
+                                             ("babyId") String babyId, @PathParam("isThumb") String isThumb, @PathParam
+                                             ("fileName") String fileName, @PathParam("roleId") String roleId,
+                                     @PathParam("roleType") String roleType, @Context HttpHeaders headers) {
         int role_type = Integer.valueOf(roleType);
         if (!checkIdAndToken(role_type, headers)) {
             LockerLogger.log.info("token过期，不能下载图片");
@@ -4099,6 +4117,7 @@ public class PublicService {
         }
         return fileOctStream;
     }
+
     /**
      * 将流转换为图片，并存储到指定路径
      *
@@ -4139,7 +4158,7 @@ public class PublicService {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String publishOrUpdateSchoolNews(@RequestBody String reqJson,@Context HttpHeaders headers) {
+    public String publishOrUpdateSchoolNews(@RequestBody String reqJson, @Context HttpHeaders headers) {
         System.out.println("接收到发布或更新校园新闻的请求");
         JSONObject job = JSONObject.fromObject(reqJson);
         JSONObject returnJsonObject = new JSONObject();
@@ -4149,7 +4168,7 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "请求参数异常");
             return returnJsonObject.toString();
         }
-        String checkReqJson = judgeValidationOfInputJson(reqJson, "type", "roleType","roleId", "title",
+        String checkReqJson = judgeValidationOfInputJson(reqJson, "imageUrls", "type", "roleType", "roleId", "title",
                 "summary", "description");
         if (!checkReqJson.equals("")) {
             return checkReqJson;
@@ -4162,7 +4181,7 @@ public class PublicService {
         }
         int optType = job.getInt("type");
         long roleId = job.getLong("roleId");
-        if(roleType!=1&&roleType!=2){
+        if (roleType != 1 && roleType != 2) {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "没有权限");
             return returnJsonObject.toString();
@@ -4203,6 +4222,7 @@ public class PublicService {
                 gartenNews.setPublishDate(publisDate);
                 gartenNews.setModifyDate(publisDate);
                 gartenNews.setImage_urls(imageUrls);
+                gartenNews.setValid(true);
                 if (gartennewsdao.addGartenNews(gartenNews)) {
                     long newsId = gartenNews.getId();
                     returnJsonObject.put("id", newsId);
@@ -4253,7 +4273,7 @@ public class PublicService {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String queryCamera(@RequestBody String reqJson,@Context HttpHeaders headers) {
+    public String queryCamera(@RequestBody String reqJson, @Context HttpHeaders headers) {
         System.out.println("收到显示摄像头列表的请求。。。");
         JSONObject returnJsonObject = new JSONObject();
         JSONObject jsonObject = JSONObject.fromObject(reqJson);
@@ -4262,13 +4282,14 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "请求参数异常");
             return returnJsonObject.toString();
         }
-        String checkReqJson = judgeValidationOfInputJson(reqJson, "gardenId", "classId");
+        String checkReqJson = judgeValidationOfInputJson(reqJson,"roleType","roleId", "gardenId", "classId");
         if (!checkReqJson.equals("")) {
             return checkReqJson;
         }
         long gardenId, classId;
         int roleType;
         long roleId;
+        List<Camera> camerList = null;
         roleType = jsonObject.getInt("roleType");
         roleId = jsonObject.getLong("roleId");
         if (!checkIdAndToken(roleType, headers)) {
@@ -4278,19 +4299,28 @@ public class PublicService {
         }
         gardenId = jsonObject.getLong("gardenId");
         classId = jsonObject.getLong("classId");
+        switch (roleType) {
+            case 1://老师角色,只能看自己班级的和公共的
+            case 2://其他角色，园长、管理员、运营商和赞助商所有都可以看
+                camerList = cameradao.getCamerasListBySchoolId(gardenId);
 
-        List<Camera> privateCameraList = cameradao.queryPrivateCamerasList(classId);
-        List<Camera> publicCameraList = cameradao.queryPublicCamerasList(gardenId);
-        if (privateCameraList == null && publicCameraList == null) {
+                break;
+            case 3: //家长角色，只有vip才能看（且只能看孩子班级和公共的）
+                camerList = cameradao.getCamerasListByClassId(classId);
+                break;
+            default://未知角色，直接返回异常
+                break;
+        }
+        if (camerList == null) {
             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
             returnJsonObject.put("resultDesc", "显示摄像头列表失败");
         } else {
             int privateCameraCount = 0, publicCameraCount = 0;
             JSONArray data = new JSONArray();
-            if (privateCameraList != null) {
-                privateCameraCount = privateCameraList.size();
+            if (camerList != null) {
+                privateCameraCount = camerList.size();
                 for (int i = 0; i < privateCameraCount; i++) {
-                    Camera camera = privateCameraList.get(i);
+                    Camera camera = camerList.get(i);
                     JSONObject item = new JSONObject();
                     item.put("cameraId", camera.getId());
                     item.put("classId", camera.getCla().getId());
@@ -4303,23 +4333,6 @@ public class PublicService {
                 }
 
             }
-            if (publicCameraList != null) {
-                publicCameraCount = publicCameraList.size();
-                for (int j = 0; j < publicCameraCount; j++) {
-                    Camera camera = publicCameraList.get(j);
-                    JSONObject item = new JSONObject();
-                    item.put("cameraId", camera.getId());
-                    item.put("classId", camera.getCla().getId());
-                    item.put("className", camera.getCla().getName());
-                    item.put("openTimeArea", camera.getActive_period());
-                    item.put("thumbPath", camera.getThumb_path());
-                    item.put("state", camera.getState());
-                    item.put("isPublic", camera.is_public());
-                    data.add(item);
-                }
-            }
-            int totalCount = privateCameraList == null && publicCameraList == null ? 0 : privateCameraCount +
-                    publicCameraCount;
             returnJsonObject.put("data", data);
             returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
             returnJsonObject.put("resultDesc", "操作成功");
@@ -4337,7 +4350,7 @@ public class PublicService {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String queryVideo(@RequestBody String reqJson,@Context HttpHeaders headers) {
+    public String queryVideo(@RequestBody String reqJson, @Context HttpHeaders headers) {
         System.out.println("收到查询摄像头的请求");
         JSONObject jsonObject = JSONObject.fromObject(reqJson);
         JSONObject returnJsonObject = new JSONObject();
@@ -4374,82 +4387,68 @@ public class PublicService {
             returnJsonObject.put("resultDesc", "获取摄像头失败");
         } else {
             switch (roleType) {
-                case 1://老师角色,只能看自己班级的和公共的
-                    if (isPublic) {
-                        returnJsonObject.put("videoUrl", camera.getVideo_url());
-                        returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                        returnJsonObject.put("resultDesc", "操作成功");
-                    } else {
-                        Teacher teacher = teacherdao.queryTeacher(roleId);
-                        if (teacher != null) {
-                            Set<Class> classes = teacher.getClasses();
-                            boolean belongTeacher = false;
-                            Iterator iterator = classes.iterator();
-                            while (iterator.hasNext()) {
-                                Class clazz = (Class) iterator.next();
-                                if (classId == clazz.getId()) {
-                                    belongTeacher = true;
-                                    break;
-                                }
-                            }
-                            if (belongTeacher) {//班级属于老师
+                case 1://老师角色,可以看所属学校所有摄像头
+                case 2://园长
+                    Class clazz = classdao.queryClass(classId);
+                    if(clazz!=null){
+                        long gardenId = clazz.getGarten().getId();
+                        if (camera.getGarten().getId() ==gardenId) {
+                            returnJsonObject.put("videoUrl", camera.getVideo_url());
+                            returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
+                            returnJsonObject.put("resultDesc", "操作成功");
+                        } else {
+                            returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                            returnJsonObject.put("resultDesc", "只能查看自己学校的摄像头");
+                        }
+                    }else{
+                        returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                        returnJsonObject.put("resultDesc", "找不到对应的班级");
+                    }
+
+                break;
+            case 3: //家长角色，只有vip才能看（且只能看孩子班级和公共的）
+                Parents parents = parentsdao.queryParents(roleId);
+                if (parents != null) {
+                    Student student = parents.getStudent();
+                    if (student != null) {
+                        boolean isVip = student.isVip();
+                        Date end = student.getVip_end();
+                        boolean outOfDate = end.before(new Date());
+                        long clazzId = student.getCla().getId();
+                        if (isVip&&!outOfDate) {
+                            if (isPublic || classId == clazzId) {
                                 returnJsonObject.put("videoUrl", camera.getVideo_url());
                                 returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
                                 returnJsonObject.put("resultDesc", "操作成功");
                             } else {
                                 returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                                returnJsonObject.put("resultDesc", "只能查看自己的班级");
+                                returnJsonObject.put("resultDesc", "不能查看其他班和公共以外的摄像头");
                             }
-                        } else {
+                        } else if(!isVip){
                             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                            returnJsonObject.put("resultDesc", "获取老师信息失败");
-                        }
-                    }
-                    break;
-                case 3: //家长角色，只有vip才能看（且只能看孩子班级和公共的）
-                    Parents parents = parentsdao.queryParents(roleId);
-                    if (parents != null) {
-                        Student student = parents.getStudent();
-                        if (student != null) {
-                            boolean isVip = student.isVip();
-                            long clazzId = student.getCla().getId();
-                            if (isVip) {
-                                if (isPublic || classId == clazzId) {
-                                    returnJsonObject.put("videoUrl", camera.getVideo_url());
-                                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                                    returnJsonObject.put("resultDesc", "操作成功");
-                                } else {
-                                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                                    returnJsonObject.put("resultDesc", "不能查看其他班和公共以外的摄像头");
-                                }
-                            } else {
-                                returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                                returnJsonObject.put("resultDesc", "该用户不是vip");
-                            }
-                        } else {
+                            returnJsonObject.put("resultDesc", "该用户不是vip");
+                        }else if(outOfDate){
                             returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                            returnJsonObject.put("resultDesc", "获取baby信息失败");
+                            returnJsonObject.put("resultDesc", "vip过期");
                         }
                     } else {
                         returnJsonObject.put("resultCode", GlobalStatus.error.toString());
-                        returnJsonObject.put("resultDesc", "获取家长信息失败");
+                        returnJsonObject.put("resultDesc", "获取baby信息失败");
                     }
-                    break;
-                case 2://其他角色，园长、管理员、运营商和赞助商所有都可以看
-                case 4:
-                case 5:
-                    returnJsonObject.put("videoUrl", camera.getVideo_url());
-                    returnJsonObject.put("resultCode", GlobalStatus.succeed.toString());
-                    returnJsonObject.put("resultDesc", "操作成功");
-                    break;
-                default://未知角色，直接返回异常
-                    returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
-                    returnJsonObject.put("resultDesc", "未知的角色");
-                    break;
-            }
+                } else {
+                    returnJsonObject.put("resultCode", GlobalStatus.error.toString());
+                    returnJsonObject.put("resultDesc", "获取家长信息失败");
+                }
+                break;
+            default://未知角色，直接返回异常
+                returnJsonObject.put("resultCode", GlobalStatus.unknown.toString());
+                returnJsonObject.put("resultDesc", "未知的角色");
+                break;
         }
-        return returnJsonObject.toString();
     }
+
+    return returnJsonObject.toString();
+}
 
     /**
      * 处理文件上传
@@ -4459,18 +4458,25 @@ public class PublicService {
      * @param ins
      * @param hasThumb
      */
-    private void handlerFileUpload(String filePath, String fileName, InputStream ins, Boolean hasThumb) throws
+    private String handlerFileUpload(String filePath, String fileName, InputStream ins, Boolean hasThumb, String
+            phone) throws
             IOException {
         File dir = new File(baseDir + filePath);
+        String returnFileName = null;
+        Random random = new Random();
+        int rnd = random.nextInt(100);
+        //拼接新的文件名
+        returnFileName = System.currentTimeMillis() + "_" + phone + "_" + rnd + "." + fileName.substring(fileName
+                .lastIndexOf(".") + 1, fileName.length());
         if (!dir.exists()) {
             dir.mkdirs();
-            System.out.println("创建图片目录:" + dir.getPath());
+            System.out.println("创建文件目录:" + dir.getPath());
         }
         //存储原图
         if (hasThumb) {
-            imgPath = dir.getPath() + "/origin/" + fileName;
+            imgPath = dir.getPath() + "/origin/" + returnFileName;
         } else {
-            imgPath = dir.getPath() + "/" + fileName;
+            imgPath = dir.getPath() + "/" + returnFileName;
         }
         storeImg(imgPath, ins);
         if (hasThumb) {
@@ -4480,6 +4486,7 @@ public class PublicService {
             //线程处理图片缩放和存储
             thumbImgThread.start();
         }
+        return returnFileName;
     }
 
     private byte[] handlerFileDownload(String fileDirPath, boolean isThumb, boolean isVideo, String fileName) throws

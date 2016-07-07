@@ -2,8 +2,10 @@ package com.umeijia.service;
 
 import com.sun.org.apache.xpath.internal.WhitespaceStrippingElementMatcher;
 import com.umeijia.dao.*;
+import com.umeijia.enums.OptEnum;
 import com.umeijia.util.GlobalStatus;
 import com.umeijia.util.LockerLogger;
+import com.umeijia.util.LogUtil;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
@@ -74,7 +76,9 @@ public class RunService {
     @Autowired
     @Qualifier("classactivitydao")
     private ClassActivityDao classactivitydao;
-
+    @Autowired
+    @Qualifier("dailylogdao")
+    private DailyLogDao dailylogdao;
     @Path("/hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -166,7 +170,8 @@ public class RunService {
                 return job_out.toString();
             }
             Agent agent = new Agent(tid);
-
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             String garten_name= job.getString("garten_name");
             String addr= job.getString("addr"); //幼儿园地址
             String contact=job.getString("garten_contact"); //幼儿园联系方式
@@ -215,6 +220,9 @@ public class RunService {
                     {
                         job_out.put("resultCode",GlobalStatus.succeed.toString());
                         job_out.put("resultDesc","成功添加幼儿园和园长");
+                        //添加日志
+                        DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加幼儿园和园长","幼儿园id:"+String.valueOf(garten.getId())+",园长id:"+String.valueOf(leader.getId()));
+                        dailylogdao.addDailyLog(dailyLog);
                         return job_out.toString();
                     }
                 }
@@ -815,6 +823,8 @@ public class RunService {
                     job_out.put("resultDesc","token已过期");
                     return job_out.toString();
                 }
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
                 String phone= job.getString("phone");
 //                String pwd= job.getString("pwd");
 //                pwd=MD5.GetSaltMD5Code(pwd);
@@ -848,6 +858,9 @@ public class RunService {
 
                     job_out.put("resultCode",GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功添加代理商");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加代理商","代理商id:"+String.valueOf(agent.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                     return  job_out.toString();
                 }
                 job_out.put("resultCode",GlobalStatus.error.toString());
@@ -884,6 +897,8 @@ public class RunService {
                 return job_out.toString();
             }
 
+            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");
             String phone= job.getString("phone");
     /*        String pwd= job.getString("pwd");
             pwd=MD5.GetSaltMD5Code(pwd);*/
@@ -912,6 +927,9 @@ public class RunService {
                 SMSMessageService .cmds.add(map);
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功添加管理员");
+                //添加日志
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加管理员","管理员id:"+String.valueOf(admin.getId()));
+                dailylogdao.addDailyLog(dailyLog);
                 return  job_out.toString();
             }
             job_out.put("resultCode",GlobalStatus.error.toString());

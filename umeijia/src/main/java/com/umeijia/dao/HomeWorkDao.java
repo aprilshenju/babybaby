@@ -1,6 +1,7 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
+import com.umeijia.vo.ClassNotification;
 import com.umeijia.vo.HomeWork;
 import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
@@ -56,6 +57,57 @@ public class HomeWorkDao {
         }else {
             return null;
         }
+    }
+
+    public List<HomeWork> queryHomeWorksByClassidAndTitle(long class_id,String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from HomeWork as work where work.class_id=%d and work.title=\'%s\' and valid=1 order by work.date desc",class_id,title);
+        Query query = session.createQuery(sql);
+        List <HomeWork> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<HomeWork> queryHomeWorksByTitle(String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from HomeWork as work where  work.title=\'%s\' and valid=1 order by work.date desc",title);
+        Query query = session.createQuery(sql);
+        List <HomeWork> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public Pager queryHomeWorksBySchool(long schoolId,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=  String.format("from HomeWork as work where work.school_id=%d and valid=1 order by work.date desc",schoolId);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<HomeWork> list=(List<HomeWork>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     /**

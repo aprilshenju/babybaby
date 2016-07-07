@@ -2,6 +2,7 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.ClassActivity;
+import com.umeijia.vo.HomeWork;
 import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -80,6 +81,57 @@ public class ClassActivityDao {
         }else {
             return null;
         }
+    }
+
+    public List queryOneClassActivitysListByClassAndTitle(long class_id,String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassActivity as ca where ca.class_id=%d and ca.title=\'%s\' and valid=1 order by ca.start_date desc",class_id,title);
+        Query query = session.createQuery(sql);
+        List <ClassActivity> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List queryOneClassActivitysListByTitle(String title) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from ClassActivity as ca where  ca.title=\'%s\' and valid=1 order by ca.start_date desc",title);
+        Query query = session.createQuery(sql);
+        List <ClassActivity> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public Pager queryOneClassActivitysListBySchoolId(long schoolId,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=  String.format("from ClassActivity as ca where ca.school_id=%d and valid=1 order by ca.start_date desc",schoolId);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<ClassActivity> list=(List<ClassActivity>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     public boolean addClassActivity(ClassActivity activity) {

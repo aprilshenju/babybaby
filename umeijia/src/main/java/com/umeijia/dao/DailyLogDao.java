@@ -1,6 +1,7 @@
 package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
+import com.umeijia.vo.BabyKnowledge;
 import com.umeijia.vo.DailyLog;
 import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
@@ -41,6 +42,30 @@ public class DailyLogDao {
         }
     }
 
+
+    public Pager queryDailyLogs(Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql= String.format("from DailyLog as log order by log.log_date desc");
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<DailyLog> list=(List<DailyLog>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
+    }
+
     /**
      * 日志查询，暂时未做筛选，后期应追加筛选条�比如时间筛�
      *
@@ -78,6 +103,51 @@ public class DailyLogDao {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from DailyLog as log where year(log.log_date)=%d and month(log.log_date)=%d order by log.log_date desc",year,month);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<DailyLog> queryDailyLogByDate(int year,int month,int day) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from DailyLog as log where year(log.log_date)=%d and month(log.log_date)=%d and day(log.log_date)=%d order by log.log_date desc",year,month,day);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<DailyLog> queryDailyLogByDateAndUserTypeAndUserId(int year,int month,int day,long userType,long userId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from DailyLog as log where year(log.log_date)=%d and month(log.log_date)=%d and day(log.log_date)=%d and log.user_type=%d and log.user_id=%d order by log.log_date desc",year,month,day,userType,userId);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List<DailyLog> queryDailyLogByUserTypeAndUserId(long userType,long userId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from DailyLog as log where  log.user_type=%d and log.user_id=%d order by log.log_date desc",userType,userId);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

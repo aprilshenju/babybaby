@@ -3,6 +3,8 @@ package com.umeijia.dao;
 import com.umeijia.util.DBManager;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.Agent;
+import com.umeijia.vo.Pager;
+import com.umeijia.vo.Teacher;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -36,6 +38,45 @@ public class AgentDao {
         }else {
             return null;
         }
+    }
+
+    public Agent queryAgentByName(String name) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Agent as u where u.name=\'%s\' and u.valid=1", name);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            Agent agent = (Agent) list.get(0);
+            return agent;
+        }else {
+            return null;
+        }
+    }
+
+    public Pager queryAgents(Pager pager) {
+
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql= String.format("from Agent as u where u.valid=1");
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<Agent> list=(List<Agent>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
 
     public Agent queryAgent(String phoneNumber) {

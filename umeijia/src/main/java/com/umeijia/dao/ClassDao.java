@@ -3,6 +3,8 @@ package com.umeijia.dao;
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.Class;
 import com.umeijia.vo.Kindergarten;
+import com.umeijia.vo.Pager;
+import com.umeijia.vo.Teacher;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -14,8 +16,7 @@ import java.util.List;
 
 /**
  * Created by shenju on 2016/6/14.
- * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效。
- * 应当是直接修改字段，用update操作
+ * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效� * 应当是直接修改字段，用update操作
  *
  *
  */
@@ -35,6 +36,59 @@ public class ClassDao {
         if(list.size()>0){
             Class cla = (Class) list.get(0);
             return cla;
+        }else {
+            return null;
+        }
+    }
+
+    public List<Class> queryClassBySchoolId(long school_id) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Class as c where c.garten.id=%d", school_id);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public Pager queryClassBySchoolId(long schoolId,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from Class as c where c.garten.id=%d", schoolId);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<Class> list=(List<Class>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
+    }
+
+
+    public Class queryClassBySchoolIdAndClassName(long schoolId,String className) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Class as c where c.garten.id=%d and c.name=\'%s\'", schoolId,className);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return (Class)list.get(0);
         }else {
             return null;
         }
@@ -60,8 +114,7 @@ public class ClassDao {
         session.clear();
         String hql = String.format("select c.teachers_contacts from Class as c where c.id=%d",class_id);
         Query query = session.createQuery(hql);
-        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
-        List<Object> list = query.list();
+        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�        List<Object> list = query.list();
         if(list.size()>0){
             teacherContacts=(String) list.get(0);
         }
@@ -98,8 +151,7 @@ public class ClassDao {
         session.clear();
         String hql = String.format("select c.parents_contacts from Class as c where c.id=%d and c.valid=1",class_id);
         Query query = session.createQuery(hql);
-        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
-        List<Object> list = query.list();
+        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�        List<Object> list = query.list();
         if(list.size()>0){
             parentsContacts=(String) list.get(0);
         }
@@ -136,8 +188,7 @@ public class ClassDao {
         session.clear();
         String hql = String.format("select c.garten from Class as c where c.id=%d and c.valid=1",class_id);
         Query query = session.createQuery(hql);
-        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean。
-        List<Object> list = query.list();
+        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�        List<Object> list = query.list();
         if(list.size()>0){
             garten=(Kindergarten) list.get(0);
         }

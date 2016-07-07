@@ -2,6 +2,8 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.FeedBack;
+import com.umeijia.vo.HomeWork;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -40,18 +42,42 @@ public class FeedBackDao {
         }
     }
 
-    public List getFeedBackList() {
+    public List<FeedBack> queryFeedBacks() {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from FeedBack");
         Query query = session.createQuery(sql);
-        List <FeedBack> list = query.list();
+        List list = query.list();
         session.close();
         if(list.size()>0){
+
             return list;
         }else {
             return null;
         }
+    }
+
+    public Pager getFeedBackList(Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql=String.format("from FeedBack");
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<FeedBack> list=(List<FeedBack>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
     
     public boolean addFeedBack(FeedBack feed_back) {

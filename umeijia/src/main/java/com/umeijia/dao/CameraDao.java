@@ -2,7 +2,8 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.Camera;
-import com.umeijia.vo.Class;
+import com.umeijia.vo.ClassActivity;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -14,8 +15,7 @@ import java.util.List;
 
 /**
  * Created by shenju on 2016/6/14.
- * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效。
- * 应当是直接修改字段，用update操作
+ * 寰呬紭鍖栭棶棰橈細鐩墠鏇存柊灞炴€у€硷紝鏄厛鏌ヨ瀵硅薄锛岀劧鍚庢洿鏂版暣涓璞＄殑銆傚苟涓嶉珮鏁堛€ * 搴斿綋鏄洿鎺ヤ慨鏀瑰瓧娈碉紝鐢╱pdate鎿嶄綔
  *
  *
  */
@@ -43,8 +43,7 @@ public class CameraDao {
     }
 
     /**
-     * 班级私有摄像头列表
-     * **/
+     * 鐝骇绉佹湁鎽勫儚澶村垪琛     * **/
     public List queryPrivateCamerasList(long class_id) {
         Session session = DBManager.getSession();
         session.clear();
@@ -58,9 +57,102 @@ public class CameraDao {
             return null;
         }
     }
+
+
+    public Pager getCamerasList(Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql= String.format("from Camera as ca where ca.valid=1");
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<Camera> list=(List<Camera>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
+    }
+
+    public List getCamerasListBySchoolId(long schoolId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.valid=1",schoolId);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List getCamerasListByClassId(long classId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.cla.id=%d and ca.valid=1",classId);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List getCamerasListByClassId(long classId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.cla.id=%d and ca.valid=1",classId);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List getCamerasListBySchoolIdAndCameraName(long schoolId,String name) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.manufactory=\'%s\' and ca.valid=1",schoolId,name);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
+    public List getCamerasListByCameraName(String name) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where  ca.manufactory=\'%s\' and ca.valid=1",name);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
     /**
-     * 一个幼儿园公共区域摄像头列表
-     * **/
+     * 涓€涓辜鍎垮洯鍏叡鍖哄煙鎽勫儚澶村垪琛     * **/
     public List queryPublicCamerasList(long garten_id) {
         Session session = DBManager.getSession();
         session.clear();
@@ -139,7 +231,7 @@ public class CameraDao {
         }
     }
 
-    // 班级删除摄像头，只是解除关系
+    // 鐝骇鍒犻櫎鎽勫儚澶达紝鍙槸瑙ｉ櫎鍏崇郴
     public boolean invalidCameraByClass(long class_id) {
         boolean result=false;
         Session session = DBManager.getSession();
@@ -163,8 +255,7 @@ public class CameraDao {
         }
     }
 
-    // 按幼儿园，直接使摄像头无效
-    public boolean invalidCameraByGarten(long garten_id) {
+    // 鎸夊辜鍎垮洯锛岀洿鎺ヤ娇鎽勫儚澶存棤鏁    public boolean invalidCameraByGarten(long garten_id) {
         boolean result=false;
         Session session = DBManager.getSession();
         try {

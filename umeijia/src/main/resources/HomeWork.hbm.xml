@@ -19,6 +19,7 @@
 			<generator class="native"></generator>
 		</id>
 		<property name="title" column="title"></property>
+		<property name="school_id" column="school_id"></property>
         <property name="valid" column="valid"></property>
         <property name="description" column="description"></property>
 		<property name="date" column="date" ></property>		

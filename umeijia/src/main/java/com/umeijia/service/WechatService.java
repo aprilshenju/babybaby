@@ -17,11 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Map;
+
+//import org.springframework.util.DigestUtils;
+//import org.springframework.util.DigestUtils;
 
 //import org.springframework.util.DigestUtils;
 
@@ -36,7 +40,8 @@ public class WechatService {
     @Qualifier("parentsdao")
     private ParentsDao parentsdao;
 
-    private final String serverIp = "http://182.150.6.36/umeijiaServer/";
+//    private final String serverIp = "http://182.150.6.36/umeijiaServer/";
+    private final String serverIp = "http://www.scsctx.com/umeijiaServer/";
     private final String bindUrl = serverIp + "rest/wechat_service/login";
     private final String intro =
             "幼美加APP”是一款专为幼儿园精心打造的家园互动管理平台。一个APP" +
@@ -67,11 +72,6 @@ public class WechatService {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-//        try {
-//            wechatValid(request,response);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         try {
             out = response.getWriter();
             Map<String, String> xmlMap = WechatUtil.xmlToMap(request);
@@ -106,14 +106,9 @@ public class WechatService {
                     }
                     break;
                 case "text"://文本
-//                    System.out.println("输入了" + content);
-//                    TextMessage textMessage = new TextMessage();
-//                    textMessage.setToUserName(fromUserName);
-//                    textMessage.setFromUserName(toUserName);
-//                    textMessage.setCreateTime(createTime);
-//                    textMessage.setMsgType("text");
-//                    textMessage.setContent(bindUrl + "?openId=" + fromUserName);
-//                    resultMessage = WechatUtil.objectToXml(textMessage);
+                    System.out.println("输入了" + content);
+                    textMessage = generateTextMessage(fromUserName,toUserName,createTime,bindUrl + "/" + fromUserName);
+                    resultMessage = WechatUtil.objectToXml(textMessage);
                     break;
                 default:
 //                    System.out.println("收到其他类型消息，暂不处理");
@@ -130,9 +125,28 @@ public class WechatService {
         }
     }
 
+//    @Path("/wechat")
+//    @GET
+//    public void wechat(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+//        System.out.println("收到微信服务器的Get请求");
+//        PrintWriter out = null;
+//        try {
+//            request.setCharacterEncoding("UTF-8");
+//            response.setCharacterEncoding("UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            wechatValid(request,response);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
     private void wechatValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String token = "umeijia";
         String encodingAESKey = "Pr9qsEaB2cf6vwNx3Ai9BP0dfVFOjCfZ17hAzjuusZq";
+//        String token = "umeijia";
+//        String encodingAESKey = "cqbnGc36sY5g86F3lIpv9LcZ1LX3kElemJu52FF6yzv";
         String corpId = "umeijia";
         // 微信加密签名
 
@@ -167,10 +181,11 @@ public class WechatService {
     }
 
     @Path("/bindW")
-    @GET
-    @Consumes("application/x-www-form-urlencoded")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Viewable bindWechat(@FormParam("name") String account, @FormParam("password") String passwd, @FormParam
             ("openId") String openId, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        System.out.println("收到绑定的请求");
         String message = null;
         if (request != null) {
             try {

@@ -2,6 +2,7 @@ package com.umeijia.dao;
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.GartenNews;
 import com.umeijia.vo.Pager;
+import com.umeijia.vo.Parents;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -40,10 +41,34 @@ public class GartenNewsDao {
     /**
      *    // 按 学校获取
      * **/
-    public List<GartenNews> queryGartenNewss(long school_id) {
+    public Pager queryGartenNewss(long school_id,Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql= String.format("from GartenNews as gnews where gnews.kindergarten.id=%d and gnews.valid=1 order by gnews.modifyDate desc",school_id);
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<GartenNews> list=(List<GartenNews>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
+    }
+
+
+    public List<GartenNews> queryGartenNewssByShoolIdAndTitle(long school_id,String title) {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d and gnews.valid=1 order by gnews.modifyDate desc",school_id);
+        String sql = String.format("from GartenNews as gnews where gnews.kindergarten.id=%d and gnews.title=\'%s\' and gnews.valid=1 order by gnews.modifyDate desc",school_id,title);
         Query query = session.createQuery(sql);
         List <GartenNews> list = query.list();
         session.close();

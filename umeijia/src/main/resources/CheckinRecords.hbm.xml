@@ -23,6 +23,7 @@
         <property name="image_path_2" column="image_path_2" ></property>
         <property name="image_path_3" column="image_path_3" ></property>
         <property name="image_path_4" column="image_path_4" ></property>
+        <property name="school_id" column="school_id"></property>
         <property name="state_1" column="state_1"></property>
         <property name="state_2" column="state_2"></property>
         <property name="state_3" column="state_3"></property>
