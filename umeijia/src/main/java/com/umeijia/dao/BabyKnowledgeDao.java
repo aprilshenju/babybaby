@@ -2,7 +2,6 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.BabyKnowledge;
-import com.umeijia.vo.Camera;
 import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -58,17 +57,17 @@ public class BabyKnowledgeDao {
 
     public List<BabyKnowledge> queryBabyKnowledges() {
         Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("from BabyKnowledge as knowledge where  valid=1");
-        Query query = session.createQuery(sql);
-        List list = query.list();
-        session.close();
-        if(list.size()>0){
-            return list;
-        }else {
-            return null;
-        }
+    session.clear();
+    String sql = String.format("from BabyKnowledge as knowledge where  valid=1");
+    Query query = session.createQuery(sql);
+    List list = query.list();
+    session.close();
+    if(list.size()>0){
+        return list;
+    }else {
+        return null;
     }
+}
 
     public Pager getBabyKnowledgeList(Pager pager) {
         if (pager == null) {
