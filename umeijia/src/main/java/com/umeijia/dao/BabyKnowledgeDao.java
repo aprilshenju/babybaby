@@ -2,6 +2,8 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.BabyKnowledge;
+import com.umeijia.vo.Camera;
+import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -54,18 +56,41 @@ public class BabyKnowledgeDao {
         }
     }
 
-    public List getBabyKnowledgeList() {
+    public List<BabyKnowledge> queryBabyKnowledges() {
         Session session = DBManager.getSession();
         session.clear();
-        String sql = String.format("from BabyKnowledge where valid=1");
+        String sql = String.format("from BabyKnowledge as knowledge where  valid=1");
         Query query = session.createQuery(sql);
-        List <BabyKnowledge> list = query.list();
+        List list = query.list();
         session.close();
         if(list.size()>0){
             return list;
         }else {
             return null;
         }
+    }
+
+    public Pager getBabyKnowledgeList(Pager pager) {
+        if (pager == null) {
+            pager = new Pager();
+        }
+        Integer pageNumber = pager.getPageNumber();
+        Integer pageSize = pager.getPageSize();
+        String hql= String.format("from BabyKnowledge where valid=1");
+        String countHql="select count(*) "+hql.substring(hql.indexOf("from"));
+        Session session=DBManager.getSession();
+        Query query=session.createQuery(countHql);
+        int totalRecord=Integer.valueOf(query.uniqueResult()+"");
+        query=session.createQuery(hql);
+
+        query.setFirstResult(pageSize*(pageNumber-1));
+        query.setMaxResults(pageSize);
+        List<BabyKnowledge> list=(List<BabyKnowledge>)query.list();
+        Pager newPage=new Pager();
+        newPage.setPageSize(pageSize);
+        newPage.setTotalCount(totalRecord);
+        newPage.setList(list);
+        return newPage;
     }
     
     public boolean addBabyKnowledge(BabyKnowledge knowledge) {
