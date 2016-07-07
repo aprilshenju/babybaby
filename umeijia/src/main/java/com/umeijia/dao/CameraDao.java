@@ -2,7 +2,6 @@ package com.umeijia.dao;
 
 import com.umeijia.util.DBManager;
 import com.umeijia.vo.Camera;
-import com.umeijia.vo.ClassActivity;
 import com.umeijia.vo.Pager;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -86,20 +85,6 @@ public class CameraDao {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from Camera as ca where ca.garten.id=%d and ca.valid=1",schoolId);
-        Query query = session.createQuery(sql);
-        List <Camera> list = query.list();
-        session.close();
-        if(list.size()>0){
-            return list;
-        }else {
-            return null;
-        }
-    }
-
-    public List getCamerasListByClassId(long classId) {
-        Session session = DBManager.getSession();
-        session.clear();
-        String sql = String.format("from Camera as ca where ca.cla.id=%d and ca.valid=1",classId);
         Query query = session.createQuery(sql);
         List <Camera> list = query.list();
         session.close();
