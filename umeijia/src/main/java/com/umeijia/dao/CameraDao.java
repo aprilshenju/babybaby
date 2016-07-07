@@ -87,6 +87,20 @@ public class CameraDao {
         }
     }
 
+    public List getCamerasListByClassId(long classId) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Camera as ca where ca.cla.id=%d and ca.valid=1",classId);
+        Query query = session.createQuery(sql);
+        List <Camera> list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     public List getCamerasListBySchoolIdAndCameraName(long schoolId,String name) {
         Session session = DBManager.getSession();
         session.clear();
