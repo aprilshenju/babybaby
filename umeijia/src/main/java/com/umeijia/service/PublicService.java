@@ -1607,21 +1607,44 @@ public class PublicService {
                 jobOut.put("resultDesc", "没有权限添加饮食");
                 return jobOut.toString();
             }
-            FoodRecord fr = new FoodRecord();
-            fr.setDate(new Date());
-            fr.setRecords(content);
-            fr.setClass_id(classId);
-            fr.setSchool_id(0);
-            String imageUrls = jobIn.getString("imageUrls");
-            fr.setImage_urls(imageUrls);
-            if(foodrecorddao.addFoodRecord(fr)){
-                jobOut.put("id", fr.getId());
-                jobOut.put("resultCode", GlobalStatus.succeed.toString());
-                jobOut.put("resultDesc", "操作成功");
-            }else{
-                jobOut.put("resultCode", GlobalStatus.error.toString());
-                jobOut.put("resultDesc", "操作失败");
+            Calendar cal=Calendar.getInstance();//使用日历类
+            int year=cal.get(Calendar.YEAR);//得到年
+            int month=cal.get(Calendar.MONTH)+1;//得到月，因为从0开始的，所以要加1
+            int day=cal.get(Calendar.DAY_OF_MONTH);//得到天
+            FoodRecord fr = foodrecorddao.queryFoodRecordByClassId(classId,year,month,day);
+            if(fr==null){  //没有当天的饮食记录就直接添加
+                fr = new FoodRecord();
+                fr.setDate(new Date());
+                fr.setRecords(content);
+                fr.setClass_id(classId);
+                fr.setSchool_id(0);
+                String imageUrls = jobIn.getString("imageUrls");
+                fr.setImage_urls(imageUrls);
+                if(foodrecorddao.addFoodRecord(fr)){
+                    jobOut.put("id", fr.getId());
+                    jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                    jobOut.put("resultDesc", "操作成功");
+                }else{
+                    jobOut.put("resultCode", GlobalStatus.error.toString());
+                    jobOut.put("resultDesc", "操作失败");
+                }
+            }else{  //有就直接更新，每天只保留一条
+                fr.setDate(new Date());
+                fr.setRecords(content);
+                fr.setClass_id(classId);
+                fr.setSchool_id(0);
+                String imageUrls = jobIn.getString("imageUrls");
+                fr.setImage_urls(imageUrls);
+                if(foodrecorddao.updateFoodRecord(fr)){
+                    jobOut.put("id", fr.getId());
+                    jobOut.put("resultCode", GlobalStatus.succeed.toString());
+                    jobOut.put("resultDesc", "操作成功");
+                }else{
+                    jobOut.put("resultCode", GlobalStatus.error.toString());
+                    jobOut.put("resultDesc", "操作失败");
+                }
             }
+
 
         } catch (Exception e) {
             jobOut.put("resultCode", GlobalStatus.error.toString());
