@@ -38,6 +38,9 @@
 		<property name="participate_time" column="participate_time"></property>
 		<property name="contact_name" column="contact_name"></property>
 		<property name="contact_phone" column="contact_phone"></property>
+		<property name="release_date" column="release_date"></property>
+		<property name="correct_date" column="correct_date"></property>
+
 	</class>
 	
 	

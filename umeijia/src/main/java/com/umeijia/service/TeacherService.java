@@ -24,6 +24,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static javax.swing.text.html.HTML.Tag.S;
+
 // ip/umeijia/teacher_service/hello
 
 @Service
@@ -349,6 +351,9 @@ public class TeacherService {
      //       String wishes = job.getString("wishes"); //园长寄语，老师不传
             String descrip=job.getString("description"); //老师介绍
             String gender=job.getString("gender");
+            String class_ids=job.getString("class_ids");
+            String [] class_array = class_ids.split(";");
+
     //        boolean is_leader = job.getBoolean("leader"); //是否是园�
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
             String pwd = SMSMessageService.GenerateRandomNumber(); //获取随即密码
@@ -364,6 +369,34 @@ public class TeacherService {
 
             Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-",gender); //普通老师
             if(teacherdao.addTeacher(ordTeacher)){
+                //先发密码
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",org_pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
+
+                // 为老师增加班级列表
+                if(class_array.length>0){
+                    //班级更新老师
+                     for (int i=0;i<class_array.length;i++){
+                            long class_id = Long.parseLong(class_array[i]);
+                         Class cla =classdao.queryClass(class_id);
+                         if(cla==null||cla.isValid()==false){
+                             job_out.put("resultCode",GlobalStatus.error.toString());
+                             job_out.put("resultDesc","班级id无效");
+                             return job_out.toString();
+                         }
+                         cla.getTeachers().add(ordTeacher);//对应班级追加相应老师
+                         if(!classdao.updateClass(cla)) //更新班级老师列表，追加新的老师
+                         {
+                             job_out.put("resultCode",GlobalStatus.error.toString());
+                             job_out.put("resultDesc","老师添加班级失败");
+                             return  job_out.toString();
+                         }
+                     }
+                }
+
             /*    Class cla =classdao.queryClass(class_id);
                 if(cla==null){
                     job_out.put("resultCode",GlobalStatus.error.toString());
@@ -377,12 +410,6 @@ public class TeacherService {
                     job_out.put("resultDesc","成功添加老师");
                     return  job_out.toString();
                 }*/
-                Map<String,Object> map = new HashMap<String,Object>();
-                map.put("phoneNum",phone);
-                map.put("verifyCode",org_pwd);
-                map.put("type",2);
-                SMSMessageService .cmds.add(map);
-
                 UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten_id);
                 thread.start();
                 job_out.put("resultCode",GlobalStatus.succeed.toString());

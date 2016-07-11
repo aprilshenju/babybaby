@@ -9,6 +9,7 @@ import com.umeijia.util.LogUtil;
 import com.umeijia.util.MD5;
 import com.umeijia.vo.*;
 import com.umeijia.vo.Class;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -320,6 +321,100 @@ public class RunService {
         }
     }
 
+    @Path("/getBabyListByClass")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getBabyListByClass(@RequestBody String userinfo, @Context HttpHeaders headers) {
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out = new JSONObject();
+        try{
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效token");
+                return job_out.toString();
+            }
+
+            long class_id = job.getLong("class_id");
+            Class cla = classdao.queryClass(class_id);
+            if(cla==null){
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效班级id");
+                return job_out.toString();
+            }
+            Set<Student> stu_set = cla.getStudents();
+            if(stu_set==null||stu_set.size()<1){
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","该班级还没有宝贝");
+                return job_out.toString();
+            }
+            JSONArray array = new JSONArray();
+            Iterator<Student> stu_it=stu_set.iterator();
+            while (stu_it.hasNext()){
+                Student baby = stu_it.next();
+                JSONObject json = new JSONObject();
+                json.put("baby_name",baby.getName());
+                json.put("id",baby.getId());
+                array.add(json);
+            }
+            job_out.put("resultCode",GlobalStatus.succeed.toString());
+            job_out.put("resultDesc","成功获取班级宝贝列表");
+            job_out.put("data",array.toString());
+            return job_out.toString();
+        } catch (JSONException e) {
+            return "error";  //json  构造异常，直接返回error
+        }
+    }
+
+    @Path("/getClassListByGarten")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getClassListByGarten(@RequestBody String userinfo, @Context HttpHeaders headers) {
+        JSONObject job = JSONObject.fromObject(userinfo);
+        JSONObject job_out = new JSONObject();
+        try{
+            String tkn = headers.getRequestHeader("tkn").get(0);
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            long roleId = Long.parseLong(headers.getRequestHeader("id").get(0));
+            if (!checkIdAndToken(2, headers)) {
+                job_out.put("resultCode", GlobalStatus.error.toString());
+                job_out.put("resultDesc", "无效token");
+                return job_out.toString();
+            }
+
+            long garten_id = job.getLong("garten_id");
+            Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
+            if(garten==null){
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","无效幼儿园id");
+                return job_out.toString();
+            }
+            Set<Class>classes= garten.getClasses();
+            if(classes==null||classes.size()<1){
+                job_out.put("resultCode",GlobalStatus.error.toString());
+                job_out.put("resultDesc","该幼儿园还没有班级");
+                return job_out.toString();
+            }
+            JSONArray array = new JSONArray();
+            Iterator<Class> cla_it=classes.iterator();
+            while (cla_it.hasNext()){
+                Class cla = cla_it.next();
+                JSONObject json = new JSONObject();
+                json.put("class_name",cla.getName());
+                json.put("id",cla.getId());
+                array.add(json);
+            }
+            job_out.put("resultCode",GlobalStatus.succeed.toString());
+            job_out.put("resultDesc","成功获取幼儿园班级列表");
+            job_out.put("data",array.toString());
+            return job_out.toString();
+        } catch (JSONException e) {
+            return "error";  //json  构造异常，直接返回error
+        }
+    }
     /***
      *
      *运营人员天添加 幼儿园 和 园长
@@ -548,7 +643,6 @@ public class RunService {
             }
             SMSMessageService .cmds.add(map); //发送新密码
 //// 更改老师与班级的关系，解除旧关系，添加新关系
-
             //在新的班级添加老师
             String [] cla_id_array=cla_ids.split(";");
             for(int i=0;i<cla_id_array.length;i++){

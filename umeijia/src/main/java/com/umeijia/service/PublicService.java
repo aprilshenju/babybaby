@@ -2070,6 +2070,8 @@ public class PublicService {
                 jo.put("participateBabyNames", item.getBaby_ids());
                 jo.put("participateBabyParentsNames", item.getParent_ids());
                 jo.put("participateTimes", item.getParticipate_time());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+                jo.put("releaseTimes",sdf.format(item.getRelease_date()));
                 ja.add(jo);
             }
             jobOut.put("data", ja.toString());

@@ -13,6 +13,7 @@ public class ClassActivity {
 
 	public ClassActivity() {
         this.valid=true;
+		release_date=new Date();
 	}
 
 	public String getTitle() {
@@ -34,6 +35,7 @@ public class ClassActivity {
 		this.contact_name = contact_name;
 		this.contact_phone = contact_phone;
 		this.valid=true;
+		this.release_date=new Date();
 	}
 
 	public void setTitle(String title) {
@@ -112,6 +114,25 @@ public class ClassActivity {
 	private String parent_ids; //参与人的家长
 	private String participate_time; //参与时间
 	private long class_id;
+
+	public Date getCorrect_date() {
+		return correct_date;
+	}
+
+	public void setCorrect_date(Date correct_date) {
+		this.correct_date = correct_date;
+	}
+
+	public Date getRelease_date() {
+		return release_date;
+	}
+
+	public void setRelease_date(Date release_date) {
+		this.release_date = release_date;
+	}
+
+	private Date release_date;
+	private Date correct_date;
 
 	public long getSchool_id() {
 		return school_id;
