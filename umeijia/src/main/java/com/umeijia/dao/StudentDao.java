@@ -179,7 +179,7 @@ public class StudentDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Student u set u.valid=%d where u.id=%d",0,id);
+            String hql=String.format("update Student u set u.valid=0,u.cla.id=0 where u.id=%d",id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();

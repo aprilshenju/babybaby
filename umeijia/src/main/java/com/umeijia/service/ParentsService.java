@@ -102,7 +102,7 @@ public class ParentsService {
                     job_out.put("resultDesc","登陆成功");
                     job_out.put("tkn",p.getToken());
                     job_out.put("tkn_exptime",p.getExpire().toString());
-                    job_out.put("p_id",p.getId());
+                    job_out.put("id",p.getId());
                     job_out.put("schoolId",p.getGarten_id());
                     job_out.put("phone",p.getPhone_num());
                     job_out.put("email",p.getEmail());
@@ -138,8 +138,8 @@ public class ParentsService {
             try {
                 // 用户 登陆token 验证
                 String tkn = headers.getRequestHeader("tkn").get(0);
-                long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-                if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+                long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+                if(!parentsdao.verifyToken(id,tkn)){ // token验证
                     job_out.put("resultCode",GlobalStatus.error.toString());
                     job_out.put("resultDesc","token已过期");
                     return job_out.toString();
@@ -178,8 +178,8 @@ public class ParentsService {
             try {
                 // 用户 登陆token 验证
                 String tkn = headers.getRequestHeader("tkn").get(0);
-                long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-                if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+                long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+                if(!parentsdao.verifyToken(id,tkn)){ // token验证
                     job_out.put("resultCode", GlobalStatus.error.toString());
                     job_out.put("resultDesc","token已过期");
                     return job_out.toString();
@@ -237,14 +237,14 @@ public class ParentsService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!parentsdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","token已过期");
                 return job_out.toString();
             }
 
-            Parents p = parentsdao.queryParents(tid);
+            Parents p = parentsdao.queryParents(id);
             if(p==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","无效家长id");
@@ -282,14 +282,14 @@ public class ParentsService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!parentsdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","token已过期");
                 return job_out.toString();
             }
 
-            Parents p = parentsdao.queryParents(tid);
+            Parents p = parentsdao.queryParents(id);
             if(p==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","无效家长id");
@@ -340,8 +340,8 @@ public class ParentsService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!parentsdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!parentsdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","token已过期");
                 return job_out.toString();
@@ -349,7 +349,7 @@ public class ParentsService {
 
             long baby_id=job.getLong("baby_id"); // 后去 宝贝id
             String name = job.getString("name");
-            String nick_name = job.getString("nick_name");
+ //           String nick_name = job.getString("nick_name");
             long class_id = job.getLong("class_id");
             String avatar = job.getString("avatar");
             String gender=job.getString("gender");
@@ -373,7 +373,7 @@ public class ParentsService {
 
             //设置宝贝信息为新设置的�
             stu.setName(name);
-            stu.setNick_name(nick_name);
+            stu.setNick_name(name);
             stu.setAvatar_path(avatar);
             stu.setCla(cla);
             stu.setGender(gender);

@@ -11,6 +11,7 @@ public class HomeWork {
 		this.image_urls = image_urls;
 		this.date = date;
 		this.teacher_id = teacher_id;
+		this.valid=true;
 	}
 
 	public HomeWork(){

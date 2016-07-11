@@ -1376,7 +1376,7 @@ public class PublicService {
             JSONObject jobIn = JSONObject.fromObject(checkinInfo);
             int roleType = jobIn.getInt("roleType");
             int roleId = jobIn.getInt("roleId");
-            int cardId = jobIn.getInt("cardId");
+            String cardId = jobIn.getString("cardId");
             int classId = jobIn.getInt("classId");
             int period = jobIn.getInt("period");
             String imageUrls = jobIn.getString("imageUrls");

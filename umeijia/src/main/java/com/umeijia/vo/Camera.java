@@ -47,7 +47,7 @@ public class Camera {
 		this.cla=cla;
 		this.create_date=new Date();
 		this.modified_date=new Date();
-
+		this.valid=true;
 	}
 
 	public Camera(long id, String ip_url, String video_url, String description, String manufactory, Class cla, Kindergarten garten, String type, String state, String thumb_path, String active_period, boolean is_public,  Date modified_date) {

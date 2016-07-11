@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * Created by shenju on 2016/6/14.
- * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效� * 应当是直接修改字段，用update操作
+ * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效� * 应当是直接修改字段，用update操作
  *
  *
  */
@@ -114,7 +114,7 @@ public class ClassDao {
         session.clear();
         String hql = String.format("select c.teachers_contacts from Class as c where c.id=%d",class_id);
         Query query = session.createQuery(hql);
-        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�        List<Object> list = query.list();
+        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�        List<Object> list = query.list();
         if(list.size()>0){
             teacherContacts=(String) list.get(0);
         }
@@ -151,11 +151,12 @@ public class ClassDao {
         session.clear();
         String hql = String.format("select c.parents_contacts from Class as c where c.id=%d and c.valid=1",class_id);
         Query query = session.createQuery(hql);
-        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�        List<Object> list = query.list();
+        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�
+        List<Object> list = query.list();
         if(list.size()>0){
             parentsContacts=(String) list.get(0);
+            return parentsContacts;
         }
-        parentsContacts="";
         return  parentsContacts;
     }
 
@@ -188,7 +189,8 @@ public class ClassDao {
         session.clear();
         String hql = String.format("select c.garten from Class as c where c.id=%d and c.valid=1",class_id);
         Query query = session.createQuery(hql);
-        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�        List<Object> list = query.list();
+        //默认查询出来的list里存放的是一个Object数组，还需要转换成对应的javaBean�
+        List<Object> list = query.list();
         if(list.size()>0){
             garten=(Kindergarten) list.get(0);
         }
@@ -214,6 +216,33 @@ public class ClassDao {
             return result;
         }
     }
+
+    /**
+     * 将该班级设为无效
+     * **/
+    public boolean invalidClass(long id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update Class u set u.valid=0,u.garten.id=0 where u.id=%d",id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
+
     public boolean addClass(Class cla) {
         boolean result=false;
         Session session = DBManager.getSession();

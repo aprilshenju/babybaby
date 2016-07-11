@@ -21,6 +21,7 @@ public class ClassNotification {
 		this.teacher_id = teacher_id;
 		this.class_id = class_id;
 		this.subscribers = subscribers;
+		this.valid=true;
 	}
 
 	public ClassNotification() {

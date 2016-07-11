@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.umeijia.enums.OptEnum.query;
+
 /**
  * Created by shenju on 2016/6/14.
  * 待优化问题：目前更新属性值，是先查询对象，然后更新整个对象的。并不高效。
@@ -29,6 +31,21 @@ public class CheckinCardDao {
         Session session = DBManager.getSession();
         session.clear();
         String sql = String.format("from CheckinCard as ca where ca.id=%d",id);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            CheckinCard checkincard = (CheckinCard) list.get(0);
+            return checkincard;
+        }else {
+            return null;
+        }
+    }
+
+    public CheckinCard queryCheckinCard(String card_id) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from CheckinCard as ca where ca.card_id=\'%s\'",card_id);
         Query query = session.createQuery(sql);
         List list = query.list();
         session.close();

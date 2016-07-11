@@ -108,6 +108,31 @@ public class KinderGartenDao {
         }
     }
 
+    /**
+     * 将该班级设为无效
+     * **/
+    public boolean invalidGarten(long id) {
+        boolean result=false;
+        Session session = DBManager.getSession();
+        try {
+            session.setFlushMode(FlushMode.AUTO);
+            session.beginTransaction();
+            String hql=String.format("update Kindergarten u set u.valid=0,u.agent=0 where u.id=%d",id);
+            Query queryupdate=session.createQuery(hql);
+            int ret=queryupdate.executeUpdate();
+            session.flush();
+            session.getTransaction().commit();
+            if(ret>=0)
+                result=true;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+            result=false;
+        } finally{
+            session.close();
+            return result;
+        }
+    }
 
     public boolean deleteKindergarten(long id) {
         boolean result=false;

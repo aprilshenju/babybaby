@@ -33,6 +33,7 @@ public class ClassActivity {
 		this.class_id = class_id;
 		this.contact_name = contact_name;
 		this.contact_phone = contact_phone;
+		this.valid=true;
 	}
 
 	public void setTitle(String title) {

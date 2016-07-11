@@ -42,7 +42,7 @@ private long id;
 
 <!-- 		<property name="class_id" column="class_id"></property>  -->  
          
-      <set name="parents" cascade="all" inverse="true" lazy="false">
+      <set name="parents" cascade="all" inverse="true" lazy="false" >
                 <key column="stu_id"></key>   
                 <one-to-many class="com.umeijia.vo.Parents"/>   
          </set> 

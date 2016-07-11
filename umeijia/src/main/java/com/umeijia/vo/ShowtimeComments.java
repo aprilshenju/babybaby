@@ -86,6 +86,7 @@ public class ShowtimeComments {
 		this.response_user_id = response_user_id;
 		this.date = date;
 		this.comment_content = comment_content;
+
 	}
 
     public ShowtimeComments(){

@@ -240,7 +240,8 @@ public class CameraDao {
         }
     }
 
-    // 鎸夊辜鍎垮洯锛岀洿鎺ヤ娇鎽勫儚澶存棤鏁    public boolean invalidCameraByGarten(long garten_id) {
+    // 鎸夊辜鍎垮洯锛岀洿鎺ヤ娇鎽勫儚澶存棤鏁
+    public boolean invalidCameraByGarten(long garten_id) {
         boolean result=false;
         Session session = DBManager.getSession();
         try {

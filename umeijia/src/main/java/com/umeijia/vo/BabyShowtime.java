@@ -20,12 +20,12 @@ public class BabyShowtime {
 
 	}
 
-	public BabyShowtime(String des,String imgs,long cid,long bid,long tid,long pid,int type){
+	public BabyShowtime(String des,String imgs,long cid,long bid,long id,long pid,int type){
 		this.description=des;
 		this.image_urls=imgs;
 		this.class_id=cid;
 		this.baby_id=bid;
-		this.teacher_id=tid;
+		this.teacher_id=id;
 		this.parent_id=pid;
 		this.valid=true;
 		this.show_type=type;

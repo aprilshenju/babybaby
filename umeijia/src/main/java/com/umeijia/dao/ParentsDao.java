@@ -404,7 +404,7 @@ public class ParentsDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Parents u set u.valid=%d where u.id=%d",0,id);
+            String hql=String.format("update Parents u set u.valid=0,u.class_id=0,u.student.id=0 where u.id=%d",id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();
