@@ -22,6 +22,16 @@ public class CheckinCard {
 
 	private long id;
 	private long stu_id;
+	private  String card_id;
+
+	public String getCard_id() {
+		return card_id;
+	}
+
+	public void setCard_id(String card_id) {
+		this.card_id = card_id;
+	}
+
 	private String is_valid;
 	private long class_id;
 	public long getClass_id() {

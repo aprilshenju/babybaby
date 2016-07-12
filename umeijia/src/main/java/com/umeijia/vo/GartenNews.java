@@ -36,6 +36,7 @@ public class GartenNews {
 			this.modifyDate=new Date();
 			this.teacher=te;
 			this.kindergarten= garten;
+			this.valid=true;
 	}
 
 	public long getId() {

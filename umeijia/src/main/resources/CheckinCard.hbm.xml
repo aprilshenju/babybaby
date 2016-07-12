@@ -15,6 +15,8 @@
 		<id name="id" column="id">
 			<generator class="native"></generator>
 		</id>
+
+		<property name="card_id" column="card_id" unique="true" not-null="true"></property>
 		<property name="stu_id" column="stu_id"></property>	
 		<property name="is_valid" column="is_valid"></property>	
       <property name="class_id" column="class_id"></property>	

@@ -1,5 +1,6 @@
 package com.umeijia.vo;
 
+import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -57,6 +58,13 @@ public class Class {
 	public Class(){
 
 	}
+	public  Class(String name,Kindergarten garten){
+		this.valid=true;
+		this.name=name;
+		this.garten= garten;
+		this.valid=true;
+	}
+
 	public  Class(String name,String class_introduction,String schedule,String tcontacts,String pcontacts,Kindergarten garten){
 		this.name=name;
 		this.class_introduction=class_introduction;
@@ -65,6 +73,7 @@ public class Class {
 		this.parents_contacts=pcontacts;
 		this.garten=garten;
 		this.teachers = new LinkedHashSet<Teacher>();
+		this.valid=true;
 	}
 
 	public String getCourse_schedule() {

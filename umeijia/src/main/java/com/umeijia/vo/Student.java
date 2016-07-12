@@ -41,7 +41,7 @@ public class Student {
 		this.valid = valid;
 	}
 
-	public  Student(String name, String nick, String gender, Date birthday, int height, int weight, String avatar, Class cla, boolean isvip, Date start, Date end, Date enter_date){
+	public  Student(String name, String nick, String gender, Date birthday, int height, int weight, String avatar, Class cla,long school_id, boolean isvip, Date start, Date end, Date enter_date){
 		vip=isvip;
 		this.vip_start=start;
 		this.vip_end=end;
@@ -56,6 +56,7 @@ public class Student {
 		this.cla=cla;
 		this.entrance_date=enter_date;
 		valid=true; //新创建的账号默认有效
+		this.school_id=school_id;
 	}
 
 

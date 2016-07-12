@@ -83,7 +83,6 @@ public class TeacherDao {
         List list = query.list();
         session.close();
         List<Teacher> teachers=new ArrayList<Teacher>();
-        session.close();
         for (int i = 0; i < list.size(); i++){
             Teacher t=(Teacher) list.get(i);
             teachers.add(t);
@@ -269,7 +268,7 @@ public class TeacherDao {
         try {
             session.setFlushMode(FlushMode.AUTO);
             session.beginTransaction();
-            String hql=String.format("update Teacher u set u.valid=%d where u.id=%d",0,id);
+            String hql=String.format("update Teacher u set u.valid=1 where u.id=%d",id);
             Query queryupdate=session.createQuery(hql);
             int ret=queryupdate.executeUpdate();
             session.flush();

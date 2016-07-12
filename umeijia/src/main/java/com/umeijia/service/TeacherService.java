@@ -24,6 +24,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static javax.swing.text.html.HTML.Tag.S;
+
 // ip/umeijia/teacher_service/hello
 
 @Service
@@ -39,7 +41,8 @@ public class TeacherService {
 
     @Autowired
     @Qualifier("parentsdao")
-    private ParentsDao parentsdao;  // 家长 ��老师 添加�    @Autowired
+    private ParentsDao parentsdao;  // 家长 ��老师 添加�
+    @Autowired
     @Qualifier("studentdao")
     private StudentDao studentdao;
     @Autowired
@@ -57,6 +60,10 @@ public class TeacherService {
     @Autowired
     @Qualifier("dailylogdao")
     private DailyLogDao dailylogdao;
+    @Autowired
+    @Qualifier("checkincarddao")
+    private CheckinCardDao checkincarddao;
+
     @Path("/hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -78,16 +85,16 @@ public class TeacherService {
         JSONObject job_out = new JSONObject();
         try {
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过�);
+                job_out.put("resultDesc","token已过时");
                 return job_out.toString();
             }
             String name = job.getString("name");
             String nick_name = " "; //job.getString("nick_name");
-            long roleId =job.getLong("roleId");
-            int roleType= job.getInt("roleType");
+/*            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");*/
             long class_id = job.getLong("class_id");
             String avatar = job.getString("avatar");
             String gender=job.getString("gender");
@@ -98,6 +105,7 @@ public class TeacherService {
             String vip_begin=job.getString("vip_begin");
             String vip_end=job.getString("vip_end");
             String entrence=job.getString("entrence");
+            String check_card=job.getString("check_card");
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
             Date date = sdf.parse(date_str);
@@ -108,16 +116,36 @@ public class TeacherService {
             Class cla = classdao.queryClass(class_id);
             if(cla==null){
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","班级不存�);
+                job_out.put("resultDesc","班级不存在");
                 return job_out.toString();
             }
-            Student stu = new Student(name,nick_name,gender,date,height,weight,avatar,cla,isvip,date_vip_begin,date_vip_end,date_entrence);
+
+            Student stu = new Student(name,nick_name,gender,date,height,weight,avatar,cla,cla.getGarten().getId(),isvip,date_vip_begin,date_vip_end,date_entrence);
             if(studentdao.addStudent(stu)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
                 job_out.put("baby_id",stu.getId()); //返回 baby_id
                 job_out.put("resultDesc","成功添加宝贝");
+                //添加考勤卡
+                if(checkincarddao.queryCheckinCard(check_card)==null){
+                    //添加考勤卡
+                    CheckinCard card = new CheckinCard();
+                    card.setCard_id(check_card);
+                    card.setStu_id(stu.getId());
+                    card.setClass_id(stu.getCla().getId());
+                    if(checkincarddao.addCheckinCard(card)==false){
+                        job_out.put("resultCode", GlobalStatus.error.toString());
+                        job_out.put("resultDesc","添加考勤卡失败");
+                        return  job_out.toString();
+                    }
+                }
+
+
                 //添加日志
-                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加学生","学生id:"+String.valueOf(stu.getId()));
+                Teacher t = teacherdao.queryTeacher(id);
+                int roleType=1;
+                if(t.getIs_leader())
+                    roleType=2;
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,id, OptEnum.insert.toString(),"添加学生","学生id:"+String.valueOf(stu.getId()));
                 dailylogdao.addDailyLog(dailyLog);
                 return  job_out.toString();
             }
@@ -146,10 +174,10 @@ public class TeacherService {
         JSONObject job_out = new JSONObject();
         try {
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过�);
+                job_out.put("resultDesc","token已过时");
                 return job_out.toString();
             }
 
@@ -157,17 +185,18 @@ public class TeacherService {
             String email = job.getString("email");
    /*         String pwd = job.getString("password");*/
             String name = job.getString("name");
-            long roleId =job.getLong("roleId");
-            int roleType= job.getInt("roleType");
+/*            long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");*/
             long class_id = job.getLong("class_id");
             long stu_id=job.getLong("baby_id");
             String relation = job.getString("relation");
             String avatar = job.getString("avatar");
             String gender=job.getString("gender");
-            //用户账号是否已注册判�            if(isPhoneOrEmailExist(phone,email)){
+            //用户账号是否已注册判�
+            if(isPhoneOrEmailExist(phone,email)){
                 //已经存在
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","用户手机号或邮箱已存�);
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
                 return job_out.toString();
             }
 
@@ -191,16 +220,22 @@ public class TeacherService {
             Parents p = new Parents(phone,email,name,baby,class_id,cla.getGarten().getId(),pwd_md,relation,avatar,gender);
             if(parentsdao.addParents(p)){
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
+                job_out.put("parents_id",p.getId());
                 job_out.put("resultDesc","成功添加家长");
                 //添加日志
-                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加家长","家长id�+String.valueOf(p.getId()));
+                Teacher t = teacherdao.queryTeacher(id);
+                int roleType=1;
+                if(t.getIs_leader())
+                    roleType=2;
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,id, OptEnum.insert.toString(),"添加家长","家长id:"+String.valueOf(p.getId()));
                 dailylogdao.addDailyLog(dailyLog);
                 Map<String,Object> map = new HashMap<String,Object>();
                 map.put("phoneNum",phone);
                 map.put("verifyCode",org_pwd);
                 map.put("type",2);
                 SMSMessageService .cmds.add(map);
-                // 添加成功，后台异步更新通讯�                UpdateParentContractsThread th_update=new UpdateParentContractsThread(class_id);
+                // 添加成功，后台异步更新通讯�
+                UpdateParentContractsThread th_update=new UpdateParentContractsThread(class_id);
                 th_update.start();
 
             }else{
@@ -217,7 +252,7 @@ public class TeacherService {
      * 添加班级
      * curl -X POST -H "Content-Type:application/json" -d {"phone":"13534456644","password":"134df","name":"ltt4aoshou","email":"12345@qq.com","class_id":"1","baby_id":"1","relation":"dad","avatar":"fdef.jpg","gender":"0"}
      * http://127.0.0.1/umeijiaServer/teacher_service/addParents
-     * **/
+     * **//*
     @Path("/addClass")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -227,14 +262,14 @@ public class TeacherService {
         JSONObject job_out = new JSONObject();
         try {
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过�);
+                job_out.put("resultDesc","token已过时");
                 return job_out.toString();
             }
-            long roleId =job.getLong("roleId");
-            int roleType= job.getInt("roleType");
+     *//*       long roleId =job.getLong("roleId");
+            int roleType= job.getInt("roleType");*//*
                 String name = job.getString("name");
                 String introduciton=job.getString("introduciton");
                 long garten_id=job.getLong("garten");
@@ -243,7 +278,7 @@ public class TeacherService {
                 Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
                 if(garten==null){
                     job_out.put("resultCode",GlobalStatus.error.toString());
-                    job_out.put("resultDesc","无此幼儿�);
+                    job_out.put("resultDesc","无此幼儿园");
                     return  job_out.toString();
                 }
 
@@ -251,8 +286,8 @@ public class TeacherService {
                 if(!teacher_ids.isEmpty()){
                     String [] id_arr = teacher_ids.split(";");
                     for (int i=0;i<id_arr.length;i++){
-                        long t_id=Long.parseLong(id_arr[i]);
-                        Teacher t=teacherdao.queryTeacher(t_id);
+                        long id=Long.parseLong(id_arr[i]);
+                        Teacher t=teacherdao.queryTeacher(id);
                         if(t!=null){
                             cla.getTeachers().add(t);
                         }
@@ -272,7 +307,7 @@ public class TeacherService {
         } catch (JSONException e) {
             return "error";  //json  构造异常，直接返回error
         }
-    }
+    }*/
 
     /***
      * 园长添加普通老师
@@ -288,13 +323,13 @@ public class TeacherService {
         JSONObject job_out = new JSONObject();
         try {
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过�);
+                job_out.put("resultDesc","token已过时");
                 return job_out.toString();
             }
-            Teacher leader= teacherdao.queryTeacher(tid);
+            Teacher leader= teacherdao.queryTeacher(id);
             if(leader==null){
                 job_out.put("resultCode",GlobalStatus.error.toString());
                 job_out.put("resultDesc","没有该老师");
@@ -305,8 +340,6 @@ public class TeacherService {
                 job_out.put("resultDesc","只有园长才能添加老师");
                 return job_out.toString();
             }
-            long roleId =job.getLong("roleId");
-            int roleType= job.getInt("roleType");
             String phone = job.getString("phone");
             String email = job.getString("email");
          /*   String pwd = job.getString("password");
@@ -318,18 +351,52 @@ public class TeacherService {
      //       String wishes = job.getString("wishes"); //园长寄语，老师不传
             String descrip=job.getString("description"); //老师介绍
             String gender=job.getString("gender");
-    //        boolean is_leader = job.getBoolean("leader"); //是否是园�            Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
+            String class_ids=job.getString("class_ids");
+            String [] class_array = class_ids.split(";");
+
+    //        boolean is_leader = job.getBoolean("leader"); //是否是园�
+            Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
             String pwd = SMSMessageService.GenerateRandomNumber(); //获取随即密码
             String org_pwd=pwd;
-            pwd=MD5.GetSaltMD5Code(pwd); //计算盐�            //用户账号是否已注册判�            if(isPhoneOrEmailExist(phone,email)){
+            pwd=MD5.GetSaltMD5Code(pwd); //计算盐值
+            // 用户账号是否已注册判
+             if(isPhoneOrEmailExist(phone,email)){
                 //已经存在
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","用户手机号或邮箱已存�);
+                job_out.put("resultDesc","用户手机号或邮箱已存在");
                 return job_out.toString();
             }
 
             Teacher ordTeacher=new Teacher(name,avatar,pwd,garten,phone,descrip,email,false,"-",gender); //普通老师
             if(teacherdao.addTeacher(ordTeacher)){
+                //先发密码
+                Map<String,Object> map = new HashMap<String,Object>();
+                map.put("phoneNum",phone);
+                map.put("verifyCode",org_pwd);
+                map.put("type",2);
+                SMSMessageService .cmds.add(map);
+
+                // 为老师增加班级列表
+                if(class_array.length>0){
+                    //班级更新老师
+                     for (int i=0;i<class_array.length;i++){
+                            long class_id = Long.parseLong(class_array[i]);
+                         Class cla =classdao.queryClass(class_id);
+                         if(cla==null||cla.isValid()==false){
+                             job_out.put("resultCode",GlobalStatus.error.toString());
+                             job_out.put("resultDesc","班级id无效");
+                             return job_out.toString();
+                         }
+                         cla.getTeachers().add(ordTeacher);//对应班级追加相应老师
+                         if(!classdao.updateClass(cla)) //更新班级老师列表，追加新的老师
+                         {
+                             job_out.put("resultCode",GlobalStatus.error.toString());
+                             job_out.put("resultDesc","老师添加班级失败");
+                             return  job_out.toString();
+                         }
+                     }
+                }
+
             /*    Class cla =classdao.queryClass(class_id);
                 if(cla==null){
                     job_out.put("resultCode",GlobalStatus.error.toString());
@@ -343,18 +410,13 @@ public class TeacherService {
                     job_out.put("resultDesc","成功添加老师");
                     return  job_out.toString();
                 }*/
-                Map<String,Object> map = new HashMap<String,Object>();
-                map.put("phoneNum",phone);
-                map.put("verifyCode",org_pwd);
-                map.put("type",2);
-                SMSMessageService .cmds.add(map);
-
                 UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten_id);
                 thread.start();
                 job_out.put("resultCode",GlobalStatus.succeed.toString());
+                job_out.put("teacher_id",ordTeacher.getId());
                 job_out.put("resultDesc","成功添加老师");
                 //添加日志
-                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),roleType,roleId, OptEnum.insert.toString(),"添加老师","老师id:"+String.valueOf(ordTeacher.getId()));
+                DailyLog dailyLog = LogUtil.generateDailyLog(new Date(),2,id, OptEnum.insert.toString(),"添加老师","老师id:"+String.valueOf(ordTeacher.getId()));
                 dailylogdao.addDailyLog(dailyLog);
                 return job_out.toString();
             }
@@ -389,9 +451,10 @@ public class TeacherService {
                 t = teacherdao.loginCheckByEmail(email,pwd_md);
             }
             if(t!=null)
-            {   //幼儿园有效性判�                if(!t.getKindergarten().isValid()){ //幼儿园已失效
+            {   //幼儿园有效性判�
+                 if(!t.getKindergarten().isValid()){ //幼儿园已失效
                     job_out.put("resultCode", GlobalStatus.error.toString());
-                    job_out.put("resultDesc","所属幼儿园已无�);
+                    job_out.put("resultDesc","所属幼儿园已无效");
                     return  job_out.toString();
                 }
 
@@ -400,7 +463,7 @@ public class TeacherService {
                 job_out.put("resultDesc","登陆成功");
                 job_out.put("tkn",t.getToken());
                 job_out.put("tkn_exptime",t.getExpire().toString());
-                job_out.put("t_id",t.getId());
+                job_out.put("id",t.getId());
                 job_out.put("phone",t.getPhone_num());
                 job_out.put("email",t.getEmail());
                 job_out.put("name",t.getName());
@@ -409,7 +472,8 @@ public class TeacherService {
                 String cla_ids="";
                 String cla_names="";
                 if(t.getIs_leader()){
-                    //园长班级列表为全学校的班�                    List<Class> classes =classdao.queryClassesByGarten(t.getKindergarten().getId());
+                    //园长班级列表为全学校的班�
+                    List<Class> classes =classdao.queryClassesByGarten(t.getKindergarten().getId());
                     if(classes!=null){
                         Iterator<Class> iterator = classes.iterator();
                         while (iterator.hasNext()){
@@ -434,7 +498,7 @@ public class TeacherService {
                     }
                 }
                 job_out.put("class_ids",cla_ids);
-                job_out.put("class_names",cla_names);  // 分号 隔开 ，班�ids names列表
+                job_out.put("class_names",cla_names);  // 分号 隔开 ，班�ids names列表
                 job_out.put("is_leader",t.getIs_leader());
                 return  job_out.toString();
             }else{
@@ -457,10 +521,10 @@ public class TeacherService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode",GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过�);
+                job_out.put("resultDesc","token已过时");
                 return job_out.toString();
             }
 
@@ -497,10 +561,10 @@ public class TeacherService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过�);
+                job_out.put("resultDesc","token已过时");
                 return job_out.toString();
             }
 
@@ -512,7 +576,7 @@ public class TeacherService {
             String email = job.getString("email");
 
 
-            Teacher t=teacherdao.queryTeacher(tid);
+            Teacher t=teacherdao.queryTeacher(id);
             if(t!=null)
             {
                 t.setName(name); // 重设相关信息
@@ -545,8 +609,8 @@ public class TeacherService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","无效token");
                 return job_out.toString();
@@ -576,7 +640,8 @@ public class TeacherService {
                     map.put("verifyCode",newpwd);
                     map.put("type",2);
                     SMSMessageService .cmds.add(map); //发送新密码
-                    //更新班级家长通信�                    UpdateParentContractsThread thread = new UpdateParentContractsThread(p.getClass_id());
+                    //更新班级家长通信�
+                    UpdateParentContractsThread thread = new UpdateParentContractsThread(p.getClass_id());
                     thread.start();
                 }
                 if(parentsdao.updateParents(p)){
@@ -594,7 +659,7 @@ public class TeacherService {
     }
 
     /***
-     * 园长端修改宝贝信�     * **/
+     * 园长端修改宝贝信�     * **/
     @Path("/correctBabyInfo")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -605,14 +670,14 @@ public class TeacherService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
-                job_out.put("resultDesc","token已过�);
+                job_out.put("resultDesc","token已过时");
                 return job_out.toString();
             }
 
-            Teacher leader = teacherdao.queryTeacher(tid);
+            Teacher leader = teacherdao.queryTeacher(id);
             if(leader==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","非法操作人员");
@@ -631,6 +696,7 @@ public class TeacherService {
             String str_birthday = job.getString("birthday");
             long class_id= job.getLong("class_id");
             boolean is_vip = job.getBoolean("is_vip");
+            String check_card=job.getString("check_card");
             String vip_end = job.getString("vip_end");
             Student stu = studentdao.queryStudent(baby_id);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
@@ -659,6 +725,29 @@ public class TeacherService {
                 stu.setVip_end(end_date);
             }
             if(studentdao.updateStudent(stu)){
+
+                if(checkincarddao.queryCheckinCard(check_card)==null){
+                    //添加考勤卡
+                    CheckinCard card = new CheckinCard();
+                    card.setCard_id(check_card);
+                    card.setStu_id(stu.getId());
+                    card.setClass_id(stu.getCla().getId());
+                    if(checkincarddao.addCheckinCard(card)==false){
+                        job_out.put("resultCode", GlobalStatus.error.toString());
+                        job_out.put("resultDesc","添加考勤卡失败");
+                        return  job_out.toString();
+                    }
+                }
+
+                //修改家长的新班级？？？？？
+                Set<Parents> parents = stu.getParents();
+                if(parents!=null){
+                    Iterator<Parents> it=parents.iterator();
+                    Parents p = it.next();
+                    p.setClass_id(class_id);
+                    parentsdao.updateParents(p); //更改家长的班级id
+                }
+
                 job_out.put("resultCode", GlobalStatus.succeed.toString());
                 job_out.put("resultDesc","成功修改宝贝信息");
                 return  job_out.toString();
@@ -685,14 +774,14 @@ public class TeacherService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","无效token");
                 return job_out.toString();
             }
 
-            Teacher leader = teacherdao.queryTeacher(tid);
+            Teacher leader = teacherdao.queryTeacher(id);
             if(leader==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","非法操作人员");
@@ -704,10 +793,16 @@ public class TeacherService {
                 return job_out.toString();
             }
 
-            String phone=job.getString("teacher_id");
-            Teacher t=teacherdao.queryTeacher(phone);
+            long teacher_id=job.getLong("teacher_id");
+            Teacher t=teacherdao.queryTeacher(teacher_id);
             if(t!=null)
             {
+                if(!t.getKindergarten().getId().equals(leader.getKindergarten().getId())){
+                    job_out.put("resultCode", GlobalStatus.error.toString());
+                    job_out.put("resultDesc","该园长和老师不在同一个幼儿园");
+                    LockerLogger.log.info("老师id "+t.getKindergarten().getId()+"园长幼儿园id"+leader.getKindergarten().getId());
+                    return job_out.toString();
+                }
                 t.setValid(false); // 老师设为无效
                 // 从相关班级集合移除老师
                 if(teacherdao.updateTeacher(t)){
@@ -721,7 +816,8 @@ public class TeacherService {
                     Kindergarten garten = t.getKindergarten();
                     garten.getTeachers().remove(t);
                     kindergartendao.updateKindergarten(garten); //更新幼儿园老师列表
-                    //更新幼儿园老师通信�                    UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten.getId());
+                    //更新幼儿园老师通信�
+                    UpdateTeacherContractsThread thread = new UpdateTeacherContractsThread(garten.getId());
                     thread.start();
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功删除老师");
@@ -746,14 +842,14 @@ public class TeacherService {
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","无效token");
                 return job_out.toString();
             }
 
-            Teacher leader = teacherdao.queryTeacher(tid);
+            Teacher leader = teacherdao.queryTeacher(id);
             if(leader==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","非法操作人员");
@@ -764,20 +860,20 @@ public class TeacherService {
                 job_out.put("resultDesc","只有园长才能删除家长");
                 return job_out.toString();
             }
-            String parent_id=job.getString("parents_id");
+            long parent_id=job.getLong("parents_id");
             Parents parents = parentsdao.queryParents(parent_id);
             if(parents!=null)
             {
-                // 无效宝贝
-                Student invalid_stu = new Student();
-                invalid_stu.setId(0);
-
-                parents.setValid(false); // 家长设为无效
-                parents.setStudent(invalid_stu); // 删除与宝贝的关系
+                if(!leader.getKindergarten().getId().equals(parents.getGarten_id())){
+                    job_out.put("resultCode", GlobalStatus.error.toString());
+                    job_out.put("resultDesc","该园长和家长不在同一个幼儿园");
+                    return job_out.toString();
+                }
                 long org_class_id=parents.getClass_id();
-                parents.setClass_id(0); //班级无效
-                if(parentsdao.updateParents(parents)){
-                    //更新班级家长通信�                    UpdateParentContractsThread thread = new UpdateParentContractsThread(org_class_id);
+                // 删除家长
+                if(parentsdao.invalidParents(parent_id)){
+                    //更新班级家长通信
+                    UpdateParentContractsThread thread = new UpdateParentContractsThread(org_class_id);
                     thread.start();
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功删除家长");
@@ -800,17 +896,18 @@ public class TeacherService {
     public String invalidBaby(@RequestBody String userinfo, @Context HttpHeaders headers){
         JSONObject job = JSONObject.fromObject(userinfo);
         JSONObject job_out=new JSONObject();
+
         try {
             // 用户 登陆token 验证
             String tkn = headers.getRequestHeader("tkn").get(0);
-            long tid = Long.parseLong( headers.getRequestHeader("id").get(0) );
-            if(!teacherdao.verifyToken(tid,tkn)){ // token验证
+            long id = Long.parseLong( headers.getRequestHeader("id").get(0) );
+            if(!teacherdao.verifyToken(id,tkn)){ // token验证
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","无效token");
                 return job_out.toString();
             }
 
-            Teacher leader = teacherdao.queryTeacher(tid);
+            Teacher leader = teacherdao.queryTeacher(id);
             if(leader==null){
                 job_out.put("resultCode", GlobalStatus.error.toString());
                 job_out.put("resultDesc","非法操作人员");
@@ -827,22 +924,23 @@ public class TeacherService {
             if(baby!=null)
             {
                 Class org_cla = baby.getCla();
-                Class invalid_cla = new Class(); //无效班级
-                invalid_cla.setId(0);
-                baby.setValid(false); // 宝贝设为无效
-                baby.setCla(invalid_cla); //解除与班级的关系
-                if(studentdao.updateStudent(baby)){
+                if(!org_cla.getGarten().getId().equals(leader.getKindergarten().getId())){
+                    job_out.put("resultCode", GlobalStatus.error.toString());
+                    job_out.put("resultDesc","该园长和宝贝不在同一个幼儿园");
+                    LockerLogger.log.info("学生id "+org_cla.getGarten().getId()+"园长幼儿园id"+leader.getKindergarten().getId());
+                    return job_out.toString();
+                }
+                if(studentdao.invalidStudent(baby_id)){
                     //删除宝贝成功
-                    //删除宝贝对应的家�                    Set<Parents> parents_set = baby.getParents();
+                    //删除宝贝对应的家�
+                    Set<Parents> parents_set = baby.getParents();
                     Iterator<Parents> it = parents_set.iterator();
                     while (it.hasNext()){
                         Parents p = it.next();
-                        p.setValid(false);
-                        Student invalid_stu=new Student();
-                        invalid_stu.setId(0);
-                        p.setStudent(invalid_stu); //学生无效
-                        parentsdao.updateParents(p); //删除宝贝对应的家�                    }
-                    //更新班级家长通信�                    UpdateParentContractsThread thread = new UpdateParentContractsThread(org_cla.getId());
+                        parentsdao.invalidParents(p.getId()); //删除宝贝对应的家�
+                    }
+                    //更新班级家长通信录
+                   UpdateParentContractsThread thread = new UpdateParentContractsThread(org_cla.getId());
                     thread.start();
                     job_out.put("resultCode", GlobalStatus.succeed.toString());
                     job_out.put("resultDesc","成功删除宝贝");
@@ -858,9 +956,9 @@ public class TeacherService {
     }
 
     /***
-     * 当一个班添加一个家长或一个老师时，更新 幼儿园的老师通信录和班级家长通信�
+     * 当一个班添加一个家长或一个老师时，更新 幼儿园的老师通信录和班级家长通信�
      *
-     *更新一个班级的 家长通信�     * **/
+     *更新一个班级的 家长通信�     * **/
      class UpdateParentContractsThread extends Thread {
         long cla_id=0;
         public UpdateParentContractsThread(long class_id) {
@@ -877,21 +975,22 @@ public class TeacherService {
                 parents_contact+=p.getStudent().getName()+"-"+p.getRelationship()+
                         "-"+p.getName()+"-"+p.getPhone_num()+"-"+p.getAvatar_path()+"-"+cla.getName();
                 // baby名称-baby妈妈-家长名字-电话-头像路径-
-                parents_contact+=";"; //下一条记�            }
+                parents_contact+=";"; //下一条记�
+            }
             cla.setParents_contacts(parents_contact);
             classdao.updateClass(cla);
         }
     }
 
     /***
-     *更新一个幼儿园 老师通信�     * **/
+     *更新一个幼儿园 老师通信�     * **/
     class UpdateTeacherContractsThread extends Thread {
         long garten_id=0;
         public UpdateTeacherContractsThread(long garten_id) {
-            garten_id=garten_id;
+            this.garten_id=garten_id;
         }
         public void run() {
-            LockerLogger.log.info("开始更新幼儿园老师通信�);
+            LockerLogger.log.info("开始更新幼儿园老师通信录");
             Kindergarten garten = kindergartendao.queryKindergarten(garten_id);
             if(garten==null)   return ;
             List<Teacher> teachers= teacherdao.getTeachersByGarten(garten_id);
@@ -908,10 +1007,11 @@ public class TeacherService {
                 }
                 teachers_contact+=t.getName()+"-"+t.getPhone_num()+"-"+t.getAvatar_path()+"-"+clas_arrs;
                 // 老师名字-老师电话-头像路径-老师班级
-                teachers_contact+=";"; //下一条记�            }
+                teachers_contact+=";"; //下一条记�
+            }
            garten.setTeacher_contacts(teachers_contact);
             if(kindergartendao.updateKindergarten(garten)==false){
-                LockerLogger.log.info("更新幼儿园老师通信�失败");
+                LockerLogger.log.info("更新幼儿园老师通信录失败");
             }
 
         }

@@ -59,6 +59,7 @@ public class Kindergarten {
 		this.garten_presence_imgs=gp_imgs;
 		this.create_date=new Date();
 		this.leader_wishes="";
+		this.valid=true;
 	}
 
 

@@ -33,7 +33,7 @@ public class Teacher {
 
 	public Teacher(long id){
 		this.id=id;
-
+		this.valid=true;
 	}
 
 	public Teacher(String name,String avatar,String pwd_md,Kindergarten garten,String phone,String descrip,String email,boolean leader,String wishes,String gender){
@@ -49,6 +49,7 @@ public class Teacher {
 		this.wishes=wishes;
 		valid=true;
 		this.gender=gender;
+		this.valid=true;
 	}
 
 	public String getGender() {
