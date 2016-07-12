@@ -36,6 +36,21 @@ public class KinderGartenDao {
         }
     }
 
+
+    public List<Kindergarten> queryKindergartenBySchoolName(String schoolName) {
+        Session session = DBManager.getSession();
+        session.clear();
+        String sql = String.format("from Kindergarten as garten where garten.name like \'%\' \'%s\' \'%\'",schoolName);
+        Query query = session.createQuery(sql);
+        List list = query.list();
+        session.close();
+        if(list.size()>0){
+            return list;
+        }else {
+            return null;
+        }
+    }
+
     /**
      *    // 按 agent获取
      * **/

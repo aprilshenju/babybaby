@@ -389,13 +389,15 @@ public class QueryService {
                         jobOut.put("resultDesc", "没权限");
                         return jobOut.toString();
                     }
-                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolId");
+                    checkInput2 = judgeValidationOfInputJson(queryInfo, "schoolName");
                     if (!checkInput2.equals("")) {
                         return checkInput2;
                     }
-                    int schoolId_Kindergarten = jobIn.getInt("schoolId");
+
+//                    int schoolId_Kindergarten = jobIn.getInt("schoolId");
+                    String schoolName_Kindergaten = jobIn.getString("schoolName");
                     List<Kindergarten> kindergartens = new ArrayList<Kindergarten>();
-                    if(schoolId_Kindergarten==-1){
+                    if(schoolName_Kindergaten.equals("")){
                         if(roleType==5){  //查看所有的学校
                             kindergartens = kindergartendao.queryKindergartens();
                         }else if(roleType==4){  //查看自己的学校
@@ -403,10 +405,8 @@ public class QueryService {
                         }
 
                     }else{
-                        Kindergarten kg = kindergartendao.queryKindergarten(schoolId_Kindergarten);
-                        if(kg!=null){
-                            kindergartens.add(kg);
-                        }
+                        kindergartens = kindergartendao.queryKindergartenBySchoolName(schoolName_Kindergaten);
+
                     }
                     if(kindergartens==null){
                         jobOut.put("resultCode", GlobalStatus.error.toString());
